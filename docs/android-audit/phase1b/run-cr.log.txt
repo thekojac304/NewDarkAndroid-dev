@@ -1,0 +1,49 @@
+[android] native entry SDL_main; run directory /data/user/0/local.newdarkandroid.ss2/files/runs/cr; port arguments: --verbose conformance.exe
+[android] device SM-S948U1 (SM8850), Android 17 (API 37), page size 4096, 8 CPUs
+[android] library /data/app/~~AVbGODMQdiAHV7jXfz2ILQ==/local.newdarkandroid.ss2-WJmqbzBTuxiPp5KucMErBw==/base.apk!/lib/arm64-v8a/libss2conf_cr.so
+[android] check app process: OK (pid 15492, process local.newdarkandroid.ss2:game, uid 10034, SELinux u:r:untrusted_app_34:s0:c34,c256,c512,c768)
+[android] check 4 GB guest reservation: OK (at 0x7480000000, zero-filled, written and read back at 6 places from 0 to 4 GB-1, discard reads back zero, released; 0.1 ms)
+[android] check deep stack: OK (thread with the game thread's attributes: stack 65551 KB + guard 16 KB; recursion used 49256 KB of it)
+[android] check threads and locks: OK (4 threads x 100000 locked increments = 400000 in 8.4 ms; a 20 ms timed wait timed out after 20.0 ms)
+[android] preflight: 0 of 4 checks failed
+[android] starting port_main after 0.051 s
+[android] game thread: stack 65551 KB + guard 16 KB at 0x760fc1e000-0x7613c21e40
+[port] guest address space: 4096 MB at 0x7480000000 (4096 MB backed)
+[port] vm: heap arena 004b0000 +2000000
+[port] vm: thread stack 024b0000 +410000
+[port] vm: PEB 00010000 +10000
+[port] running the recompiled entry point 004010a0 (147 imports, 0 without an implementation)
+[port] not found (fopen): "ctest_dir\missing.txt"
+[port] not found (stat): "nope"
+[port] not found (stat): "ctest_dir\bin2.dat"
+[port] not found (CreateFile): "ctest_dir\none"
+[port] not found (mmioOpen): "ctest_dir\missing.wav"
+[port] vm: VirtualAlloc 00020000 +100000
+[port] vm: VirtualAlloc 028c0000 +4000000
+[port] vm: VirtualAlloc 00020000 +200000
+[port] vm: VirtualAlloc 028c0000 +4000000
+[port] LoadLibraryA(no_such_library.dll): not available on this host
+[port] vm: thread stack 00020000 +110000
+[port] thread 1008 (_beginthreadex) started at 00419710
+[port] vm: thread stack 00130000 +110000
+[port] thread 1012 (_beginthreadex) started at 00419710
+[port] thread 1008 (_beginthreadex) ended with 11
+[port] thread 1012 (_beginthreadex) ended with 22
+[port] vm: thread stack 00020000 +110000
+[port] thread 1016 (CreateThread) started at 00419770
+[port] thread 1016 (CreateThread) ended with 7
+[port] vm: thread stack 00020000 +110000
+[port] thread 1020 (CreateThread) started at 00419790
+[port] thread 1020 (CreateThread) ended with 0
+[port] vm: thread stack 00020000 +50000
+[port] Direct3D 9: device 320x240 windowed, back buffer format 22, depth buffer
+[port] first frame presented
+[port] warning: Direct3D: ProcessVertices is not implemented
+[port] DirectSound: no audio device; sound is mixed and discarded
+conformance: 0 of 511 checks failed
+[port] ExitProcess(0)
+[port] guest memory touched: 6 MB of 4096 MB (longest touched run 5 MB)
+[port]   region 004b0000 +32768 KB: 5932 KB touched, highest touched page ends at +32768 KB
+[port]   region 024b0000 +4160 KB: 8 KB touched, highest touched page ends at +4100 KB
+[port]   region f0000000 +262080 KB: 0 KB touched, highest touched page ends at +0 KB
+[android] process exit(0) after 0.919 s

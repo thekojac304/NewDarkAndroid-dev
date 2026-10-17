@@ -1,0 +1,47 @@
+// The app shell (android/README.md). Native libraries are built by ../build_native.py, not by Gradle: the recompiled
+// game is large and is lifted on the PC first. SDL's Java side comes straight from the SDL source tree.
+apply plugin: 'com.android.application'
+
+def repo = rootProject.file('..')
+def sdl2 = file(project.findProperty('sdl2.dir') ?: System.getenv('SDL2_SOURCE') ?: "${repo}/build/deps/SDL2")
+def nativeOut = file(project.findProperty('native.dir') ?: "${repo}/build/android")
+
+android {
+    namespace 'local.newdarkandroid.ss2'
+    compileSdk 34
+    ndkVersion '29.0.14206865'           // only to strip the prebuilt libraries' debug info when packaging
+
+    defaultConfig {
+        applicationId 'local.newdarkandroid.ss2'
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName '0.1.0-phase1b'
+        ndk { abiFilters 'arm64-v8a' }
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs += "${sdl2}/android-project/app/src/main/java"
+            jniLibs.srcDirs = ["${nativeOut}/libs"]
+            assets.srcDirs = ["${nativeOut}/assets"]
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    lint { abortOnError false }
+}
+
+tasks.register('checkNativeInputs') {
+    doLast {
+        if (!file("${sdl2}/android-project/app/src/main/java/org/libsdl/app/SDLActivity.java").exists())
+            throw new GradleException("SDL 2 source not found at ${sdl2}: set SDL2_SOURCE or -Psdl2.dir")
+        if (!file("${nativeOut}/libs/arm64-v8a/libSDL2.so").exists())
+            throw new GradleException("native libraries not built: run python android/build_native.py first")
+    }
+}
+preBuild.dependsOn checkNativeInputs
