@@ -222,6 +222,7 @@ EXPORT int SDL_main(int argc, char **argv) {
     if (plat_sdl2_main) {               /* the game's window: OpenGL ES; the GL context stays on the game thread, which also pumps SDL's events */
         setenv("SS2PORT_GLES", "1", 0); unsetenv("SS2PORT_RENDER_THREAD");
         setenv("SS2PORT_FULLSCREEN", "1", 0); setenv("SDL_IOS_ORIENTATIONS", "LandscapeLeft LandscapeRight", 0);   /* SDL_HINT_ORIENTATIONS */
+        setenv("SDL_ANDROID_TRAP_BACK_BUTTON", "1", 0);      /* Back (or a keyboard's Esc mapped to Back) must not finish the game's activity */
         alog(PLAT_LOG_INFO, "backend sdl2: OpenGL ES, fullscreen landscape, renderer on the game thread");
     }
     GameArgs g = { ac, av, 0, crash_test }; pthread_attr_t a = game_attr(); pthread_t t;

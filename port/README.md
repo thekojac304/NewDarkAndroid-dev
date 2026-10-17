@@ -181,6 +181,10 @@ codes for keys.
   checks; it also passes with `SS2PORT_RENDER_THREAD=1`). It also runs clean under ASan, UBSan and TSan, and as a 32-bit build with a small guest space.
   `--cache-regs` runs the same checks on code lifted with `lift.py --cache-regs`; `--abi-check` adds the run-time convention
   checks and fails on any violation.
+  `--write-dir` runs a separate section (113 checks) with `SS2PORT_WRITE_DIR` set. It covers `_findfirst` and
+  `FindFirstFileA` over the merged game and write folders: the write folder's copy wins on a name both folders have, each
+  name is listed once regardless of case, and missing names and folders report Windows' errors. The runner also
+  checks that the game folder was not written. It is a separate run, so the 511-check count above is unchanged.
   `--target windows --wrap wine` builds and runs the Windows exe (under Wine, or natively on Windows).
   Verified on Windows (cross-built 64-bit exe launched from WSL, NVIDIA OpenGL 4.6): 476/476 on `null` and 503/503 on
   `sdl2`, each both plain and with `--cache-regs`.

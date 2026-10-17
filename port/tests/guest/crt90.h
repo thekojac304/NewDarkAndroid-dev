@@ -75,6 +75,7 @@ struct _finddata64i32_t { unsigned attrib; long long time_create, time_access, t
 IMP long __cdecl _findfirst64i32(const char *, struct _finddata64i32_t *);
 IMP int __cdecl _findnext64i32(long, struct _finddata64i32_t *);
 IMP int __cdecl _findclose(long);
+IMP int *__cdecl _errno(void);
 IMP long long __cdecl _time64(long long *);
 IMP unsigned __cdecl _beginthreadex(void *, unsigned, unsigned (__stdcall *)(void *), void *, unsigned, unsigned *);
 IMP int __cdecl _setjmp3(void *, int, ...);

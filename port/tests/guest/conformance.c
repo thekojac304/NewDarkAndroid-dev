@@ -6,7 +6,8 @@
  * so the platform layer can be tested anywhere without the game's files.
  *
  * Each check prints "FAIL <section>: <expression>" when it fails; the exit code is the number of failures. Sections can
- * be skipped by name on the command line: conformance.exe -skip threads -skip window */
+ * be skipped by name on the command line: conformance.exe -skip threads -skip window. -writedir runs only the "writedir"
+ * section, which needs the folders that run_conformance.py --write-dir prepares. */
 #define WIN32_LEAN_AND_MEAN
 #define CINTERFACE
 #define COBJMACROS
@@ -79,7 +80,7 @@ __asm__(".globl _floor_ftol\n_floor_ftol:\n  fldl 4(%esp)\n  sub $8, %esp\n  fst
 __asm__(".globl _ci_sqrt2\n_ci_sqrt2:\n  fldl 4(%esp)\n  call __CIsqrt\n  fadd %st(0), %st(0)\n  ret\n"
         ".globl _ci_ftol_sum\n_ci_ftol_sum:\n  fldl 12(%esp)\n  fldl 4(%esp)\n  call __ftol\n  sub $4, %esp\n  fistpl (%esp)\n  add (%esp), %eax\n  add $4, %esp\n  ret\n");
 static int close_to(double a, double b) { double d = a - b; return d < 1e-9 && d > -1e-9; }
-static int skip_mask; static const char *const names[] = { "crt", "stdio", "win32", "threads", "window", "d3d9", "dsound", "dinput", "pixels", 0 };
+static int skip_mask; static const char *const names[] = { "crt", "stdio", "win32", "threads", "window", "d3d9", "dsound", "dinput", "pixels", "writedir", 0 };
 static int on(int i) { section = names[i]; return !(skip_mask & (1 << i)); }
 
 /* ---------------------------------------------------------------- C runtime: formatting, parsing, strings, sorting, math */
@@ -602,13 +603,87 @@ static void test_dinput(HWND hwnd) {
     IDirectInput_Release(di);
 }
 
+/* ---------------------------------------------------------------- writedir: listings with a separate write folder
+ * Runs only with -writedir, in the folders run_conformance.py --write-dir prepares (WRITEDIR_LAYOUT there):
+ *   game folder (the working directory)         write folder (SS2PORT_WRITE_DIR)
+ *   ctest_wd\a.txt       "game a"      6         ctest_wd\both.txt    "write both!"   11
+ *   ctest_wd\both.txt    "game"        4         ctest_wd\MIXED.txt   "write mixed!!" 13
+ *   ctest_wd\Mixed.TXT   "game mixed" 10         ctest_wd\w_only.txt  "w"              1
+ *   ctest_wd\game.bin    "12345678"    8         ctest_wd\wsub\w.txt  "ww"             2
+ *   ctest_wd\gsub\g.txt  "g"           1         wonly_dir\x.txt      "x"              1
+ * A listing shows both folders, each name once (case-insensitively); for a name in both, the write folder's file. */
+typedef struct { char name[64]; unsigned size, attrib; } WdEnt;
+static int wd_find(WdEnt *e, int n, const char *name) { for (int i = 0; i < n && i < 16; i++) if (!_stricmp(e[i].name, name)) return i; return -1; }
+static void wd_put(WdEnt *e, int n, const char *name, unsigned size, unsigned attrib) {
+    if (n >= 16) return; strncpy(e[n].name, name, 63); e[n].name[63] = 0; e[n].size = size; e[n].attrib = attrib;
+}
+static int wd_list_crt(const char *pat, WdEnt *e) {           /* _findfirst/_findnext, without "." and ".."; -1: no match */
+    struct _finddata64i32_t fd; int n = 0; long h = _findfirst64i32(pat, &fd); if (h == -1) return -1;
+    do { if (!seq(fd.name, ".") && !seq(fd.name, "..")) wd_put(e, n++, fd.name, fd.size, fd.attrib); } while (_findnext64i32(h, &fd) == 0);
+    _findclose(h); return n;
+}
+static int wd_list_w32(const char *pat, WdEnt *e) {           /* FindFirstFileA/FindNextFileA, the same */
+    WIN32_FIND_DATAA fd; int n = 0; HANDLE h = FindFirstFileA(pat, &fd); if (h == INVALID_HANDLE_VALUE) return -1;
+    do { if (!seq(fd.cFileName, ".") && !seq(fd.cFileName, "..")) wd_put(e, n++, fd.cFileName, fd.nFileSizeLow, fd.dwFileAttributes); } while (FindNextFileA(h, &fd));
+    FindClose(h); return n;
+}
+/* the four *.txt names of ctest_wd, once each, with the write folder's size and spelling where both folders have the name */
+static void wd_check_txt(WdEnt *e, int n) {
+    CHECKI(n, 4);
+    int i = wd_find(e, n, "a.txt"); CHECK(i >= 0); if (i >= 0) CHECKI(e[i].size, 6);
+    i = wd_find(e, n, "both.txt"); CHECK(i >= 0); if (i >= 0) CHECKI(e[i].size, 11);
+    i = wd_find(e, n, "mixed.txt"); CHECK(i >= 0); if (i >= 0) { CHECKI(e[i].size, 13); CHECKS(e[i].name, "MIXED.txt"); }
+    i = wd_find(e, n, "w_only.txt"); CHECK(i >= 0); if (i >= 0) CHECKI(e[i].size, 1);
+    int dup = 0; for (int a = 0; a < n && a < 16; a++) for (int b = a + 1; b < n && b < 16; b++) dup |= !_stricmp(e[a].name, e[b].name);
+    CHECK(!dup);
+}
+static void test_writedir(void) {
+    WdEnt e[16]; int n; char b[64];
+    /* _findfirst and FindFirstFileA list the merged folder, also with the path and the pattern in another case */
+    n = wd_list_crt("ctest_wd\\*.txt", e); wd_check_txt(e, n);
+    n = wd_list_crt("CTEST_WD\\*.TXT", e); wd_check_txt(e, n);
+    n = wd_list_w32("ctest_wd\\*.txt", e); wd_check_txt(e, n);
+    n = wd_list_w32("Ctest_Wd\\*.TxT", e); wd_check_txt(e, n);
+    /* everything: the files and folders of both, folders marked as folders */
+    static const char *const all[] = { "a.txt", "both.txt", "mixed.txt", "w_only.txt", "game.bin", "gsub", "wsub" };
+    for (int pass = 0; pass < 2; pass++) {
+        n = pass ? wd_list_w32("ctest_wd\\*", e) : wd_list_crt("ctest_wd\\*", e); CHECKI(n, 7);
+        for (int k = 0; k < 7; k++) { int i = wd_find(e, n, all[k]); CHECK(i >= 0); if (i >= 0) CHECKI((e[i].attrib & 0x10) != 0, k >= 5); }
+    }
+    /* a name without wildcards finds the write folder's file */
+    n = wd_list_crt("ctest_wd\\BOTH.TXT", e); CHECKI(n, 1); if (n == 1) CHECKI(e[0].size, 11);
+    n = wd_list_w32("ctest_wd\\mixed.txt", e); CHECKI(n, 1); if (n == 1) { CHECKI(e[0].size, 13); CHECKS(e[0].name, "MIXED.txt"); }
+    n = wd_list_w32("ctest_wd\\game.bin", e); CHECKI(n, 1); if (n == 1) CHECKI(e[0].size, 8);
+    /* folders that only one side has */
+    n = wd_list_crt("ctest_wd\\gsub\\*.txt", e); CHECKI(n, 1); if (n == 1) CHECKS(e[0].name, "g.txt");
+    n = wd_list_w32("ctest_wd\\wsub\\*.txt", e); CHECKI(n, 1); if (n == 1) { CHECKS(e[0].name, "w.txt"); CHECKI(e[0].size, 2); }
+    n = wd_list_crt("wonly_dir\\*.txt", e); CHECKI(n, 1); if (n == 1) CHECKS(e[0].name, "x.txt");
+    n = wd_list_w32("WONLY_DIR\\X.TXT", e); CHECKI(n, 1);
+    /* missing names and folders: the errors the C runtime and Windows report */
+    *_errno() = 0; CHECKI(wd_list_crt("ctest_wd\\*.none", e), -1); CHECKI(*_errno(), 2);
+    *_errno() = 0; CHECKI(wd_list_crt("no_such_dir\\*.txt", e), -1); CHECKI(*_errno(), 2);
+    SetLastError(0); CHECKI(wd_list_w32("ctest_wd\\*.none", e), -1); CHECKI(GetLastError(), ERROR_FILE_NOT_FOUND);
+    SetLastError(0); CHECKI(wd_list_w32("ctest_wd\\nothing.txt", e), -1); CHECKI(GetLastError(), ERROR_FILE_NOT_FOUND);
+    SetLastError(0); CHECKI(wd_list_w32("no_such_dir\\*", e), -1); CHECKI(GetLastError(), ERROR_PATH_NOT_FOUND);
+    /* reads agree with the listing: the write folder's copy first */
+    FILE *f = fopen("ctest_wd\\Both.txt", "rb"); CHECK(f != 0); if (f) { memset(b, 0, sizeof b); CHECKI(fread(b, 1, sizeof b - 1, f), 11); CHECKS(b, "write both!"); fclose(f); }
+    f = fopen("ctest_wd\\a.txt", "rb"); CHECK(f != 0); if (f) { memset(b, 0, sizeof b); CHECKI(fread(b, 1, sizeof b - 1, f), 6); CHECKS(b, "game a"); fclose(f); }
+    /* a file the guest writes goes to the write folder and is listed at once; once removed, it is gone again */
+    f = fopen("ctest_wd\\new.txt", "wb"); CHECK(f != 0); if (f) { fwrite("new!", 1, 4, f); fclose(f); }
+    n = wd_list_crt("ctest_wd\\*.txt", e); CHECKI(n, 5); { int i = wd_find(e, n, "new.txt"); CHECK(i >= 0); if (i >= 0) CHECKI(e[i].size, 4); }
+    n = wd_list_w32("ctest_wd\\NEW.TXT", e); CHECKI(n, 1);
+    CHECKI(remove("ctest_wd\\new.txt"), 0);
+    n = wd_list_crt("ctest_wd\\*.txt", e); CHECKI(n, 4); CHECKI(wd_list_w32("ctest_wd\\new.txt", e), -1);
+}
+
 /* ---------------------------------------------------------------- entry */
 void __stdcall start(void) {
     const char *cl = GetCommandLineA(); char buf[256]; strncpy(buf, cl, 255); buf[255] = 0;
-    skip_mask = 1 << 8;                       /* "pixels" runs only when asked for */
+    skip_mask = 1 << 8 | 1 << 9;              /* "pixels" runs only when asked for; "writedir" only on its own, with its folders */
     for (char *t = strtok(buf, " "); t; t = strtok(0, " ")) {
         if (seq(t, "-skip")) { char *w = strtok(0, " "); for (int i = 0; w && names[i]; i++) if (!_stricmp(w, names[i])) skip_mask |= 1 << i; }
         if (seq(t, "-pixels")) skip_mask &= ~(1 << 8);
+        if (seq(t, "-writedir")) skip_mask = ~(1 << 9);
     }
     if (on(0)) test_crt();
     if (on(1)) test_stdio();
@@ -619,6 +694,7 @@ void __stdcall start(void) {
     if (on(6)) test_dsound(h);
     if (on(7)) test_dinput(h);
     if (on(8)) test_pixels(h);
+    if (on(9)) test_writedir();
     char b[128]; sprintf(b, "conformance: %d of %d checks failed\n", fails, checks); out(b);
     ExitProcess((UINT)fails);
 }

@@ -9,11 +9,12 @@
         android:allowBackup="false"
         android:hardwareAccelerated="true">
 
-        <!-- Test screen, later the launcher. Main process. -->
+        <!-- Test screen, later the launcher. Main process. singleTop, not singleTask: as the root of a task with the game
+             on top, a singleTask activity reopened from the home screen would clear (destroy) the game's activity. -->
         <activity
             android:name=".LauncherActivity"
             android:exported="true"
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
             android:theme="@android:style/Theme.Material">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

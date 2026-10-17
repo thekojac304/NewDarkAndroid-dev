@@ -1,0 +1,379 @@
+[android] native entry SDL_main; run directory /data/user/0/local.newdarkandroid.ss2/files/runs/game; port arguments: --verbose --android-env SS2PORT_WRITE_DIR=/data/user/0/local.newdarkandroid.ss2/files/profiles/ss2 --android-env SS2PORT_INPUT_DEBUG=1 --android-env SS2PORT_PROFILE=1 /storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2/SS2.exe
+[android] device SM-S948U1 (SM8850), Android 17 (API 37), page size 4096, 8 CPUs
+[android] library /data/app/~~FnL0Mb1dF5k8IkivegdciA==/local.newdarkandroid.ss2-qZHwBWnpj6aua6sI0_LD3w==/base.apk!/lib/arm64-v8a/libss2game.so
+[android] check app process: OK (pid 31977, process local.newdarkandroid.ss2:game, uid 10034, SELinux u:r:untrusted_app_34:s0:c34,c256,c512,c768)
+[android] check 4 GB guest reservation: OK (at 0x7480000000, zero-filled, written and read back at 6 places from 0 to 4 GB-1, discard reads back zero, released; 0.1 ms)
+[android] check deep stack: OK (thread with the game thread's attributes: stack 65551 KB + guard 16 KB; recursion used 49256 KB of it)
+[android] check threads and locks: OK (4 threads x 100000 locked increments = 400000 in 9.6 ms; a 20 ms timed wait timed out after 20.0 ms)
+[android] preflight: 0 of 4 checks failed
+[android] environment SS2PORT_WRITE_DIR=/data/user/0/local.newdarkandroid.ss2/files/profiles/ss2
+[android] environment SS2PORT_INPUT_DEBUG=1
+[android] environment SS2PORT_PROFILE=1
+[android] backend sdl2: OpenGL ES, fullscreen landscape, renderer on the game thread
+[android] starting port_main after 0.061 s
+[android] game thread: stack 65551 KB + guard 16 KB at 0x7607ff4000-0x760bff7e40
+[port] guest address space: 4096 MB at 0x7480000000 (4096 MB backed)
+[port] vm: heap arena 00d30000 +2000000
+[port] vm: thread stack 02d30000 +410000
+[port] vm: PEB 00010000 +10000
+[port] running the recompiled entry point 006f7105 (364 imports, 0 without an implementation)
+[port] vm: VirtualAlloc 03140000 +4000000
+[port] not found (stat): "ubermod"
+[port] not found (stat): "patch_ext"
+[port] not found (fopen): "fm.cfg"
+[port] lgvid.dll: loaded the recompiled module at 30300000 (60 imports bound), DllMain -> 1
+INFO: pixel format wanted SDL_PIXELFORMAT_RGBX8888 (2), got SDL_PIXELFORMAT_RGBX8888 (2)
+[gl] OpenGL ES 3.2 V@0842.19.13 (GIT@089d643e2a, Icecd8f0534, 1782882597) (Date:07/01/26) / Adreno (TM) 840
+[sdl] input: window event 10 (0,0)
+[sdl] input: window event 12 (0,0)
+[sdl] input: window event 6 (2340,1080)
+[sdl] input: window event 5 (2340,1080)
+[port] not found (stat): "C:\ubermod"
+[port] not found (stat): "C:\ubermod.zip"
+[port] not found (stat): "C:\ubermod.crf"
+[port] not found (stat): "C:\patch_ext"
+[port] not found (stat): "C:\patch_ext.zip"
+[port] not found (stat): "C:\osm\subtitles"
+[port] not found (stat): "C:\osm\subtitles.zip"
+[port] not found (stat): "C:\osm\subtitles.crf"
+[port] not found (stat): "C:\patch\subtitles"
+[port] not found (stat): "C:\patch\subtitles.zip"
+[port] not found (stat): "C:\patch\subtitles.crf"
+[port] not found (stat): "C:\subtitles"
+[port] not found (stat): "C:\subtitles.zip"
+[port] not found (stat): "C:\subtitles.crf"
+[port] not found (stat): "C:\Data\subtitles"
+[port] not found (stat): "C:\Data\subtitles.zip"
+[port] not found (stat): "C:\Data\subtitles.crf"
+[port] not found (stat): "C:\Data\res\subtitles"
+[port] not found (stat): "C:\Data\res\subtitles.zip"
+[port] not found (stat): "C:\Data\res\subtitles.crf"
+[port] not found (stat): "C:\osm\fonts"
+[port] not found (stat): "C:\osm\fonts.zip"
+[port] not found (stat): "C:\osm\fonts.crf"
+[port] not found (stat): "C:\patch\fonts"
+[port] not found (stat): "C:\patch\fonts.zip"
+[port] not found (stat): "C:\patch\fonts.crf"
+[port] not found (stat): "C:\fonts"
+[port] not found (stat): "C:\fonts.zip"
+[port] not found (stat): "C:\fonts.crf"
+[port] not found (stat): "C:\Data\fonts"
+[port] not found (stat): "C:\Data\fonts.zip"
+[port] not found (stat): "C:\Data\fonts.crf"
+[port] not found (stat): "C:\Data\res\fonts"
+[port] not found (stat): "C:\Data\res\fonts.zip"
+[port] not found (stat): "C:\osm\snd2"
+[port] not found (stat): "C:\osm\snd2.zip"
+[port] not found (stat): "C:\osm\snd2.crf"
+[port] not found (stat): "C:\osm\snd"
+[port] not found (stat): "C:\osm\snd.zip"
+[port] not found (stat): "C:\osm\snd.crf"
+[port] not found (stat): "C:\patch\snd2"
+[port] not found (stat): "C:\patch\snd2.zip"
+[port] not found (stat): "C:\patch\snd2.crf"
+[port] not found (stat): "C:\patch\snd"
+[port] not found (stat): "C:\patch\snd.zip"
+[port] not found (stat): "C:\patch\snd.crf"
+[port] not found (stat): "C:\snd2"
+[port] not found (stat): "C:\snd2.zip"
+[port] not found (stat): "C:\snd2.crf"
+[port] not found (stat): "C:\snd"
+[port] not found (stat): "C:\snd.zip"
+[port] not found (stat): "C:\snd.crf"
+[port] not found (stat): "C:\Data\snd2"
+[port] not found (stat): "C:\Data\snd2.zip"
+[port] not found (stat): "C:\Data\snd2.crf"
+[port] not found (stat): "C:\Data\snd"
+[port] not found (stat): "C:\Data\snd.zip"
+[port] not found (stat): "C:\Data\snd.crf"
+[port] not found (stat): "C:\Data\res\snd2"
+[port] not found (stat): "C:\Data\res\snd2.zip"
+[port] not found (stat): "C:\Data\res\snd"
+[port] not found (stat): "C:\Data\res\snd.zip"
+[port] DirectSound: mixing to 44100 Hz stereo
+[port] vm: thread stack 00020000 +110000
+[port] thread 1008 (_beginthreadex) started at 006a1e50
+[port] not found (stat): "C:\osm\iface"
+[port] not found (stat): "C:\osm\iface.zip"
+[port] not found (stat): "C:\osm\iface.crf"
+[port] not found (stat): "C:\patch\iface"
+[port] not found (stat): "C:\patch\iface.zip"
+[port] not found (stat): "C:\iface"
+[port] not found (stat): "C:\iface.zip"
+[port] not found (stat): "C:\iface.crf"
+[port] not found (stat): "C:\Data\iface"
+[port] not found (stat): "C:\Data\iface.zip"
+[port] not found (stat): "C:\Data\iface.crf"
+[port] not found (stat): "C:\Data\res\iface"
+[port] not found (stat): "C:\Data\res\iface.zip"
+[port] not found (stat): "C:\osm\strings"
+[port] not found (stat): "C:\osm\strings.zip"
+[port] not found (stat): "C:\osm\strings.crf"
+[port] not found (stat): "C:\patch\strings"
+[port] not found (stat): "C:\patch\strings.zip"
+[port] not found (stat): "C:\strings"
+[port] not found (stat): "C:\strings.zip"
+[port] not found (stat): "C:\strings.crf"
+[port] not found (stat): "C:\Data\strings"
+[port] not found (stat): "C:\Data\strings.zip"
+[port] not found (stat): "C:\Data\strings.crf"
+[port] not found (stat): "C:\Data\res\strings"
+[port] not found (stat): "C:\Data\res\strings.zip"
+[port] not found (stat): "C:\osm\intrface"
+[port] not found (stat): "C:\osm\intrface.zip"
+[port] not found (stat): "C:\osm\intrface.crf"
+[port] not found (stat): "C:\patch\intrface"
+[port] not found (stat): "C:\patch\intrface.zip"
+[port] not found (stat): "C:\intrface"
+[port] not found (stat): "C:\intrface.zip"
+[port] not found (stat): "C:\intrface.crf"
+[port] not found (stat): "C:\Data\intrface"
+[port] not found (stat): "C:\Data\intrface.zip"
+[port] not found (stat): "C:\Data\intrface.crf"
+[port] not found (stat): "C:\Data\res\intrface"
+[port] not found (stat): "C:\Data\res\intrface.zip"
+[port] vm: big heap block 00130000 +130000
+[port] vm: big heap block 00260000 +130000
+[port] vm: big heap block 07140000 +130000
+[port] vm: big heap block 07270000 +130000
+[port] vm: big heap block 073a0000 +130000
+[port] vm: big heap block 074d0000 +130000
+[port] vm: big heap block 07600000 +130000
+[port] Direct3D 9: device 800x600 fullscreen, back buffer format 22, depth buffer
+[port] vm: big heap block 07730000 +130000
+[port] first frame presented
+[port] vm: big heap block 07860000 +130000
+[port] thread 1008 (_beginthreadex) ended with 0
+[port] cutscenes: stream 0: video codec 116 320x240 0 Hz 0 ch 0-bit, 1/15
+[port] cutscenes: stream 1: audio codec 65536 0x0 22050 Hz 2 ch 16-bit, 4/88200
+[port] vm: thread stack 00020000 +110000
+[port] thread 1012 (_beginthreadex) started at 006a1e50
+[port] thread 1012 (_beginthreadex) ended with 0
+[port] vm: big heap block 07990000 +130000
+[port] vm: big heap block 07ac0000 +130000
+[port] vm: thread stack 00020000 +110000
+[port] thread 1016 (_beginthreadex) started at 30301870
+[port] vm: thread stack 07bf0000 +110000
+[port] thread 1020 (_beginthreadex) started at 30301870
+[port] cutscenes: scaler: 320x240 fmt 6 -> 640x480 fmt 30, bicubic
+[sdl] input: key down scancode 41 (Escape) dik 0x01 repeat 0
+[port] thread 1016 (_beginthreadex) ended with 0
+[port] thread 1020 (_beginthreadex) ended with 0
+[port] vm: thread stack 00020000 +110000
+[port] thread 1024 (_beginthreadex) started at 006a1e50
+[port] vm: big heap block 07860000 +130000
+[sdl] input: key up scancode 41 (Escape) dik 0x01 repeat 0
+[sdl] profile: 32.1 fps | frame ms mean 31.1 p50 11.4 p95 71.3 p99 78.2 max 79.4 | >50ms 58 >100ms 0 | swap 1% | rss 209 MB
+[sdl] input: text "3"
+[sdl] input: key down scancode 32 (3) dik 0x04 repeat 0
+[sdl] input: key up scancode 32 (3) dik 0x04 repeat 0
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.0 p95 12.6 p99 13.2 max 13.9 | >50ms 0 >100ms 0 | swap 3% | rss 210 MB
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.9 p95 12.4 p99 13.4 max 14.1 | >50ms 0 >100ms 0 | swap 3% | rss 210 MB
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.9 p95 12.2 p99 12.8 max 14.1 | >50ms 0 >100ms 0 | swap 3% | rss 211 MB
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.9 p95 12.4 p99 13.5 max 14.6 | >50ms 0 >100ms 0 | swap 3% | rss 211 MB
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.0 p95 12.3 p99 13.1 max 13.6 | >50ms 0 >100ms 0 | swap 3% | rss 210 MB
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.9 p95 12.5 p99 13.4 max 14.3 | >50ms 0 >100ms 0 | swap 3% | rss 210 MB
+[sdl] input: finger down at 0.261,0.059
+[sdl] input: mouse button 1 down at 611,64
+[sdl] input: finger up at 0.261,0.059
+[sdl] input: mouse button 1 up at 611,64
+[port] vm: big heap block 07860000 +130000
+[sdl] profile: 99.9 fps | frame ms mean 10.0 p50 10.0 p95 12.5 p99 13.9 max 18.0 | >50ms 0 >100ms 0 | swap 3% | rss 210 MB
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.8 p95 12.1 p99 12.6 max 12.9 | >50ms 0 >100ms 0 | swap 3% | rss 210 MB
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.0 p95 12.0 p99 12.6 max 13.1 | >50ms 0 >100ms 0 | swap 3% | rss 210 MB
+[sdl] input: text "1"
+[sdl] input: key down scancode 30 (1) dik 0x02 repeat 0
+[sdl] input: key up scancode 30 (1) dik 0x02 repeat 0
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.8 p95 12.2 p99 13.1 max 13.4 | >50ms 0 >100ms 0 | swap 3% | rss 210 MB
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.9 p95 12.2 p99 12.7 max 15.8 | >50ms 0 >100ms 0 | swap 3% | rss 210 MB
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.8 p95 12.4 p99 13.0 max 14.2 | >50ms 0 >100ms 0 | swap 3% | rss 210 MB
+[sdl] input: finger down at 0.200,0.344
+[sdl] input: mouse button 1 down at 468,371
+[sdl] input: finger up at 0.200,0.344
+[sdl] input: mouse button 1 up at 468,371
+[port] vm: big heap block 07860000 +130000
+[port] thread 1024 (_beginthreadex) ended with 0
+[port] cutscenes: stream 0: video codec 116 320x240 0 Hz 0 ch 0-bit, 1/15
+[port] cutscenes: stream 1: audio codec 65541 0x0 22050 Hz 2 ch 8-bit, 2/44100
+[port] vm: thread stack 00020000 +110000
+[port] thread 1028 (_beginthreadex) started at 006a1e50
+[port] thread 1028 (_beginthreadex) ended with 0
+[port] vm: big heap block 07990000 +130000
+[port] vm: big heap block 07ac0000 +130000
+[port] vm: thread stack 00020000 +110000
+[port] thread 1032 (_beginthreadex) started at 30301870
+[port] vm: thread stack 07bf0000 +110000
+[port] thread 1036 (_beginthreadex) started at 30301870
+[port] cutscenes: scaler: 320x240 fmt 6 -> 640x480 fmt 30, bicubic
+[sdl] profile: 44.9 fps | frame ms mean 22.3 p50 10.3 p95 70.2 p99 74.4 max 123.7 | >50ms 48 >100ms 1 | swap 1% | rss 234 MB
+[sdl] profile: 15.0 fps | frame ms mean 66.7 p50 65.8 p95 71.8 p99 73.5 max 73.5 | >50ms 75 >100ms 0 | swap 0% | rss 234 MB
+[sdl] input: key down scancode 41 (Escape) dik 0x01 repeat 0
+[port] thread 1032 (_beginthreadex) ended with 0
+[port] thread 1036 (_beginthreadex) ended with 0
+[port] vm: thread stack 00020000 +110000
+[port] thread 1040 (_beginthreadex) started at 006a1e50
+[port] vm: big heap block 07860000 +130000
+[sdl] input: key up scancode 41 (Escape) dik 0x01 repeat 0
+[port] vm: thread stack 07990000 +110000
+[port] thread 1044 (_beginthreadex) started at 006a1e50
+[port] not found (stat): "C:\gamesys.dml"
+[port] not found (stat): "C:\misdml\gamesys.dml"
+[port] not found (stat): "C:\Data\gamesys.dml"
+[port] not found (stat): "C:\osm\gamesys.dml"
+[port] not found (stat): "C:\shock2.gam.dml"
+[port] not found (stat): "C:\osm\shock2.gam.dml"
+[port] not found (stat): "C:\osm\dbmods"
+[port] not found (stat): "C:\osm\dbmods.zip"
+[port] not found (stat): "C:\osm\dbmods.crf"
+[port] not found (stat): "C:\patch\dbmods"
+[port] not found (stat): "C:\patch\dbmods.zip"
+[port] not found (stat): "C:\patch\dbmods.crf"
+[port] not found (stat): "C:\dbmods"
+[port] not found (stat): "C:\dbmods.zip"
+[port] not found (stat): "C:\dbmods.crf"
+[port] not found (stat): "C:\Data\dbmods"
+[port] not found (stat): "C:\Data\dbmods.zip"
+[port] not found (stat): "C:\Data\dbmods.crf"
+[port] not found (stat): "C:\Data\res\dbmods"
+[port] not found (stat): "C:\Data\res\dbmods.zip"
+[port] not found (stat): "C:\Data\res\dbmods.crf"
+[port] not found (stat): "C:\osm\pal"
+[port] not found (stat): "C:\osm\pal.zip"
+[port] not found (stat): "C:\osm\pal.crf"
+[port] not found (stat): "C:\patch\pal"
+[port] not found (stat): "C:\patch\pal.zip"
+[port] not found (stat): "C:\patch\pal.crf"
+[port] not found (stat): "C:\pal"
+[port] not found (stat): "C:\pal.zip"
+[port] not found (stat): "C:\pal.crf"
+[port] not found (stat): "C:\Data\pal"
+[port] not found (stat): "C:\Data\pal.zip"
+[port] not found (stat): "C:\Data\pal.crf"
+[port] not found (stat): "C:\Data\res\pal"
+[port] not found (stat): "C:\Data\res\pal.zip"
+[port] vm: big heap block 07aa0000 +1f0000
+[port] not found (stat): "C:\osm\fam"
+[port] not found (stat): "C:\osm\fam.zip"
+[port] not found (stat): "C:\osm\fam.crf"
+[port] not found (stat): "C:\patch\fam"
+[port] not found (stat): "C:\patch\fam.zip"
+[port] not found (stat): "C:\patch\fam.crf"
+[port] not found (stat): "C:\fam"
+[port] not found (stat): "C:\fam.zip"
+[port] not found (stat): "C:\fam.crf"
+[port] not found (stat): "C:\Data\fam"
+[port] not found (stat): "C:\Data\fam.zip"
+[port] not found (stat): "C:\Data\fam.crf"
+[port] not found (stat): "C:\Data\res\fam"
+[port] not found (stat): "C:\Data\res\fam.zip"
+[port] allobjs.osm: loaded the recompiled module at 10000000 (61 imports bound), DllMain -> 1
+[port] GetProcAddress(IsTNT): not available
+[port] not found (CreateFile): "C:\module_10000000.dll"
+[port] not found (stat): "C:\miss_all.dml"
+[port] not found (stat): "C:\misdml\miss_all.dml"
+[port] not found (stat): "C:\Data\miss_all.dml"
+[port] not found (stat): "C:\osm\miss_all.dml"
+[port] not found (stat): "C:\earth.mis.dml"
+[port] not found (stat): "C:\osm\earth.mis.dml"
+[port] GetProcAddress(FlsAlloc): not available
+[port] GetProcAddress(FlsGetValue): not available
+[port] GetProcAddress(FlsSetValue): not available
+[port] GetProcAddress(FlsFree): not available
+[port] GetProcAddress(EncodePointer): not available
+[port] GetProcAddress(EncodePointer): not available
+[port] GetProcAddress(EncodePointer): not available
+[port] GetProcAddress(EncodePointer): not available
+[port] GetProcAddress(EncodePointer): not available
+[port] GetProcAddress(EncodePointer): not available
+[port] GetProcAddress(EncodePointer): not available
+[port] GetProcAddress(DecodePointer): not available
+[port] GetProcAddress(DecodePointer): not available
+[port] GetProcAddress(EncodePointer): not available
+[port] GetProcAddress(DecodePointer): not available
+[port] Squirrel.osm: loaded the recompiled module at 30000000 (112 imports bound), DllMain -> 1
+[port] not found (FindFirstFile): ".\Data\sq_scripts\*.nut"
+[port] not found (FindFirstFile): ".\misdml\sq_scripts\*.nut"
+[port] not found (FindFirstFile): "patch_ext\sq_scripts\*.nut"
+[port] not found (FindFirstFile): "ubermod\sq_scripts\*.nut"
+[port] not found (FindFirstFile): "osm\sq_scripts\*.nut"
+[port] not found (CreateFile): "C:\module_30000000.dll"
+[port] not found (stat): "osm\motiondb.bin"
+[port] not found (stat): "osm\mschema\motiondb.bin"
+[port] not found (stat): "ubermod\motiondb.bin"
+[port] not found (stat): "ubermod\mschema\motiondb.bin"
+[port] not found (stat): "patch_ext\motiondb.bin"
+[port] not found (stat): "patch_ext\mschema\motiondb.bin"
+[port] not found (fopen): "motiondb.bin"
+[port] not found (stat): "C:\osm\mesh"
+[port] not found (stat): "C:\osm\mesh.zip"
+[port] not found (stat): "C:\osm\mesh.crf"
+[port] not found (stat): "C:\patch\mesh"
+[port] not found (stat): "C:\patch\mesh.zip"
+[port] not found (stat): "C:\mesh"
+[port] not found (stat): "C:\mesh.zip"
+[port] not found (stat): "C:\mesh.crf"
+[port] not found (stat): "C:\Data\mesh"
+[port] not found (stat): "C:\Data\mesh.zip"
+[port] not found (stat): "C:\Data\mesh.crf"
+[port] not found (stat): "C:\Data\res\mesh"
+[port] not found (stat): "C:\Data\res\mesh.zip"
+[port] not found (stat): "C:\osm\obj"
+[port] not found (stat): "C:\osm\obj.zip"
+[port] not found (stat): "C:\osm\obj.crf"
+[port] not found (stat): "C:\patch\obj"
+[port] not found (stat): "C:\patch\obj.zip"
+[port] not found (stat): "C:\obj"
+[port] not found (stat): "C:\obj.zip"
+[port] not found (stat): "C:\obj.crf"
+[port] not found (stat): "C:\Data\obj"
+[port] not found (stat): "C:\Data\obj.zip"
+[port] not found (stat): "C:\Data\obj.crf"
+[port] not found (stat): "C:\Data\res\obj"
+[port] not found (stat): "C:\Data\res\obj.zip"
+[port] not found (stat): "C:\osm\bitmap"
+[port] not found (stat): "C:\osm\bitmap.zip"
+[port] not found (stat): "C:\osm\bitmap.crf"
+[port] not found (stat): "C:\patch\bitmap"
+[port] not found (stat): "C:\patch\bitmap.zip"
+[port] not found (stat): "C:\bitmap"
+[port] not found (stat): "C:\bitmap.zip"
+[port] not found (stat): "C:\bitmap.crf"
+[port] not found (stat): "C:\Data\bitmap"
+[port] not found (stat): "C:\Data\bitmap.zip"
+[port] not found (stat): "C:\Data\bitmap.crf"
+[port] not found (stat): "C:\Data\res\bitmap"
+[port] not found (stat): "C:\Data\res\bitmap.zip"
+[port] thread 1044 (_beginthreadex) ended with 0
+[port] Direct3D: pixel shaders are translated to GLSL
+[port] vm: heap arena 07c90000 +2000000
+[port] not found (stat): "C:\osm\camera"
+[port] not found (stat): "C:\osm\camera.zip"
+[port] not found (stat): "C:\osm\camera.crf"
+[port] not found (stat): "C:\patch\camera"
+[port] not found (stat): "C:\patch\camera.zip"
+[port] not found (stat): "C:\patch\camera.crf"
+[port] not found (stat): "C:\camera"
+[port] not found (stat): "C:\camera.zip"
+[port] not found (stat): "C:\camera.crf"
+[port] not found (stat): "C:\Data\camera"
+[port] not found (stat): "C:\Data\camera.zip"
+[port] not found (stat): "C:\Data\camera.crf"
+[port] not found (stat): "C:\Data\res\camera"
+[port] not found (stat): "C:\Data\res\camera.zip"
+[port] not found (stat): "C:\Data\res\camera.crf"
+[port] not found (stat): "C:\osm\motions"
+[port] not found (stat): "C:\osm\motions.zip"
+[port] not found (stat): "C:\osm\motions.crf"
+[port] not found (stat): "C:\patch\motions"
+[port] not found (stat): "C:\patch\motions.zip"
+[port] not found (stat): "C:\motions"
+[port] not found (stat): "C:\motions.zip"
+[port] not found (stat): "C:\motions.crf"
+[port] not found (stat): "C:\Data\motions"
+[port] not found (stat): "C:\Data\motions.zip"
+[port] not found (stat): "C:\Data\motions.crf"
+[port] not found (stat): "C:\Data\res\motions"
+[port] not found (stat): "C:\Data\res\motions.zip"
+[sdl] profile: 47.4 fps | frame ms mean 21.1 p50 10.2 p95 68.0 p99 136.1 max 383.0 | >50ms 37 >100ms 3 | swap 1% | rss 276 MB
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.0 p95 10.8 p99 12.5 max 13.1 | >50ms 0 >100ms 0 | swap 1% | rss 276 MB
+[sdl] profile: 99.3 fps | frame ms mean 10.1 p50 10.0 p95 10.8 p99 12.0 max 13.0 | >50ms 0 >100ms 0 | swap 1% | rss 276 MB

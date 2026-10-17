@@ -30,6 +30,7 @@ especially SCP.
 | [PHASE1A_RESULTS.md](PHASE1A_RESULTS.md) | Phase 1A: arm64 setjmp fix, conformance through `adb shell` on the Galaxy S26 Ultra |
 | [PHASE1B_RESULTS.md](PHASE1B_RESULTS.md) | Phase 1B: the APK (`android/`), conformance inside the app process, game-file and graphics preparation |
 | [PHASE1C_RESULTS.md](PHASE1C_RESULTS.md) | Phase 1C: the recompiled NewDark 2.48 game running in the app, headless and with SDL2 + OpenGL ES; first frames on the S26 Ultra |
+| [PHASE1D_RESULTS.md](PHASE1D_RESULTS.md) | Phase 1D: gameplay on the S26 Ultra (Earth and MedSci: movement, mouse look, frob, inventory, PDA, melee, save/load), input, audio, performance, lifecycle, write-folder regression test |
 
 ## Overall feasibility
 

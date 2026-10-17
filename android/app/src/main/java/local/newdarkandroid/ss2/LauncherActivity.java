@@ -44,7 +44,9 @@ public class LauncherActivity extends Activity {
         { "neg-exe", "ss2conf", "negative test: wrong executable (expect FAIL)", "missing.exe" },
         { "neg-crash", "ss2conf", "negative test: native crash (expect FAIL)", "--android-crash-test conformance.exe" },
         // Phase 1C: the recompiled game, run from games/ss2/ (read only); saves and configuration go to files/profiles/ss2/.
-        // Arguments are built in startNext. From adb, --ei frames N changes the frame limit (0: none).
+        // Arguments are built in startNext. From adb, --ei frames N changes the frame limit (0: none), and
+        // --es env NAME=value,NAME=value adds settings (e.g. SS2PORT_PROFILE=1,SS2PORT_INPUT_DEBUG=1), and --es portargs
+        // adds port arguments before the executable (e.g. "--trace-only GetKeyState,MapVirtualKeyA").
         { "game-null", "ss2null", "game, headless (null backend)", "" },
         { "game", "ss2game", "game, SDL2 + OpenGL ES", "" },
     };
@@ -62,6 +64,10 @@ public class LauncherActivity extends Activity {
     @Override
     protected void onCreate(Bundle saved) {
         super.onCreate(saved);
+        // Opened from the home screen while the task already exists (say a game started from adb is on top): show the
+        // task as it is instead of another launcher on top of the game.
+        Intent in = getIntent();
+        if (!isTaskRoot() && Intent.ACTION_MAIN.equals(in.getAction()) && in.hasCategory(Intent.CATEGORY_LAUNCHER)) { finish(); return; }
         state = getSharedPreferences("runs", MODE_PRIVATE);
         buildUi();
         Log.i(TAG, "onCreate" + (saved != null ? " (restored)" : "") + ", autorun=" + getIntent().getStringExtra("autorun"));
@@ -135,7 +141,7 @@ public class LauncherActivity extends Activity {
         Button b = new Button(this);
         b.setText(label);
         b.setAllCaps(false);
-        b.setOnClickListener(v -> { state.edit().putInt("frames", -1).apply(); startQueue(which); });
+        b.setOnClickListener(v -> { state.edit().putInt("frames", -1).putString("env", "").putString("portargs", "").apply(); startQueue(which); });
         col.addView(b);
         buttons.add(b);
     }
@@ -178,11 +184,14 @@ public class LauncherActivity extends Activity {
     private void autorun(Intent intent) {
         String which = intent != null ? intent.getStringExtra("autorun") : null;
         if (which == null) return;
-        state.edit().putInt("frames", intent.getIntExtra("frames", -1)).apply();      // -1: each game mode's default
+        String env = intent.getStringExtra("env"), pa = intent.getStringExtra("portargs");   // game runs: NAME=value settings; port arguments
+        state.edit().putInt("frames", intent.getIntExtra("frames", -1))                // -1: each game mode's default
+            .putString("env", env != null ? env.trim() : "").putString("portargs", pa != null ? pa.trim() : "").apply();
         startQueue(which);
     }
 
     private void startQueue(String which) {
+        settleDeadRun();
         if (state.getString("pending", null) != null || !state.getString("queue", "").isEmpty()) {
             Log.w(TAG, "a run is already in progress; ignoring " + which);
             return;
@@ -221,6 +230,8 @@ public class LauncherActivity extends Activity {
             int frames = state.getInt("frames", -1);
             if (frames < 0) frames = defaultFrames(m);
             args.addAll(Arrays.asList("--android-env", "SS2PORT_WRITE_DIR=" + profile.getAbsolutePath()));
+            for (String e : state.getString("env", "").split("[ ,]")) if (e.contains("=")) args.addAll(Arrays.asList("--android-env", e));
+            for (String e : state.getString("portargs", "").split(" ")) if (!e.isEmpty()) args.add(e);
             if (frames > 0) args.addAll(Arrays.asList("--frames", Integer.toString(frames)));
             args.add(exe.getAbsolutePath());
         } else args.addAll(Arrays.asList(x[3].split(" ")));
@@ -238,19 +249,21 @@ public class LauncherActivity extends Activity {
         @Override
         public void run() {
             handler.removeCallbacks(this);
-            String m = state.getString("pending", null);
-            if (m == null) { startNext(); return; }
-            String st = lastLine(Files.read(new File(runDir(m), "status")));
-            boolean alive = gameProcessAlive();
-            long age = System.currentTimeMillis() - state.getLong("launched", 0);
-            if (alive || (st == null && age < START_GRACE_MS)) {            // still running, or not started yet
-                handler.postDelayed(this, 250);
-                return;
-            }
-            finishRun(m, st);
-            startNext();
+            if (state.getString("pending", null) == null || settleDeadRun()) { startNext(); return; }
+            handler.postDelayed(this, 250);                                  // still running, or not started yet
         }
     };
+
+    /** Reports the pending run if its process has ended (exited, crashed, or killed with am force-stop); true if it did. */
+    private boolean settleDeadRun() {
+        String m = state.getString("pending", null);
+        if (m == null) return false;
+        String st = lastLine(Files.read(new File(runDir(m), "status")));
+        long age = System.currentTimeMillis() - state.getLong("launched", 0);
+        if (gameProcessAlive() || (st == null && age < START_GRACE_MS)) return false;
+        finishRun(m, st);
+        return true;
+    }
 
     private boolean gameProcessAlive() {
         ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);

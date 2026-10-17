@@ -1,0 +1,26 @@
+ 19.16%  nd_call
+ 14.87%  maybe_yield
+  3.37%  [libGLESv2_adreno.so] !!!0000!867ec0377944951e765c69488e60a3!089d643e2a!
+  1.96%  nd_006f7206
+  1.80%  nd_005ea980
+  1.46%  nd_00622780
+  1.39%  nd_00496010
+  1.33%  nd_0051f530
+  1.21%  nd_006221b0
+  1.11%  rt_preempt
+  1.08%  [libGLESv2_adreno.so] !!!0000!58c4cf89d3544eaf0d40972d4ff12d!089d643e2a!
+  0.95%  vertex
+  0.94%  nd_00412210
+  0.81%  thunk_run
+  0.78%  nd_0061bf70
+  0.74%  nd_00640f00
+  0.71%  nd_00627be0
+  0.71%  [libGLESv2_adreno.so] !!!0000!adf5c2b6bf504f0f87a1a84bacaed9!089d643e2a!
+  0.69%  [libc.so] clock_gettime
+  0.68%  nd_00536430
+  0.64%  [libc.so] __memmove_aarch64_nt
+  0.55%  nd_0064eeb0
+  0.54%  nd_006a27e0
+  0.52%  nd_00587e80
+  0.50%  nd_005249e0
+total 107.5%
