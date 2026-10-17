@@ -1,7 +1,8 @@
 # Phase 1A results: Android ARM64 runtime bring-up
 
 2026-10-17. Scope: back up the Shockolate touch work, fix the arm64 `setjmp` blocker (B1), and run the game-free
-conformance suite for Android arm64. No game code was built, no APK was made, and no touch, NVScript or SCP work was
+conformance suite for Android arm64. The test phone is a **Samsung Galaxy S26 Ultra**: the owner switched to it from the
+Pixel 10 named in the plan. No game code was built, no APK was made, and no touch, NVScript or SCP work was
 started.
 
 ## Summary
@@ -12,12 +13,12 @@ started.
 | B1 (`__builtin_setjmp` on arm64) | **Fixed** in `runtime/rt.h`. The NDK build of the conformance host now has no errors and no warnings. |
 | Other platforms | **Unchanged.** `rt.h` preprocesses to byte-identical code for every existing target. Conformance passes on Windows x64 and Linux x86-64 (GCC). |
 | Conformance on arm64 (QEMU user-mode emulation) | **0 of 511 failed**, both default and `--cache-regs --abi-check`. |
-| Conformance on the Pixel 10 | **Pending.** No device was visible to `adb` (USB or wireless) at any point in the session. |
+| Conformance on the device (Galaxy S26 Ultra) | **0 of 511 failed**, default and `--cache-regs --abi-check`, 5 runs each. The setjmp test passed 5 runs at `-O0` and `-O2`. |
 | New regression coverage | `port/tests/setjmp` (host primitive) and 2 new guest checks in the conformance suite. Mutation-tested. |
 
-**QEMU is not the Pixel.** QEMU runs the same arm64 machine code and the same bionic `_setjmp`/`_longjmp`, which
-makes it a useful pre-check. It does not reproduce Android's kernel, memory limits, 16 KB pages, scheduler, SELinux,
-or the Tensor G5 CPU. The acceptance criterion (a pass on the Pixel 10) is **not yet met**.
+QEMU (user-mode emulation of the same arm64 code and bionic) ran first, while no phone was connected. **The device
+runs (§6) are the acceptance evidence**, and they agree with QEMU. Phase 1A's acceptance criterion is **met** on the
+S26 Ultra.
 
 ## 1. Shockolate baseline backup
 
@@ -58,7 +59,7 @@ Nothing was pushed, reset, cleaned, stashed or checked out in the Shockolate rep
 | Android SDK | `C:\Users\<user>\AppData\Local\Android\Sdk` (`ANDROID_HOME` set). Platforms android-34 and android-37.0. |
 | NDK | `29.0.14206865` (r29), `Android (13989888, based on r563880c) clang version 21.0.0`. Only NDK installed; `ANDROID_NDK_ROOT` is not set. |
 | CMake / Ninja | SDK `cmake 3.22.1` and `ninja 1.10.2` (neither is on `PATH`; the runner finds them in the SDK) |
-| adb | `1.0.41` (platform-tools 37.0.1). `adb devices`: **empty** (checked 5 times). `adb mdns services`: nothing. No Pixel/ADB device in Windows PnP. |
+| adb | `1.0.41` (platform-tools 37.0.1). At first `adb devices` was **empty** (checked 5 times; `adb mdns services` and Windows PnP showed nothing either). Later the owner connected the Galaxy S26 Ultra, serial `<device-serial>` (§6). |
 | Python | 3.14.5 (global) with `capstone` 5.0.9 and `pytest`; **no** `pefile` or `ziglang` |
 | Installed | A venv, `C:\Dev\NewDarkAndroid\build\venv`, with `--system-site-packages` (reuses the global capstone) plus `pefile` 2024.8.26 and `ziglang` 0.16.0. These are the two packages the suite needs (`run_conformance.py:9`). The global Python is unchanged, and `build/` is git-ignored. |
 | Docker | 29.7.2 (WSL2 kernel 6.18). Existing local images were used: `gcc:13` (GCC 13.5.0, amd64), with Docker Desktop's QEMU `binfmt` handler for arm64. **Nothing was pulled.** |
@@ -222,10 +223,10 @@ clean runs at each level.
 The working directory is `C:\Dev\NewDarkAndroid` (Git Bash). `PY=build/venv/Scripts/python.exe`.
 
 ```bash
-# Android arm64 (device runs pending; these builds succeed and stop at "adb: no devices")
-$PY port/tests/run_conformance.py --target android --build build/conf-android
-$PY port/tests/run_conformance.py --target android --cache-regs --abi-check --build build/conf-android-cr
-sh port/tests/setjmp/run.sh android
+# Android arm64 on the device (see §6 for the exact runs)
+$PY port/tests/run_conformance.py --target android --serial <device-serial> --build build/conf-android [--no-rebuild-guest]
+$PY port/tests/run_conformance.py --target android --serial <device-serial> --cache-regs --abi-check --build build/conf-android-cr [--no-rebuild-guest]
+ADB=$ANDROID_HOME/platform-tools/adb sh port/tests/setjmp/run.sh android <device-serial>
 
 # Windows x64, natively. See the note below the results table.
 $PY port/tests/run_conformance.py --target windows [--cache-regs --abi-check] --build build/conf-win[-cr]   # guest + lift
@@ -259,61 +260,70 @@ WSL.
 | Linux x86-64 GCC 13.5 (Docker) | Default | 0 of 511 failed, exit 0 |
 | Linux x86-64 GCC 13.5 | `--cache-regs --abi-check` | 0 of 511 failed, exit 0 |
 | Linux x86-64 GCC 13.5 | `setjmp` test `-O0` / `-O2` | 6075/6075 each (builtin branch) |
-| **Pixel 10** | Everything | **Pending (no adb device)** |
+| **Galaxy S26 Ultra** (Android 17, adb shell) | Default | **0 of 511 checks failed**, `ExitProcess(0)`, PASS; 5/5 runs |
+| **Galaxy S26 Ultra** | `--cache-regs --abi-check` | **0 of 511 checks failed**, `ABI check: 0 call site(s)…`, PASS; 5/5 runs |
+| **Galaxy S26 Ultra** | `setjmp` test `-O0` / `-O2` | **6075/6075 each**; 5/5 runs |
+| **Galaxy S26 Ultra** | Broken jump mutants (`-O2`) | Both crash (SIGSEGV); `adb shell` returns status 139 |
 
-**`--cache-regs`:** it passes in every environment where it was run. No speed claim is made: nothing was timed, and
-QEMU timings would mean nothing for the Pixel.
+**`--cache-regs`:** it passes on the device and in every other environment where it was run. No speed claim is made:
+nothing was timed. A conformance run takes about 1.5 s, which says nothing about game performance.
 
-### Validation areas, as covered so far (all by QEMU arm64; none yet on the Pixel)
+### Validation areas (on the S26 Ultra, both lift modes; also under QEMU)
 
 | Area | Evidence |
 | --- | --- |
-| Guest memory mapping | `vm_init` (`host.c:167-189`) reserves 4 GB for the guest at start-up. Every check runs inside it. No `--guest-space` was needed. |
+| Guest memory mapping | `vm_init` (`host.c:167-189`) reserves 4 GB for the guest at start-up; on the device: `guest address space: 4096 MB at 0x7458c00000 (4096 MB backed)`. Every check runs inside it. No `--guest-space` was needed. |
 | Function dispatch | The host bound 147 imports, all implemented. The C runtime and Win32 sections cover indirect calls and re-entrant callbacks (`qsort` comparators that sort). `--cache-regs` adds the indirect-call cache and the ABI checks. |
-| Threading | `threads` section: `_beginthreadex`/`CreateThread`, critical sections, interlocked operations, events, `PulseEvent`, WINMM timers. Plus 4 host threads in the setjmp test. |
+| Threading | `threads` section: `_beginthreadex`/`CreateThread`, critical sections, interlocked operations, events, `PulseEvent`, WINMM timers. The device's `--verbose` log shows the guest threads starting and ending with the expected codes (11, 22, 7). Plus 4 host threads in the setjmp test. |
 | Stack behaviour | Deep guest recursion. The new check that the stack position is unchanged after 420 nonlocal jumps. Exact stack and frame restore in the setjmp test. |
 | Nonlocal jumps | 3 original and 2 new guest checks. The setjmp test. |
 | Filesystem | `stdio` section: stdio, low-level and Win32 file APIs, case-insensitive paths, mmio RIFF from a file. It runs in the test's working directory. |
 | Runtime initialisation | "running the recompiled entry point 004010a0 (147 imports, 0 without an implementation)" |
-| Process exit | `ExitProcess(0)`, host exit status 0. The Android runner relies on `adb shell` returning the status, which still needs confirming on the device. |
+| Process exit | `ExitProcess(0)`, host exit status 0. On the device, `adb shell` returns the status: 0 for passing runs, 139 for the crashing mutants. So a failure cannot be reported as a pass. |
 
-## 6. Pixel 10 evidence
+## 6. Device evidence: Samsung Galaxy S26 Ultra
 
-**None yet.** `adb devices` was empty at every check during the session, and no Android device was present over USB
-(PnP) or mDNS.
+The owner chose the **Galaxy S26 Ultra** as the target phone in place of the Pixel 10. The device was connected over
+USB with debugging authorised, and all runs were done through `adb shell` as the `shell` user.
 
-To finish Phase 1A's acceptance criterion:
+| Property | Value |
+| --- | --- |
+| Model | `SM-S948U1` (`ro.product.device` `m3q`), serial `<device-serial>` |
+| SoC | Qualcomm `SM8850` (`ro.soc.manufacturer` QTI), 8 CPUs, `arm64-v8a` |
+| Android | 17, API 37; build `samsung/m3quew/m3q:17/CP2A.260605.016/S948U1UES4BZIG_OYM4BZIG:user/release-keys` |
+| Kernel | `6.12.69-android16-6-pb4d3caf-abogkiS948USQS4BZIG-4k`, aarch64 |
+| Page size | 4096 (a 4 KB kernel; 16 KB pages remain untested) |
+| RAM | MemTotal 11,350,976 kB |
+| Shell | `uid=2000(shell)`, SELinux **Enforcing**, context `u:r:shell:s0`, `ulimit -s` 8192 KB |
 
-1. Connect the Pixel 10 with USB debugging enabled.
-2. Accept the RSA prompt.
-3. Run:
+**Results** (binaries from the commits in §8: NDK r29, API 26, dynamic PIE; installed only under `/data/local/tmp`)
 
-```bash
-PY=build/venv/Scripts/python.exe
-$PY port/tests/run_conformance.py --target android --build build/conf-android --no-rebuild-guest
-$PY port/tests/run_conformance.py --target android --cache-regs --abi-check --build build/conf-android-cr --no-rebuild-guest
-ANDROID_HOME=$ANDROID_HOME ADB=$ANDROID_HOME/platform-tools/adb sh port/tests/setjmp/run.sh android
-```
+| Run | Result |
+| --- | --- |
+| `sh port/tests/setjmp/run.sh android <device-serial>` ×5 | `-O0` and `-O2`: `setjmp (C library _setjmp / _longjmp, RT_HJ_WORDS=33): 6075 checks, all passed`, every run |
+| `run_conformance.py --target android --serial <device-serial> --build build/conf-android --no-rebuild-guest` ×5 | `conformance: 0 of 511 checks failed`, `[port] ExitProcess(0)`, `conformance (null, android): PASS`, every run |
+| `run_conformance.py … --cache-regs --abi-check --build build/conf-android-cr --no-rebuild-guest` ×5 | `0 of 511 checks failed`, `ABI check: 0 call site(s) broke the calling-convention contract`, PASS, every run |
+| `./ss2port --verbose conformance.exe` (default build) | `guest address space: 4096 MB at 0x7458c00000 (4096 MB backed)`; guest thread stacks mapped; threads 1008/1012/1016 ended with 11/22/7 |
+| Scratch mutants `mutant-noregs`, `mutant-smallbuf` (`-O2`, §4) | `Segmentation fault`, `adb shell` exit status **139**. The real test returns 0. |
 
-**Expected output:**
+The first default run's full log is `build/conf-android/device-run.txt`. The `[port] not found` lines in it are the
+expected misses that the `stdio` section probes for.
 
-- each conformance run prints `conformance: 0 of 511 checks failed` and the `PASS` summary;
-- the `--cache-regs` run also prints `ABI check: 0 call site(s)…`;
-- each setjmp level prints `6075 checks, all passed`.
+**Two problems in `port/tests/setjmp/run.sh android`, fixed in `92a701a`** (test script only):
 
-**Record in this file:**
+1. Git Bash rewrote `/data/local/tmp/...` into a Windows path. The fix sets `MSYS_NO_PATHCONV=1`.
+2. Files pushed from Windows had no execute bit, so the shell reported "Permission denied". The fix runs `chmod 755`.
 
-- `adb shell getprop ro.product.model` (and `ro.build.fingerprint`);
-- `uname -a` and `getconf PAGE_SIZE` (from `adb shell`);
-- the outputs above.
+The push failure also no longer slips past `set -e`. `run_conformance.py` was not affected: it passes argument lists
+from native Python and already ran `chmod`.
 
-Everything is installed only under `/data/local/tmp`, and `rm -rf /data/local/tmp/ss2*` removes it.
+To clean up: `adb shell rm -rf /data/local/tmp/ss2conformance /data/local/tmp/ss2setjmp`.
 
 ## 7. Regressions
 
 None found:
 
-- Windows x64 and Linux x86-64 pass all 511 checks in both modes.
+- Windows x64, Linux x86-64 and the Galaxy S26 Ultra pass all 511 checks in both modes.
 - Preprocessing proves the existing configurations compile identical code.
 
 One issue appeared during the work: the test-only thread race (§4). It was fixed before the commit.
@@ -326,7 +336,9 @@ One issue appeared during the work: the test-only thread race (§4). It was fixe
 | Branch | `android-port`, from `android-port-audit` = `main` @ `02f77da` |
 | `5a26315` | docs: Phase 0 Android port audit (the six existing reports, committed unchanged) |
 | `8962e14` | runtime: arm64 clang host setjmp via `_setjmp`/`_longjmp`; Android conformance target |
-| (next) | docs: this report |
+| `5488c34` | docs: this report (first version, before the device runs) |
+| `92a701a` | tests/setjmp: `run.sh android` works from Git Bash on Windows (§6) |
+| (next) | docs: this report, with the device results |
 
 **Files in `8962e14`**
 
@@ -345,12 +357,15 @@ One issue appeared during the work: the test-only thread race (§4). It was fixe
 
 ## 9. Remaining blockers
 
-1. **Pixel 10 hardware run (Phase 1A acceptance).** It needs the device on `adb`; it takes about two minutes with the
-   commands in §6. Risks that only hardware can answer:
-   - SELinux or `noexec` on `/data/local/tmp` (normally allowed for shell);
-   - the 4 GB `MAP_NORESERVE` reservation under the device's overcommit settings;
-   - 16 KB pages;
-   - MTE stack tagging in `_longjmp` if MTE is enabled for shell processes (it is off by default).
+No blocker remains for Phase 1A. Open points:
+
+1. **Untested on the device:**
+   - **16 KB pages.** This S26 Ultra kernel uses 4 KB pages. The host's 64 KB VM granularity should cover 16 KB, but
+     it is unverified.
+   - **MTE in `_longjmp`.** MTE is not enabled for shell processes.
+   - **The app context.** A future APK runs as an untrusted_app with its own SELinux domain, memory limits and
+     overcommit. The 4 GB reservation succeeded from `adb shell`; this has to be checked again from the APK in
+     Phase 1B/1C.
 2. **NewDark 2.48 install.** It is still absent and is needed before any game lift (Phase 1B onward).
 3. **Native Windows builds with the upstream Zig toolchain** do not work: shell-script wrappers. This does not block
    Android, which uses NDK CMake. It only affects running `--target windows` without WSL.
@@ -360,7 +375,8 @@ One open question from the audit is now settled: running `lift.py` and `gen_host
 
 ## 10. Recommended Phase 1B scope
 
-**Start condition:** the §6 device run is recorded here and shows 0 failures.
+**Start condition:** met (§6). The target device is now the Galaxy S26 Ultra. The Phase 0 documents still name the
+Pixel 10; read that as the S26 Ultra.
 
 **In scope**
 
@@ -376,7 +392,7 @@ One open question from the audit is now settled: running `lift.py` and `gen_host
 3. **With a 2.48 install:**
    - lift `out/port` on the PC (native Windows Python now looks viable; time it);
    - build the `null`-backend game for arm64;
-   - run it on the Pixel with `adb shell … --frames 600`;
+   - run it on the S26 Ultra with `adb shell … --frames 600`;
    - acceptance: `allobjs.osm`, `Squirrel.osm` and `lgvid.dll` load as recompiled modules, "first frame presented",
      clean exit, no guest fault.
    - Repeat with `--cache-regs --abi-check`.
