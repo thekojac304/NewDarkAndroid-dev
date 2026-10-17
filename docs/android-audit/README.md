@@ -1,0 +1,78 @@
+# Android port audit: executive summary
+
+Phase 0 (audit and planning only), 2026-10-17. Target: System Shock 2 (NewDark 2.48) as a native Android ARM64 APK,
+first on the Google Pixel 10, with the existing Shockolate touch controls and support for pre-modded installs,
+especially SCP.
+
+## Workspace
+
+| Item | Value |
+| --- | --- |
+| Upstream | `https://github.com/Owloeb/NewDarkRecompiled` |
+| Checkout | `C:\Dev\NewDarkAndroid` (new; `C:\Dev\NewDark Recompiled` was empty and no other checkout existed) |
+| Upstream commit | `02f77da02d0743869defbf09171790e4ab2b6059` (`main`, 2026-10-15, "Update FLAGS.md"; 184 commits). Remote branches: `main`, `per-pixel-lighting`, `pixel-shaders` |
+| Local branch | `android-port-audit` (created from `main`). The only changes are these uncommitted audit documents. Nothing is pushed. |
+| Relevant build configurations | `port/build.py` (lift + CMake; targets `linux`/`windows`; `--cache-regs`, `--fastpaths`, `--abi-check`, `--prof`, `--low-dll-bases`); `port/CMakeLists.txt` (`PORT_BACKEND`=sdl2/null/vita, `PORT_SYSTEM`=posix/win32, `PORT_PREEMPT`, `PORT_VIDEO`, `PORT_SHADERS`, `PORT_PPL`) |
+| Shockolate Android project | `C:\Dev\system-shock-android`, branch `touch-controls` at `7502370` (38 commits not pushed, plus uncommitted, unaccepted polish work). Not modified. |
+| Accepted touch baseline | Committed `7502370`, files in `AndroidProject/app/jni/touch/` (TOUCH_CONTROLS.md §1) |
+| Android toolchain on the PC | SDK with NDK `29.0.14206865` (clang 21), as used by the Shockolate build |
+| Local SS2 install | `E:\Launchbox\Games\PC Games\System Shock 2`: GOG + SS2Tool + Blue's Mod Manager, **NewDark 2.47** (not 2.48), mods inactive. Read only, unchanged. |
+
+## Reports
+
+| Report | Contents |
+| --- | --- |
+| [ANDROID_COMPATIBILITY.md](ANDROID_COMPATIBILITY.md) | Platform matrix, the confirmed blocker, required backend changes |
+| [TOUCH_CONTROLS.md](TOUCH_CONTROLS.md) | Shockolate source inventory, reuse plan, SS2 input mapping, risks |
+| [MOD_COMPATIBILITY.md](MOD_COMPATIBILITY.md) | Data vs script vs native mods, module identity checks, search paths |
+| [SCP_COMPATIBILITY.md](SCP_COMPATIBILITY.md) | SCP version, components, dependencies, saves, test plan |
+| [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) | Architecture, storage design, milestones, performance plan, first task |
+
+## Overall feasibility
+
+**Feasible, and NewDarkRecompiled is a good foundation.** The portable host has a single, small platform interface
+(`port/include/plat.h`). Everything above it is OS-free C with no x86 assumptions. It already runs on one ARM device
+(the PS Vita, with an OpenGL ES 2.0 renderer shared with the SDL2 backend). An Android port is mostly a new backend
+and packaging, not engine work.
+
+## Current technical readiness
+
+- **Works today on other platforms (not tested on Android):** POSIX system layer, GLES 2.0 renderer, software audio
+  mixer, Win32 path translation with case-insensitive lookup and a separate write directory, cutscene decoder,
+  recompiled `allobjs.osm`/`Squirrel.osm`/`lgvid.dll`.
+- **Confirmed blocker (small):** NDK clang rejects `__builtin_setjmp` on arm64 (checked here with NDK 29). This is
+  about a 6-line fix in `runtime/rt.h`.
+- **Missing:** an Android build target (shared library, NDK toolchain), an Android entry point (SDL_main, big-stack
+  thread, logging, options, GLES default, soft-keyboard handling, lifecycle), APK packaging, game-folder access, and
+  the touch bridge.
+- **SCP:** blocked today, because SCP needs the native **NVScript.osm**, which is not among the recompiled modules.
+  SCP's own start-up check stops progress on Earth if it is missing. NVScript.osm (MSVC 2008, static CRT,
+  relocatable) looks like the already-recompiled `squirrel.osm`, so recompiling it is the expected fix.
+
+## Major risks
+
+1. **NVScript.osm recompilation** could hit unsupported constructs (C++ `throw`, SSE paths), which would block SCP and
+   SS2Tool-patched installs.
+2. **Feel of the touch controls:** the host offers no analog movement path (DirectInput joysticks are not
+   implemented), so the Shockolate analog stick becomes digital W/A/S/D unless more host work is done.
+3. **Automatic cursor/interface-mode detection** may not be possible from the signals the host sees. The manual
+   toggle stays as the fallback.
+4. **Android lifecycle and GPU driver behaviour** (context across background/foreground, mediump precision, shader
+   compile hitches) can only be found on hardware.
+5. **Distribution:** the APK contains code generated from the user's game files, so it can only ever be a personal
+   build. It is never a public release.
+6. **Prerequisites:** the local install is NewDark 2.47, and a 2.48 install is required. The accepted touch code
+   exists only in an unpushed local branch.
+
+## Recommended next action
+
+Start Phase 1 with the task in IMPLEMENTATION_PLAN.md §6: fix the arm64 setjmp path, then run upstream's game-free
+conformance suite on the Pixel 10 via `adb`. Before that, the owner should obtain a NewDark 2.48 install for lifting
+and approve installing Python packages and test binaries.
+
+## Fact vs inference
+
+Statements with file and line references come from the source. Results marked *verified here* were run in this
+audit (only the NDK `__builtin_setjmp` probe and read-only PE header and string scans of local game files). Anything
+labelled Unknown, inference, or "likely" has not been demonstrated. No part of the game has been built or run on
+Android, and no claim is made that SCP or any mod works on the portable host.
