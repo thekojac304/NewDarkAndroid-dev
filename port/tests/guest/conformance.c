@@ -89,6 +89,20 @@ static int __cdecl cmp_nested(const void *a, const void *b) {        /* a compar
     int t[5] = { 5, 1, 4, 2, 3 }; qsort(t, 5, sizeof *t, cmp_int); nested_calls += t[0] == 1 && t[4] == 5;
     return *(const int *)a - *(const int *)b;
 }
+/* setjmp in one function, longjmp from calls nested below it (as the Squirrel compiler does on a syntax error) */
+static int sj_buf[16]; static volatile int sj_sink;
+static __attribute__((noinline)) void sj_down(int n, int v) {   /* uses EBX/ESI/EDI on the way down, so they differ at the longjmp */
+    int a = n * 7 + v, b = a ^ n, d = b + v; volatile int pad[4]; pad[n & 3] = d;
+    if (n) sj_down(n - 1, v); else longjmp(sj_buf, v);
+    sj_sink = a + b + d + pad[n & 3];
+}
+static __attribute__((noinline)) int sj_deep(int n) {          /* setjmp's return value plus locals live across it */
+    int a = n * 3 + sj_sink, b = (n ^ 0x55) + sj_sink, d = n + 1000 + sj_sink; volatile int got = -1;
+    int r = _setjmp3(sj_buf, 0);
+    if (r == 0) { got = 0; sj_down(n, n + 1); got = 99; } else got = r;
+    return got + a + b + d;
+}
+static __attribute__((noinline)) unsigned sj_sp(void) { volatile int probe = 0; return (unsigned)&probe; }
 static void test_crt(void) {
     char b[256];
     CHECKI(sprintf(b, "%d|%5d|%-5d|%05d|%u|%x|%X|%08x", -42, 7, 7, 7, 3000000000u, 255, 255, 0xbeef), 47); CHECKS(b, "-42|    7|7    |00007|3000000000|ff|FF|0000beef");
@@ -150,6 +164,10 @@ static void test_crt(void) {
     static int jb[16]; volatile int stage = 0; int r = _setjmp3(jb, 0);
     if (r == 0) { stage = 1; longjmp(jb, 7); stage = 99; }
     CHECKI(r, 7); CHECKI(stage, 1);
+    /* ... from 0-20 calls below, many times: the locals live across setjmp and the stack come back every time */
+    unsigned sp0 = sj_sp(); int bad_n = -1;
+    for (int i = 0; i < 420; i++) { int n = i % 21; if (sj_deep(n) != (n + 1) + n * 3 + (n ^ 0x55) + n + 1000 && bad_n < 0) bad_n = n; }
+    CHECKI(bad_n, -1); CHECKI(sj_sp(), sp0);
 }
 
 /* ---------------------------------------------------------------- files: stdio, low-level, Win32, case-insensitive paths */

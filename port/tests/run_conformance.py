@@ -5,8 +5,12 @@ recompiles it with lift.py, builds the portable host around it and runs it. No g
     python3 port/tests/run_conformance.py [--backend null|sdl2] [--build DIR] [--skip SECTION ...] [--cc CC] [--cflags ...]
     python3 port/tests/run_conformance.py --target windows --wrap wine        # Windows exe, run under Wine (or on Windows)
     python3 port/tests/run_conformance.py --cache-regs                        # lift with lift.py --cache-regs
+    python3 port/tests/run_conformance.py --target android [--serial ID]     # arm64 Android: NDK build, run on a device via adb
 
 Needs: python3 -m pip install pefile capstone ziglang, CMake, a host C compiler (and SDL2 for --backend sdl2).
+--target android needs the Android NDK (--ndk, ANDROID_NDK_ROOT, or the newest under ANDROID_HOME/ndk; CMake and Ninja
+come from the SDK when not on PATH) and adb with one device attached (or --serial); it builds the host with the NDK's
+clang for arm64-v8a, pushes it with the guest to --device-dir and runs it there with adb shell.
 Exit status: 0 when every check passes."""
 import argparse, os, re, shutil, subprocess, sys
 
@@ -45,11 +49,33 @@ def lift(exe, bdir, extra=()):
     with open(os.path.join(gen, "mods", "mods.c"), "w") as f: f.write('#include "recomp_mod.h"\nconst RecompModDesc *const recomp_mods[] = { 0 };\n')
     return gen
 
+def sdk_tool(name):
+    """name from PATH, else from the Android SDK (platform-tools, or the newest cmake/<version>/bin)"""
+    p = shutil.which(name)
+    if p: return p
+    sdk = os.environ.get("ANDROID_HOME") or os.environ.get("ANDROID_SDK_ROOT") or ""; exe = name + (".exe" if os.name == "nt" else "")
+    cm = os.path.join(sdk, "cmake"); vers = sorted(os.listdir(cm), reverse=True) if os.path.isdir(cm) else []
+    return next((c for c in [os.path.join(sdk, "platform-tools", exe)] + [os.path.join(cm, v, "bin", exe) for v in vers] if os.path.isfile(c)), None)
+
+def android_ndk(a):
+    ndk = a.ndk or os.environ.get("ANDROID_NDK_ROOT") or os.environ.get("ANDROID_NDK_HOME")
+    if not ndk:
+        root = os.path.join(os.environ.get("ANDROID_HOME") or os.environ.get("ANDROID_SDK_ROOT") or "", "ndk")
+        vers = sorted(os.listdir(root), key=lambda v: [int(x) for x in re.findall(r"\d+", v)]) if os.path.isdir(root) else []
+        ndk = os.path.join(root, vers[-1]) if vers else None
+    if not ndk or not os.path.isfile(os.path.join(ndk, "build", "cmake", "android.toolchain.cmake")): sys.exit("--target android: no Android NDK found (use --ndk)")
+    return ndk
+
 def build_host(gen, bdir, a):
-    win = a.target == "windows"
-    hb = os.path.join(bdir, "host-" + a.backend + ("-win" if win else ""))
-    cfg = ["cmake", "-S", PORT, "-B", hb, "-G", "Ninja" if shutil.which("ninja") else "Unix Makefiles", f"-DPORT_GENERATED={gen}",
+    win = a.target == "windows"; android = a.target == "android"
+    hb = os.path.join(bdir, "host-" + a.backend + ("-win" if win else "-android" if android else ""))
+    cmake, ninja = (sdk_tool("cmake"), sdk_tool("ninja")) if android else ("cmake", shutil.which("ninja"))
+    cfg = [cmake, "-S", PORT, "-B", hb, "-G", "Ninja" if ninja else "Unix Makefiles", f"-DPORT_GENERATED={gen}",
            f"-DPORT_BACKEND={a.backend}", "-DCMAKE_BUILD_TYPE=" + a.config]
+    if android:
+        if not (cmake and ninja): sys.exit("--target android: needs CMake and Ninja (on PATH or in the Android SDK)")
+        cfg += [f"-DCMAKE_MAKE_PROGRAM={ninja}", "-DCMAKE_TOOLCHAIN_FILE=" + os.path.join(android_ndk(a), "build", "cmake", "android.toolchain.cmake"),
+                "-DANDROID_ABI=arm64-v8a", f"-DANDROID_PLATFORM=android-{a.android_api}"]
     if win:
         sys.path.insert(0, os.path.join(PORT, "tools")); import deps
         os.environ["ZIG_PY"] = PY
@@ -58,19 +84,22 @@ def build_host(gen, bdir, a):
     if a.cc: cfg.append(f"-DCMAKE_C_COMPILER={a.cc}")
     if a.cflags: cfg.append(f"-DCMAKE_C_FLAGS={a.cflags}")
     cfg.append(f"-DPORT_ABI_CHECK={'ON' if a.abi_check else 'OFF'}")
-    run(cfg, stdout=subprocess.DEVNULL); run(["cmake", "--build", hb], stdout=subprocess.DEVNULL)
+    run(cfg, stdout=subprocess.DEVNULL); run([cmake, "--build", hb], stdout=subprocess.DEVNULL)
     return os.path.join(hb, "ss2port.exe" if win else "ss2port")
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--backend", default="null"); ap.add_argument("--target", default="native", choices=["native", "windows"]); ap.add_argument("--build", default=os.path.join(ROOT, "build", "conformance"))
+    ap.add_argument("--backend", default="null"); ap.add_argument("--target", default="native", choices=["native", "windows", "android"]); ap.add_argument("--build", default=os.path.join(ROOT, "build", "conformance"))
     ap.add_argument("--skip", action="append", default=[]); ap.add_argument("--cc"); ap.add_argument("--cflags")
     ap.add_argument("--config", default="RelWithDebInfo"); ap.add_argument("--no-rebuild-guest", action="store_true")
     ap.add_argument("--cache-regs", action="store_true", help="lift with --cache-regs (guest registers in C locals)")
     ap.add_argument("--abi-check", action="store_true", help="with --cache-regs: build with -DPORT_ABI_CHECK=ON and fail if any call breaks the calling-convention contract")
     ap.add_argument("--wrap", help="run the host under this command (e.g. 'valgrind -q', 'xvfb-run -a')")
+    ap.add_argument("--ndk", help="--target android: NDK directory"); ap.add_argument("--android-api", type=int, default=26)
+    ap.add_argument("--serial", help="--target android: adb device serial"); ap.add_argument("--device-dir", default="/data/local/tmp/ss2conformance")
     a = ap.parse_args(); a.build = os.path.abspath(a.build)
     if a.abi_check and not a.cache_regs: sys.exit("--abi-check needs --cache-regs")
+    if a.target == "android" and a.backend != "null": sys.exit("--target android: only --backend null")
     os.makedirs(a.build, exist_ok=True)
     exe = os.path.join(a.build, "guest", "conformance.exe")
     if not (a.no_rebuild_guest and os.path.exists(exe)): exe = build_guest(a.build)
@@ -81,14 +110,19 @@ def main():
     if a.target == "windows" and os.path.isfile(os.path.join(os.path.dirname(host), "SDL2.dll")): shutil.copy(os.path.join(os.path.dirname(host), "SDL2.dll"), work)
     args = (a.wrap.split() if a.wrap else []) + [host, os.path.join(work, "conformance.exe")] + [x for s in a.skip for x in ("-skip", s)]
     if a.backend != "null": args.append("-pixels")         # a real renderer: check what it draws
+    if a.target == "android":                               # run in a fresh directory on the device; adb shell passes the exit status back
+        adb = [sdk_tool("adb") or sys.exit("--target android: adb not found")] + (["-s", a.serial] if a.serial else []); dev = a.device_dir
+        run(adb + ["shell", f"rm -rf {dev} && mkdir -p {dev}"]); run(adb + ["push", host, exe, dev + "/"], stdout=subprocess.DEVNULL)
+        args = adb + ["shell", f"cd {dev} && chmod 755 ss2port && ./ss2port conformance.exe" + "".join(f" -skip {s}" for s in a.skip)]
     r = subprocess.run(args, cwd=work, stderr=subprocess.PIPE if a.abi_check else None, text=True)
     if a.abi_check:
         sys.stderr.write(r.stderr)
-        logs = r.stderr + "".join(open(os.path.join(work, f), errors="replace").read() for f in os.listdir(work) if f.endswith(".log"))
+        if a.target == "android": logs = r.stderr + subprocess.run(adb + ["shell", f"cat {dev}/*.log 2>/dev/null"], capture_output=True, text=True, errors="replace").stdout
+        else: logs = r.stderr + "".join(open(os.path.join(work, f), errors="replace").read() for f in os.listdir(work) if f.endswith(".log"))
         nv = logs.count("ABI VIOLATION")
         print(f"ABI check: {nv} call site(s) broke the calling-convention contract")
         if nv: r = subprocess.CompletedProcess(args, 1)
-    print(f"conformance ({a.backend}{', windows' if a.target == 'windows' else ''}): {'PASS' if r.returncode == 0 else 'FAIL (exit %d)' % r.returncode}")
+    print(f"conformance ({a.backend}{', ' + a.target if a.target != 'native' else ''}): {'PASS' if r.returncode == 0 else 'FAIL (exit %d)' % r.returncode}")
     sys.exit(0 if r.returncode == 0 else 1)
 
 if __name__ == "__main__": main()

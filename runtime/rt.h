@@ -98,6 +98,16 @@ extern uint32_t rt_shadow[]; extern int rt_shadow_sp;
 #define RT_HJ_WORDS (sizeof(jmp_buf) / sizeof(void *) + 1)
 #define RT_HOST_SETJMP(b) _setjmp((_JBTYPE *)(void *)(b), NULL)
 #define RT_HOST_LONGJMP(b) longjmp(*(jmp_buf *)(void *)(b), 1)
+#elif defined(__aarch64__) && defined(__clang__)
+/* Clang has no __builtin_setjmp on arm64 ("not supported for the current target"; checked with Android NDK r29,
+ * clang 21), so use the C library's _setjmp/_longjmp: they save and restore every callee-saved register (x19-x30, sp,
+ * d8-d15) and, unlike setjmp/longjmp, leave the signal mask alone, as the builtin does. _setjmp is returns_twice, and
+ * RT_SETJMP calls it in the recompiled caller's own frame, so the frame is live whenever rt_longjmp jumps back to it.
+ * (GCC on arm64 keeps the builtin below.) port/tests/setjmp checks this host primitive. */
+#include <setjmp.h>
+#define RT_HJ_WORDS (sizeof(jmp_buf) / sizeof(void *) + 1)
+#define RT_HOST_SETJMP(b) _setjmp(*(jmp_buf *)(void *)(b))
+#define RT_HOST_LONGJMP(b) _longjmp(*(jmp_buf *)(void *)(b), 1)
 #else
 #define RT_HJ_WORDS 5
 #define RT_HOST_SETJMP(b) __builtin_setjmp(b)
