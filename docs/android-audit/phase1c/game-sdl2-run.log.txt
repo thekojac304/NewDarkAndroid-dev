@@ -1,0 +1,176 @@
+[android] native entry SDL_main; run directory /data/user/0/local.newdarkandroid.ss2/files/runs/game; port arguments: --verbose --android-env SS2PORT_WRITE_DIR=/data/user/0/local.newdarkandroid.ss2/files/profiles/ss2 --frames 900 /storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2/SS2.exe
+[android] device SM-S948U1 (SM8850), Android 17 (API 37), page size 4096, 8 CPUs
+[android] library /data/app/~~gNrK_DTEBNCGH4ZDtFj93g==/local.newdarkandroid.ss2-_XkRswSGS-iLytFUv8eZNw==/base.apk!/lib/arm64-v8a/libss2game.so
+[android] check app process: OK (pid 26015, process local.newdarkandroid.ss2:game, uid 10034, SELinux u:r:untrusted_app_34:s0:c34,c256,c512,c768)
+[android] check 4 GB guest reservation: OK (at 0x7480000000, zero-filled, written and read back at 6 places from 0 to 4 GB-1, discard reads back zero, released; 0.1 ms)
+[android] check deep stack: OK (thread with the game thread's attributes: stack 65551 KB + guard 16 KB; recursion used 49256 KB of it)
+[android] check threads and locks: OK (4 threads x 100000 locked increments = 400000 in 9.8 ms; a 20 ms timed wait timed out after 20.0 ms)
+[android] preflight: 0 of 4 checks failed
+[android] environment SS2PORT_WRITE_DIR=/data/user/0/local.newdarkandroid.ss2/files/profiles/ss2
+[android] backend sdl2: OpenGL ES, fullscreen landscape, renderer on the game thread
+[android] starting port_main after 0.053 s
+[android] game thread: stack 65551 KB + guard 16 KB at 0x76084c0000-0x760c4c3e40
+[port] guest address space: 4096 MB at 0x7480000000 (4096 MB backed)
+[port] vm: heap arena 00d30000 +2000000
+[port] vm: thread stack 02d30000 +410000
+[port] vm: PEB 00010000 +10000
+[port] running the recompiled entry point 006f7105 (364 imports, 0 without an implementation)
+[port] vm: VirtualAlloc 03140000 +4000000
+[port] not found (stat): "ubermod"
+[port] not found (stat): "patch_ext"
+[port] not found (fopen): "fm.cfg"
+[port] lgvid.dll: loaded the recompiled module at 30300000 (60 imports bound), DllMain -> 1
+INFO: pixel format wanted SDL_PIXELFORMAT_RGBX8888 (2), got SDL_PIXELFORMAT_RGBX8888 (2)
+[gl] OpenGL ES 3.2 V@0842.19.13 (GIT@089d643e2a, Icecd8f0534, 1782882597) (Date:07/01/26) / Adreno (TM) 840
+[port] not found (stat): "C:\ubermod"
+[port] not found (stat): "C:\ubermod.zip"
+[port] not found (stat): "C:\ubermod.crf"
+[port] not found (stat): "C:\patch_ext"
+[port] not found (stat): "C:\patch_ext.zip"
+[port] not found (stat): "C:\osm\subtitles"
+[port] not found (stat): "C:\osm\subtitles.zip"
+[port] not found (stat): "C:\osm\subtitles.crf"
+[port] not found (stat): "C:\patch\subtitles"
+[port] not found (stat): "C:\patch\subtitles.zip"
+[port] not found (stat): "C:\patch\subtitles.crf"
+[port] not found (stat): "C:\subtitles"
+[port] not found (stat): "C:\subtitles.zip"
+[port] not found (stat): "C:\subtitles.crf"
+[port] not found (stat): "C:\Data\subtitles"
+[port] not found (stat): "C:\Data\subtitles.zip"
+[port] not found (stat): "C:\Data\subtitles.crf"
+[port] not found (stat): "C:\Data\res\subtitles"
+[port] not found (stat): "C:\Data\res\subtitles.zip"
+[port] not found (stat): "C:\Data\res\subtitles.crf"
+[port] not found (stat): "C:\osm\fonts"
+[port] not found (stat): "C:\osm\fonts.zip"
+[port] not found (stat): "C:\osm\fonts.crf"
+[port] not found (stat): "C:\patch\fonts"
+[port] not found (stat): "C:\patch\fonts.zip"
+[port] not found (stat): "C:\patch\fonts.crf"
+[port] not found (stat): "C:\fonts"
+[port] not found (stat): "C:\fonts.zip"
+[port] not found (stat): "C:\fonts.crf"
+[port] not found (stat): "C:\Data\fonts"
+[port] not found (stat): "C:\Data\fonts.zip"
+[port] not found (stat): "C:\Data\fonts.crf"
+[port] not found (stat): "C:\Data\res\fonts"
+[port] not found (stat): "C:\Data\res\fonts.zip"
+[port] not found (stat): "C:\osm\snd2"
+[port] not found (stat): "C:\osm\snd2.zip"
+[port] not found (stat): "C:\osm\snd2.crf"
+[port] not found (stat): "C:\osm\snd"
+[port] not found (stat): "C:\osm\snd.zip"
+[port] not found (stat): "C:\osm\snd.crf"
+[port] not found (stat): "C:\patch\snd2"
+[port] not found (stat): "C:\patch\snd2.zip"
+[port] not found (stat): "C:\patch\snd2.crf"
+[port] not found (stat): "C:\patch\snd"
+[port] not found (stat): "C:\patch\snd.zip"
+[port] not found (stat): "C:\patch\snd.crf"
+[port] not found (stat): "C:\snd2"
+[port] not found (stat): "C:\snd2.zip"
+[port] not found (stat): "C:\snd2.crf"
+[port] not found (stat): "C:\snd"
+[port] not found (stat): "C:\snd.zip"
+[port] not found (stat): "C:\snd.crf"
+[port] not found (stat): "C:\Data\snd2"
+[port] not found (stat): "C:\Data\snd2.zip"
+[port] not found (stat): "C:\Data\snd2.crf"
+[port] not found (stat): "C:\Data\snd"
+[port] not found (stat): "C:\Data\snd.zip"
+[port] not found (stat): "C:\Data\snd.crf"
+[port] not found (stat): "C:\Data\res\snd2"
+[port] not found (stat): "C:\Data\res\snd2.zip"
+[port] not found (stat): "C:\Data\res\snd"
+[port] not found (stat): "C:\Data\res\snd.zip"
+[port] DirectSound: mixing to 44100 Hz stereo
+[port] vm: thread stack 00020000 +110000
+[port] thread 1008 (_beginthreadex) started at 006a1e50
+[port] not found (stat): "C:\osm\iface"
+[port] not found (stat): "C:\osm\iface.zip"
+[port] not found (stat): "C:\osm\iface.crf"
+[port] not found (stat): "C:\patch\iface"
+[port] not found (stat): "C:\patch\iface.zip"
+[port] not found (stat): "C:\iface"
+[port] not found (stat): "C:\iface.zip"
+[port] not found (stat): "C:\iface.crf"
+[port] not found (stat): "C:\Data\iface"
+[port] not found (stat): "C:\Data\iface.zip"
+[port] not found (stat): "C:\Data\iface.crf"
+[port] not found (stat): "C:\Data\res\iface"
+[port] not found (stat): "C:\Data\res\iface.zip"
+[port] not found (stat): "C:\osm\strings"
+[port] not found (stat): "C:\osm\strings.zip"
+[port] not found (stat): "C:\osm\strings.crf"
+[port] not found (stat): "C:\patch\strings"
+[port] not found (stat): "C:\patch\strings.zip"
+[port] not found (stat): "C:\strings"
+[port] not found (stat): "C:\strings.zip"
+[port] not found (stat): "C:\strings.crf"
+[port] not found (stat): "C:\Data\strings"
+[port] not found (stat): "C:\Data\strings.zip"
+[port] not found (stat): "C:\Data\strings.crf"
+[port] not found (stat): "C:\Data\res\strings"
+[port] not found (stat): "C:\Data\res\strings.zip"
+[port] not found (stat): "C:\osm\intrface"
+[port] not found (stat): "C:\osm\intrface.zip"
+[port] not found (stat): "C:\osm\intrface.crf"
+[port] not found (stat): "C:\patch\intrface"
+[port] not found (stat): "C:\patch\intrface.zip"
+[port] not found (stat): "C:\intrface"
+[port] not found (stat): "C:\intrface.zip"
+[port] not found (stat): "C:\intrface.crf"
+[port] not found (stat): "C:\Data\intrface"
+[port] not found (stat): "C:\Data\intrface.zip"
+[port] not found (stat): "C:\Data\intrface.crf"
+[port] not found (stat): "C:\Data\res\intrface"
+[port] not found (stat): "C:\Data\res\intrface.zip"
+[port] vm: big heap block 00130000 +130000
+[port] vm: big heap block 00260000 +130000
+[port] vm: big heap block 07140000 +130000
+[port] vm: big heap block 07270000 +130000
+[port] vm: big heap block 073a0000 +130000
+[port] vm: big heap block 074d0000 +130000
+[port] vm: big heap block 07600000 +130000
+[port] Direct3D 9: device 800x600 fullscreen, back buffer format 22, depth buffer
+[port] vm: big heap block 07730000 +130000
+[port] first frame presented
+[port] vm: big heap block 07860000 +130000
+[port] thread 1008 (_beginthreadex) ended with 0
+[port] cutscenes: stream 0: video codec 116 320x240 0 Hz 0 ch 0-bit, 1/15
+[port] cutscenes: stream 1: audio codec 65536 0x0 22050 Hz 2 ch 16-bit, 4/88200
+[port] vm: thread stack 00020000 +110000
+[port] thread 1012 (_beginthreadex) started at 006a1e50
+[port] thread 1012 (_beginthreadex) ended with 0
+[port] vm: big heap block 07990000 +130000
+[port] vm: big heap block 07ac0000 +130000
+[port] vm: thread stack 00020000 +110000
+[port] thread 1016 (_beginthreadex) started at 30301870
+[port] vm: thread stack 07bf0000 +110000
+[port] thread 1020 (_beginthreadex) started at 30301870
+[port] cutscenes: scaler: 320x240 fmt 6 -> 640x480 fmt 30, bicubic
+[port] thread 1016 (_beginthreadex) ended with 0
+[port] thread 1020 (_beginthreadex) ended with 0
+[port] vm: thread stack 00020000 +110000
+[port] thread 1024 (_beginthreadex) started at 006a1e50
+[port] vm: big heap block 07860000 +130000
+[port] stopping after 900 frames
+[port] guest memory touched: 26 MB of 4096 MB (longest touched run 6 MB)
+[port]   region 00020000 +1088 KB: 8 KB touched, highest touched page ends at +1028 KB
+[port]   region 00130000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 00260000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 00400000 +9408 KB: 7464 KB touched, highest touched page ends at +9364 KB
+[port]   region 00d30000 +32768 KB: 6980 KB touched, highest touched page ends at +32768 KB
+[port]   region 02d30000 +4160 KB: 32 KB touched, highest touched page ends at +4100 KB
+[port]   region 03140000 +65536 KB: 48 KB touched, highest touched page ends at +48 KB
+[port]   region 07140000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 07270000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 073a0000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 074d0000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 07600000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 07730000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 07860000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 30000000 +2688 KB: 0 KB touched, highest touched page ends at +0 KB
+[port]   region f0000000 +262080 KB: 2048 KB touched, highest touched page ends at +2048 KB
+[android] process exit(0) after 22.897 s

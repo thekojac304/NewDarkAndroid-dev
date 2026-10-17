@@ -124,15 +124,14 @@ SHIM(GetDiskFreeSpaceExA) { if (A(1)) WR64(A(1), 8ull << 30); if (A(2)) WR64(A(2
 SHIM(GetDiskFreeSpaceA) { if (A(1)) WR32(A(1), 8); if (A(2)) WR32(A(2), 512); if (A(3)) WR32(A(3), 2000000); if (A(4)) WR32(A(4), 16000000); RET(1); }
 
 /* ---------------------------------------------------------------- FindFirstFile */
-typedef struct { KObj k; PlatDir *d; char dir[1024], pat[300]; int dots; } KFind;
-static void kfind_destroy(KObj *o) { KFind *f = (KFind *)o; if (f->d) plat_fs_closedir(f->d); free(f); }
+typedef struct { KObj k; VfsDir *d; char pat[300]; int dots; } KFind;
+static void kfind_destroy(KObj *o) { KFind *f = (KFind *)o; vfs_closedir(f->d); free(f); }
 static int find_next(KFind *h, uint32_t out) {
     for (;;) {
-        const char *e; char nm[300];
-        if (h->dots < 2) { e = h->dots++ ? ".." : "."; } else if (!(e = plat_fs_readdir(h->d))) return 0;
+        const char *e; char nm[300], full[1400]; PlatStat st;
+        if (h->dots < 2) { e = h->dots++ ? ".." : "."; } else if (!(e = vfs_readdir(h->d, full, sizeof full))) return 0;
         if (!win_glob(h->pat, e)) continue;
         snprintf(nm, sizeof nm, "%s", e);
-        char full[1400]; PlatStat st; snprintf(full, sizeof full, "%s/%s", h->dir, e);
         if (h->dots && strcmp(e, ".") && strcmp(e, "..") && plat_fs_stat(full, &st)) continue;
         if (!strcmp(e, ".") || !strcmp(e, "..")) { memset(&st, 0, sizeof st); st.is_dir = 1; }
         memset(GP(out), 0, 320);
@@ -149,9 +148,9 @@ SHIM(FindFirstFileA) {
     const char *pat = sl ? sl + 1 : wdir; char patc[300]; snprintf(patc, sizeof patc, "%s", pat);
     if (sl) sl[1] = 0; else wdir[0] = 0;
     KFind *f = calloc(1, sizeof *f); f->k = (KObj){ K_FIND, 1, kfind_destroy, NULL, NULL };
-    vfs_map(wdir[0] ? wdir : ".", f->dir, sizeof f->dir); snprintf(f->pat, sizeof f->pat, "%s", patc);
+    snprintf(f->pat, sizeof f->pat, "%s", patc);
     f->dots = strpbrk(patc, "*?") ? 0 : 2;                  /* "." and ".." only for wildcard searches */
-    f->d = plat_fs_opendir(f->dir);
+    f->d = vfs_opendir(wdir[0] ? wdir : ".");               /* the write folder and the game folder */
     if (!f->d) { free(f); port_miss("FindFirstFile", w); set_last_error(3); RET(0xFFFFFFFFu); return; }
     if (!find_next(f, A(1))) { kfind_destroy(&f->k); set_last_error(2); RET(0xFFFFFFFFu); return; }
     RET(handle_new(&f->k));

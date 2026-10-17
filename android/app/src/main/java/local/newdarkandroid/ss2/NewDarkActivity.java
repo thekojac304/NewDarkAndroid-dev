@@ -1,5 +1,6 @@
 package local.newdarkandroid.ss2;
 
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -20,7 +21,7 @@ import java.io.File;
  * run starts in a fresh process; LauncherActivity reads the result from the main process.
  */
 public class NewDarkActivity extends SDLActivity {
-    static final String EXTRA_LIB = "lib", EXTRA_ARGS = "args", EXTRA_TITLE = "title";
+    static final String EXTRA_LIB = "lib", EXTRA_ARGS = "args", EXTRA_TITLE = "title", EXTRA_OVERLAY = "overlay";
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private TextView overlay;
@@ -44,6 +45,10 @@ public class NewDarkActivity extends SDLActivity {
         super.onCreate(state);
         String[] args = getArguments();
         if (mBrokenLibraries || mLayout == null || args.length == 0) return;
+        if (!getIntent().getBooleanExtra(EXTRA_OVERLAY, true)) {   // the game's window: landscape, nothing on top
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            return;
+        }
         // A status line over the SDL surface: the tail of the run log while the native program runs.
         log = new File(args[0], "run.log");
         title = getIntent().getStringExtra(EXTRA_TITLE);

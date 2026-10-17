@@ -58,7 +58,9 @@ int plat_video_open(int w, int h, int fullscreen, const char *title) {
         }
         GlSetup g = { gles, 0, 0, 0 }; glt_call(gl_setup, &g);
         if (g.ret) return -1;
+#ifndef __ANDROID__                 /* on Android it would open the on-screen keyboard */
         SDL_StartTextInput();
+#endif
     } else {
         SDL_SetWindowFullscreen(win, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
         if (!fullscreen) { int cw, ch; SDL_GetWindowSize(win, &cw, &ch); if (cw < surf_w || ch < surf_h) SDL_SetWindowSize(win, surf_w, surf_h); }
@@ -177,7 +179,11 @@ void plat_audio_pause(int p) { if (adev) SDL_PauseAudioDevice(adev, p); }
 void plat_alert(const char *title, const char *text) { if (!getenv("SS2PORT_NOALERT")) SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title, text, win); }
 
 int port_main(int argc, char **argv);
+#ifdef __ANDROID__                  /* SDL calls SDL_main (backends/android/android_main.c), which runs this on its game thread */
+int plat_sdl2_main(int argc, char **argv) {
+#else
 int main(int argc, char **argv) {
+#endif
     /* SS2PORT_MOUSE_WARP=1: emulate captured mouse by re-centring the pointer (for systems without pointer capture,
        such as some remote desktops); SS2PORT_MOUSE_SCALE: multiply mouse motion (e.g. 0.5) */
     const char *mw = getenv("SS2PORT_MOUSE_WARP"); SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, mw && *mw == '1' ? "1" : "0");

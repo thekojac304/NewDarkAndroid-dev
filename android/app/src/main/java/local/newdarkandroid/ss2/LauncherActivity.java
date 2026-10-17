@@ -43,7 +43,14 @@ public class LauncherActivity extends Activity {
         // Negative tests, from adb only (--es autorun neg): both must be reported as FAIL with the reason.
         { "neg-exe", "ss2conf", "negative test: wrong executable (expect FAIL)", "missing.exe" },
         { "neg-crash", "ss2conf", "negative test: native crash (expect FAIL)", "--android-crash-test conformance.exe" },
+        // Phase 1C: the recompiled game, run from games/ss2/ (read only); saves and configuration go to files/profiles/ss2/.
+        // Arguments are built in startNext. From adb, --ei frames N changes the frame limit (0: none).
+        { "game-null", "ss2null", "game, headless (null backend)", "" },
+        { "game", "ss2game", "game, SDL2 + OpenGL ES", "" },
     };
+    static final String GAME = "ss2";                       // games/<GAME>/SS2.exe, profiles/<GAME>/
+    static boolean isGame(String m) { return m.startsWith("game"); }
+    static int defaultFrames(String m) { return m.equals("game-null") ? 600 : 3600; }
     static final long START_GRACE_MS = 15000;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -100,12 +107,14 @@ public class LauncherActivity extends Activity {
         col.setPadding(40, 40, 40, 40);
         TextView title = text(20, false);
         title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setText("NewDark SS2: runtime conformance (Phase 1B)");
+        title.setText("NewDark SS2: runtime conformance and first game runs (Phase 1C)");
         col.addView(title);
         col.addView(info = text(12, true));
         addButton(col, "Run default lift", "default");
         addButton(col, "Run --cache-regs --abi-check", "cr");
         addButton(col, "Run both", "all");
+        addButton(col, "Game: headless, 600 frames", "game-null");
+        addButton(col, "Game: SDL2 window", "game");
         col.addView(status = text(15, false));
         status.setTypeface(Typeface.DEFAULT_BOLD);
         col.addView(results = text(12, true));
@@ -126,7 +135,7 @@ public class LauncherActivity extends Activity {
         Button b = new Button(this);
         b.setText(label);
         b.setAllCaps(false);
-        b.setOnClickListener(v -> startQueue(which));
+        b.setOnClickListener(v -> { state.edit().putInt("frames", -1).apply(); startQueue(which); });
         col.addView(b);
         buttons.add(b);
     }
@@ -168,7 +177,9 @@ public class LauncherActivity extends Activity {
 
     private void autorun(Intent intent) {
         String which = intent != null ? intent.getStringExtra("autorun") : null;
-        if (which != null) startQueue(which);
+        if (which == null) return;
+        state.edit().putInt("frames", intent.getIntExtra("frames", -1)).apply();      // -1: each game mode's default
+        startQueue(which);
     }
 
     private void startQueue(String which) {
@@ -190,11 +201,13 @@ public class LauncherActivity extends Activity {
         int comma = q.indexOf(',');
         String m = comma < 0 ? q : q.substring(0, comma), rest = comma < 0 ? "" : q.substring(comma + 1);
         String[] x = mode(m);
-        File dir = runDir(m);
+        File dir = runDir(m), exe = new File(new File(gamesDir(), GAME), "SS2.exe"), profile = new File(getFilesDir(), "profiles/" + GAME);
         try {
             Files.deleteTree(dir);
             if (!dir.mkdirs()) throw new IOException("cannot create " + dir);
-            Files.copy(getAssets().open("conformance/conformance.exe"), new File(dir, "conformance.exe"));
+            if (!isGame(m)) Files.copy(getAssets().open("conformance/conformance.exe"), new File(dir, "conformance.exe"));
+            else if (!exe.isFile()) throw new IOException("no game: " + exe + " not found (copy the game folder there with adb push)");
+            else if (!profile.isDirectory() && !profile.mkdirs()) throw new IOException("cannot create " + profile);
         } catch (IOException e) {
             state.edit().putString("queue", rest).apply();
             finishRun(m, "launcher could not prepare the run: " + e);
@@ -204,10 +217,17 @@ public class LauncherActivity extends Activity {
         state.edit().putString("queue", rest).putString("pending", m).putString("last", m).putLong("launched", System.currentTimeMillis()).apply();
         Log.i(TAG, "starting " + m + ": lib" + x[1] + ".so in " + dir);
         List<String> args = new ArrayList<>(Arrays.asList(dir.getAbsolutePath(), "--verbose"));
-        args.addAll(Arrays.asList(x[3].split(" ")));
+        if (isGame(m)) {
+            int frames = state.getInt("frames", -1);
+            if (frames < 0) frames = defaultFrames(m);
+            args.addAll(Arrays.asList("--android-env", "SS2PORT_WRITE_DIR=" + profile.getAbsolutePath()));
+            if (frames > 0) args.addAll(Arrays.asList("--frames", Integer.toString(frames)));
+            args.add(exe.getAbsolutePath());
+        } else args.addAll(Arrays.asList(x[3].split(" ")));
         Intent i = new Intent(this, NewDarkActivity.class)
             .putExtra(NewDarkActivity.EXTRA_LIB, x[1])
             .putExtra(NewDarkActivity.EXTRA_TITLE, x[2])
+            .putExtra(NewDarkActivity.EXTRA_OVERLAY, !m.equals("game"))      // the game's own picture needs no log on top
             .putExtra(NewDarkActivity.EXTRA_ARGS, args.toArray(new String[0]));
         startActivity(i);
         refresh();
@@ -254,6 +274,7 @@ public class LauncherActivity extends Activity {
     private static final Pattern EXITP = Pattern.compile("^\\[port\\] ExitProcess\\((\\d+)\\)", Pattern.MULTILINE);
     private static final Pattern SECS = Pattern.compile("^\\[android\\] process exit\\(-?\\d+\\) after ([0-9.]+) s", Pattern.MULTILINE);
     private static final Pattern START = Pattern.compile("^start (\\d+)", Pattern.MULTILINE);
+    private static final Pattern STOP = Pattern.compile("^\\[port\\] stopping after (\\d+) frames", Pattern.MULTILINE);
 
     private void finishRun(String m, String st) {
         File dir = runDir(m);
@@ -268,8 +289,15 @@ public class LauncherActivity extends Activity {
         Matcher conf = CONF.matcher(runLog), pre = PRE.matcher(runLog), exitp = EXITP.matcher(runLog), secs = SECS.matcher(runLog);
         boolean hasConf = conf.find(), hasPre = pre.find(), hasExitp = exitp.find(), hasSecs = secs.find();
         Matcher pid = START.matcher(statusText != null ? statusText : "");
-        boolean pass = exit != null && exit == 0 && hasConf && conf.group(1).equals("0") && !conf.group(2).equals("0")
-            && hasPre && pre.group(1).equals("0") && hasExitp && exitp.group(1).equals("0") && abi == 0;
+        boolean game = isGame(m);
+        Matcher stop = STOP.matcher(runLog);
+        boolean first = runLog.contains("[port] first frame presented"), hasStop = stop.find(), fatal = runLog.contains("[port] FATAL");
+        int modules = count(runLog, ": loaded the recompiled module at");
+        // A game run passes when it presented frames and ended by itself with exit 0: at its frame limit, or (no limit) on quit.
+        boolean pass = game
+            ? exit != null && exit == 0 && hasPre && pre.group(1).equals("0") && first && !fatal && abi == 0
+            : exit != null && exit == 0 && hasConf && conf.group(1).equals("0") && !conf.group(2).equals("0")
+              && hasPre && pre.group(1).equals("0") && hasExitp && exitp.group(1).equals("0") && abi == 0;
 
         String outcome = st == null ? "no native start recorded (library not loaded or process never started)"
             : st.startsWith("exit ") ? "process exit " + exit + (hasSecs ? " after " + secs.group(1) + " s" : "")
@@ -277,8 +305,14 @@ public class LauncherActivity extends Activity {
             : st.startsWith("start ") ? "process ended without an exit status (killed?)" : st;
         StringBuilder r = new StringBuilder();
         r.append(title(m)).append(": ").append(pass ? "PASS" : "FAIL").append('\n');
-        r.append("  conformance: ").append(hasConf ? conf.group(1) + " of " + conf.group(2) + " checks failed" : "no result line").append('\n');
-        r.append("  ExitProcess: ").append(hasExitp ? exitp.group(1) : "not reached").append("; ").append(outcome).append('\n');
+        if (game) {
+            r.append("  frames: ").append(first ? "first frame presented" : "none presented").append(hasStop ? "; stopped after " + stop.group(1) : "").append('\n');
+            r.append("  recompiled modules loaded: ").append(modules).append(fatal ? "; FATAL error in the log" : "").append('\n');
+            r.append("  ").append(outcome).append('\n');
+        } else {
+            r.append("  conformance: ").append(hasConf ? conf.group(1) + " of " + conf.group(2) + " checks failed" : "no result line").append('\n');
+            r.append("  ExitProcess: ").append(hasExitp ? exitp.group(1) : "not reached").append("; ").append(outcome).append('\n');
+        }
         r.append("  ABI violations: ").append(abi).append('\n');
         r.append("  preflight: ").append(hasPre ? pre.group(1) + " of " + pre.group(2) + " checks failed" : "did not run").append('\n');
         for (Matcher c = CHECK.matcher(runLog); c.find(); ) r.append("    ").append(c.group(1)).append(": ").append(c.group(2)).append('\n');
@@ -288,9 +322,13 @@ public class LauncherActivity extends Activity {
         String when = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
         r.append("  pid ").append(pid.find() ? pid.group(1) : "?").append(", finished ").append(when).append('\n');
 
-        String line = String.format(Locale.US, "RESULT mode=%s verdict=%s conformance=%s preflight=%s abi_violations=%d exitprocess=%s status=\"%s\" pid=%s seconds=%s",
-            m, pass ? "PASS" : "FAIL", hasConf ? conf.group(1) + "/" + conf.group(2) : "none", hasPre ? pre.group(1) + "/" + pre.group(2) : "none", abi,
-            hasExitp ? exitp.group(1) : "none", st, pid.find(0) ? pid.group(1) : "?", hasSecs ? secs.group(1) : "?");
+        String line = game
+            ? String.format(Locale.US, "RESULT mode=%s verdict=%s first_frame=%s frames=%s modules=%d fatal=%s preflight=%s status=\"%s\" pid=%s seconds=%s",
+                m, pass ? "PASS" : "FAIL", first ? "yes" : "no", hasStop ? stop.group(1) : "?", modules, fatal ? "yes" : "no",
+                hasPre ? pre.group(1) + "/" + pre.group(2) : "none", st, pid.find(0) ? pid.group(1) : "?", hasSecs ? secs.group(1) : "?")
+            : String.format(Locale.US, "RESULT mode=%s verdict=%s conformance=%s preflight=%s abi_violations=%d exitprocess=%s status=\"%s\" pid=%s seconds=%s",
+                m, pass ? "PASS" : "FAIL", hasConf ? conf.group(1) + "/" + conf.group(2) : "none", hasPre ? pre.group(1) + "/" + pre.group(2) : "none", abi,
+                hasExitp ? exitp.group(1) : "none", st, pid.find(0) ? pid.group(1) : "?", hasSecs ? secs.group(1) : "?");
         if (pass) Log.i(TAG, line); else Log.e(TAG, line);
         try {
             Files.write(resultFile(m), r.toString(), false);

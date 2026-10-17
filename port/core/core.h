@@ -141,6 +141,12 @@ char *vfs_map(const char *win, char *out, size_t n);
 char *vfs_map_write(const char *win, char *out, size_t n);     /* the same, for a file the game writes (the write folder, if any) */
 PlatFile *vfs_open(const char *win, int flags, int *err, char *host, size_t hn);
 void  vfs_changed(const char *host_path);   /* after creating, removing or renaming: drops cached directory listings */
+/* Lists a Windows folder: the write folder's copy and the game folder's together (a name in both is listed once, from the
+ * write folder). vfs_readdir returns the next name ("." and ".." are skipped) and its host path in host. */
+typedef struct VfsDir VfsDir;
+VfsDir *vfs_opendir(const char *win);
+const char *vfs_readdir(VfsDir *d, char *host, size_t n);
+void  vfs_closedir(VfsDir *d);
 int   vfs_copy(const char *from_host, const char *to_host);
 int   vfs_chdir(const char *win);
 const char *vfs_cwd(void);

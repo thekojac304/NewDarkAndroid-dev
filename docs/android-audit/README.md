@@ -29,6 +29,7 @@ especially SCP.
 | [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) | Architecture, storage design, milestones, performance plan, first task |
 | [PHASE1A_RESULTS.md](PHASE1A_RESULTS.md) | Phase 1A: arm64 setjmp fix, conformance through `adb shell` on the Galaxy S26 Ultra |
 | [PHASE1B_RESULTS.md](PHASE1B_RESULTS.md) | Phase 1B: the APK (`android/`), conformance inside the app process, game-file and graphics preparation |
+| [PHASE1C_RESULTS.md](PHASE1C_RESULTS.md) | Phase 1C: the recompiled NewDark 2.48 game running in the app, headless and with SDL2 + OpenGL ES; first frames on the S26 Ultra |
 
 ## Overall feasibility
 

@@ -340,13 +340,13 @@ SHIM(getdcwd_) { RET(cwd_into(A(1), A(2))); }
 SHIM(getdrive_) { RET(3); }
 SHIM(fullpath_) { char b[1100]; vfs_full_win(gs(A(1)), b, sizeof b); uint32_t l = (uint32_t)strlen(b) + 1, d = A(0); if (!d) d = g_alloc(l); else if (A(2) < l) { RET(0); return; } memcpy(GP(d), b, l); RET(d); }
 /* _findfirst: struct _finddata64i32_t (attrib, time_create, time_access, time_write as 64-bit, size, name[260]) */
-typedef struct { KObj k; PlatDir *d; char dir[1024], pat[300]; int dots; } FindH;
+typedef struct { KObj k; VfsDir *d; char pat[300]; int dots; } FindH;
 static FindH *finds[64];
 static int find_fill(FindH *h, uint32_t out, int t32) {
     for (;;) {
-        const char *e; if (h->dots < 2) e = h->dots++ ? ".." : "."; else if (!(e = plat_fs_readdir(h->d))) return 0;
+        const char *e; char full[1400]; if (h->dots < 2) e = h->dots++ ? ".." : "."; else if (!(e = vfs_readdir(h->d, full, sizeof full))) return 0;
         if (!win_glob(h->pat, e)) continue;
-        PlatStat st; memset(&st, 0, sizeof st); char full[1400]; snprintf(full, sizeof full, "%s/%s", h->dir, e);
+        PlatStat st; memset(&st, 0, sizeof st);
         if (strcmp(e, ".") && strcmp(e, "..")) { if (plat_fs_stat(full, &st)) continue; } else st.is_dir = 1;
         if (t32) { memset(GP(out), 0, 280); WR32(out, st.is_dir ? 0x10 : 0x20); WR32(out + 4, (uint32_t)(st.ctime_ns / 1000000000)); WR32(out + 8, (uint32_t)(st.atime_ns / 1000000000)); WR32(out + 12, (uint32_t)(st.mtime_ns / 1000000000)); WR32(out + 16, (uint32_t)st.size); snprintf((char *)GP(out + 20), 260, "%s", e); }
         else { memset(GP(out), 0, 296); WR32(out, st.is_dir ? 0x10 : 0x20); WR64(out + 8, (uint64_t)(st.ctime_ns / 1000000000)); WR64(out + 16, (uint64_t)(st.atime_ns / 1000000000)); WR64(out + 24, (uint64_t)(st.mtime_ns / 1000000000)); WR32(out + 32, (uint32_t)st.size); snprintf((char *)GP(out + 36), 260, "%s", e); }
@@ -357,10 +357,10 @@ static uint32_t do_findfirst(const char *w, uint32_t out, int t32) {
     char wdir[1024]; snprintf(wdir, sizeof wdir, "%s", w); char *sl = strrchr(wdir, '\\'), *s2 = strrchr(wdir, '/'); if (s2 > sl) sl = s2;
     char pat[300]; snprintf(pat, sizeof pat, "%s", sl ? sl + 1 : wdir); if (sl) sl[1] = 0; else wdir[0] = 0;
     int i; for (i = 0; i < 64 && finds[i]; i++) ; if (i == 64) { crt_set_errno(24); return 0xFFFFFFFFu; }
-    FindH *h = calloc(1, sizeof *h); vfs_map(wdir[0] ? wdir : ".", h->dir, sizeof h->dir); snprintf(h->pat, sizeof h->pat, "%s", pat);
-    h->dots = strpbrk(pat, "*?") ? 0 : 2; h->d = plat_fs_opendir(h->dir);
+    FindH *h = calloc(1, sizeof *h); snprintf(h->pat, sizeof h->pat, "%s", pat);
+    h->dots = strpbrk(pat, "*?") ? 0 : 2; h->d = vfs_opendir(wdir[0] ? wdir : ".");      /* the write folder and the game folder */
     if (!h->d) { free(h); crt_set_errno(2); return 0xFFFFFFFFu; }
-    if (!find_fill(h, out, t32)) { plat_fs_closedir(h->d); free(h); crt_set_errno(2); return 0xFFFFFFFFu; }
+    if (!find_fill(h, out, t32)) { vfs_closedir(h->d); free(h); crt_set_errno(2); return 0xFFFFFFFFu; }
     finds[i] = h; return 0x4000u + (uint32_t)i;
 }
 static FindH *FIND(uint32_t h) { return h >= 0x4000 && h < 0x4040 ? finds[h - 0x4000] : NULL; }
@@ -368,7 +368,7 @@ SHIM(findfirst64i32_) { RET(do_findfirst(gs(A(0)), A(1), 0)); }
 SHIM(findfirst32_) { RET(do_findfirst(gs(A(0)), A(1), 1)); }
 SHIM(findnext64i32_) { FindH *h = FIND(A(0)); if (!h || !find_fill(h, A(1), 0)) { crt_set_errno(2); RET(0xFFFFFFFFu); return; } RET(0); }
 SHIM(findnext32_) { FindH *h = FIND(A(0)); if (!h || !find_fill(h, A(1), 1)) { crt_set_errno(2); RET(0xFFFFFFFFu); return; } RET(0); }
-SHIM(findclose_) { FindH *h = FIND(A(0)); if (!h) { RET(0xFFFFFFFFu); return; } plat_fs_closedir(h->d); finds[A(0) - 0x4000] = NULL; free(h); RET(0); }
+SHIM(findclose_) { FindH *h = FIND(A(0)); if (!h) { RET(0xFFFFFFFFu); return; } vfs_closedir(h->d); finds[A(0) - 0x4000] = NULL; free(h); RET(0); }
 
 const ShimDef msvcrt_stdio_shims[] = {
     SA("fopen", fopen_, CDECL), SA("_fsopen", fsopen_, CDECL), SA("fopen_s", fopen_s_, CDECL), SA("freopen", freopen_, CDECL), SA("fclose", fclose_, CDECL), SA("_fcloseall", fcloseall_, CDECL),

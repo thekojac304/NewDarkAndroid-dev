@@ -94,6 +94,38 @@ char *vfs_map(const char *win, char *out, size_t n) {
     resolve(g_cfg.game_dir, rel, out, n);
     return out;
 }
+/* a folder listing must show the game folder's files even when the write folder has a copy of that folder (vfs_map would
+ * return only the write folder's) */
+struct VfsDir { char dirs[2][1024]; int n, cur, has_write; PlatDir *d; };
+VfsDir *vfs_opendir(const char *win) {
+    crt_flush_writes();
+    char rel[1024]; normalise(win, rel, sizeof rel);
+    VfsDir *v = calloc(1, sizeof *v); const char *wd = write_dir();
+    if (wd && resolve(wd, rel, v->dirs[v->n], sizeof v->dirs[0])) { v->n++; v->has_write = 1; }
+    if (resolve(g_cfg.game_dir, rel, v->dirs[v->n], sizeof v->dirs[0])) v->n++;
+    while (v->cur < v->n && !(v->d = plat_fs_opendir(v->dirs[v->cur]))) v->cur++;
+    if (!v->d) { free(v); return NULL; }
+    return v;
+}
+const char *vfs_readdir(VfsDir *v, char *host, size_t n) {
+    for (;;) {
+        const char *e = v->d ? plat_fs_readdir(v->d) : NULL;
+        if (!e) {
+            if (v->d) plat_fs_closedir(v->d);
+            v->d = NULL; if (++v->cur >= v->n) return NULL;
+            v->d = plat_fs_opendir(v->dirs[v->cur]); continue;
+        }
+        if (!strcmp(e, ".") || !strcmp(e, "..")) continue;
+        if (v->has_write && v->cur == 1) {        /* listed already from the write folder? */
+            DirCache *d = dir_list(v->dirs[0]); int dup = 0;
+            if (d) for (int i = 0; i < d->n && !dup; i++) dup = ieq(d->names[i], e);
+            if (dup) continue;
+        }
+        snprintf(host, n, "%s/%s", v->dirs[v->cur], e); return e;
+    }
+}
+void vfs_closedir(VfsDir *v) { if (v) { if (v->d) plat_fs_closedir(v->d); free(v); } }
+
 char *vfs_map_write(const char *win, char *out, size_t n) {
     crt_flush_writes();
     char rel[1024]; normalise(win, rel, sizeof rel);

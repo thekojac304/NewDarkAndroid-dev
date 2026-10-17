@@ -182,12 +182,14 @@ static void check_sync(void) {
 }
 
 /* ---------------------------------------------------------------- the game thread */
+/* The SDL2 backend's entry (backends/sdl2/plat_sdl2.c: SDL set-up, then port_main); absent from null-backend builds. */
+extern int plat_sdl2_main(int argc, char **argv) __attribute__((weak));
 typedef struct { int argc; char **argv; int ret, crash_test; } GameArgs;
 static void *game_thread(void *arg) {
     GameArgs *g = arg; StackInfo s; stack_info(&s); pthread_setname_np(pthread_self(), "ss2-game");
     alog(PLAT_LOG_INFO, "game thread: stack %zu KB + guard %zu KB at %p-%p", s.size >> 10, s.guard >> 10, (void *)s.lo, (void *)s.hi);
     if (g->crash_test) { alog(PLAT_LOG_WARN, "crash test: writing to address 0x10"); *(volatile int *)(uintptr_t)0x10 = 1; }
-    g->ret = port_main(g->argc, g->argv);
+    g->ret = plat_sdl2_main ? plat_sdl2_main(g->argc, g->argv) : port_main(g->argc, g->argv);
     return NULL;
 }
 
@@ -210,8 +212,18 @@ EXPORT int SDL_main(int argc, char **argv) {
     alog(n_failed ? PLAT_LOG_ERROR : PLAT_LOG_INFO, "preflight: %d of %d checks failed", n_failed, n_checks);
 
     static char *av[64]; int ac = 0, crash_test = 0; av[ac++] = "ss2port";
-    for (int i = 2; i < argc && ac < 63; i++) if (!strcmp(argv[i], "--android-crash-test")) crash_test = 1; else av[ac++] = argv[i];
+    for (int i = 2; i < argc && ac < 63; i++)
+        if (!strcmp(argv[i], "--android-crash-test")) crash_test = 1;
+        else if (!strcmp(argv[i], "--android-env") && i + 1 < argc) {       /* NAME=value, e.g. SS2PORT_WRITE_DIR=... */
+            char *v = argv[++i], *eq = strchr(v, '=');
+            if (eq) { *eq = 0; setenv(v, eq + 1, 1); alog(PLAT_LOG_INFO, "environment %s=%s", v, eq + 1); *eq = '='; }
+        } else av[ac++] = argv[i];
     av[ac] = NULL;
+    if (plat_sdl2_main) {               /* the game's window: OpenGL ES; the GL context stays on the game thread, which also pumps SDL's events */
+        setenv("SS2PORT_GLES", "1", 0); unsetenv("SS2PORT_RENDER_THREAD");
+        setenv("SS2PORT_FULLSCREEN", "1", 0); setenv("SDL_IOS_ORIENTATIONS", "LandscapeLeft LandscapeRight", 0);   /* SDL_HINT_ORIENTATIONS */
+        alog(PLAT_LOG_INFO, "backend sdl2: OpenGL ES, fullscreen landscape, renderer on the game thread");
+    }
     GameArgs g = { ac, av, 0, crash_test }; pthread_attr_t a = game_attr(); pthread_t t;
     alog(PLAT_LOG_INFO, "starting port_main after %.3f s", seconds());
     int e = pthread_create(&t, &a, game_thread, &g); pthread_attr_destroy(&a);
