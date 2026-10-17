@@ -6,6 +6,12 @@ and main menu.
 **Out of scope, and not done:** no Shockolate or touch controls, no SCP or NVScript, no optimisation. Shockolate, the
 lifter, `runtime/`, the generated code and the Steam installation were not modified. Nothing was pushed.
 
+> **Correction (Phase 1E):** the "Earth grav shafts do not lift the player" defect below was a **test error**, not a
+> port defect. Every attempt here was in the x = −30 shaft, which is a 20 % low-gravity *descent* shaft: a high, slow
+> jump that falls back is correct there. The lift is the x = −24 shaft. Walked into, it lifts the player from the floor
+> to the top exit on Android and on a Windows desktop build alike, with matching positions. See
+> [PHASE1E_RESULTS.md](PHASE1E_RESULTS.md). The original text is kept below, with the wrong statements struck through.
+
 ## Summary
 
 **The primary success criterion is met.** The recompiled game loads playable areas on Android, and real gameplay input
@@ -20,7 +26,7 @@ works: Earth (the tram station where character creation starts) and the MedSci d
 | Inventory, PDA | **PASS.** Tab opens interface mode: inventory grid, equipment, status bar. The PDA opens (Emails: Deck 1 Engineering, with Email/Logs/Notes/Help tabs). The status-bar icons answer clicks. |
 | Combat | **PASS (melee).** `1` equips the wrench ("Wrench equipped"). Left button swings it, captured mid-swing. No enemy was fought and no gun was fired. |
 | Save and reload | **PASS.** The save dialog and typed name work. Saves land in `files/profiles/ss2/save_N/`. They reload in the same session and after a cold process restart (Earth 614 KB, MedSci 1.5 MB). |
-| Character creation | **Not completed.** The Earth grav shafts do not lift the player, so the path to the recruitment choices cannot be walked (§3.3, open defect). MedSci was reached with NewDark's `first_level` setting instead. |
+| Character creation | **Not completed.** ~~The Earth grav shafts do not lift the player, so the path to the recruitment choices cannot be walked (§3.3, open defect).~~ *Phase 1E: test error, only the descent shaft was tried; the lift shaft works.* MedSci was reached with NewDark's `first_level` setting instead. |
 | Audio | Initialised and producing non-silent samples at 43 callbacks/s with no starvation. AudioFlinger shows 0 underruns on our track. **Not listened to** (§5). |
 | Performance | MedSci, default lift: **99–100 fps** (the game's own `framerate_cap 100`), frame time p95 10.8 ms, p99 ≤ 12 ms. One game thread at ~71 % of a core. RSS 281–285 MB. Level loads take about 1.0–1.2 s, with one 440–500 ms frame (§6). |
 | Lifecycle | Home → icon, Recents and Back all keep or resume the same game process, with picture, sound and mouse capture. Destroying the activity ends the process cleanly. Two defects found and fixed (§7). Screen off was not tested. |
@@ -130,13 +136,18 @@ From `phase1d/game-earth-run.log.txt` and `phase1d/game-medsci-run.log.txt` (thu
 **Not shown:** that individual `allobjs.osm` scripts ran. Door, pickup and HUD behaviour all worked, but I have no
 per-script trace.
 
-### 3.3 Open defect: the Earth grav shafts do not lift the player
+### 3.3 ~~Open defect: the Earth grav shafts do not lift the player~~ (test error, see Phase 1E)
 
 *(The user confirmed that these are grav shafts, with no buttons or doors.)*
 
+> **Phase 1E:** "either shaft" is wrong. The second attempt meant for the other shaft re-entered the same left disc, so
+> only the x = −30 descent shaft (room 44, `RoomGrav` 20) was tested. What is described below is correct behaviour for
+> that shaft. The lift shaft (x = −24, room 43, `RoomGrav` −10) works ([PHASE1E_RESULTS.md](PHASE1E_RESULTS.md)).
+
 **What happens**
 
-- Walking into either shaft onto its emitter disc and waiting more than 5 s: the player stays on the floor.
+- ~~Walking into either shaft~~ Walking into the x = −30 shaft onto its emitter disc and waiting more than 5 s: the
+  player stays on the floor.
 - Jumping inside gives a short rise, then the player falls back. Holding jump while pushing forward does not reach the
   upper exit.
 - With `phys_freq 60` and `framerate_cap 60` in a write-folder `cam_ext.cfg`, the result was the same, so it is not the
@@ -152,8 +163,9 @@ per-script trace.
 - **Whether a desktop build of the same recompiled code has the same bug.** This is the next check, because it decides
   whether the bug is Android-specific.
 
-**Impact:** a normal new game cannot leave Earth, so character creation (the three recruitment choices) was not
-reached. The rest of gameplay was tested on MedSci.
+**Impact:** ~~a normal new game cannot leave Earth, so~~ character creation (the three recruitment choices) was not
+reached. The rest of gameplay was tested on MedSci. *(Phase 1E: the lift works, so the route is open; character
+creation itself is still untested.)*
 
 ## 4. Defects found and fixed
 
@@ -295,8 +307,9 @@ are **not committed**: they show the game's copyrighted art. They are in the ses
 
 ## 10. Remaining defects and open points
 
-1. **Earth grav shafts do not lift the player** (§3.3). This blocks a normal new game and therefore character creation.
-   Next: run the same save on a desktop build of the port to tell a recompiler/port bug from an Android one.
+1. ~~**Earth grav shafts do not lift the player** (§3.3). This blocks a normal new game and therefore character creation.
+   Next: run the same save on a desktop build of the port to tell a recompiler/port bug from an Android one.~~
+   *Closed in Phase 1E: test error; the lift shaft works on Android and desktop.*
 2. **Not exercised:** ranged combat, enemies and AI, level transitions through the game's own elevators, the
    recruitment choices, audible sound, real USB/Bluetooth hardware, screen off/on, and low-memory process death while in
    the background.
@@ -322,5 +335,6 @@ are **not committed**: they show the game's copyrighted art. They are in the ses
   that this mapping is exact.
 - **Test with the HID tool and a real keyboard** next to the touch layer, so that every touch action can be compared with
   its keyboard or mouse equivalent.
-- **Keep the grav-shaft defect separate.** It is not an input problem, and it should be settled first (on desktop) so
-  that touch testing can start from a normal new game.
+- ~~**Keep the grav-shaft defect separate.** It is not an input problem, and it should be settled first (on desktop) so
+  that touch testing can start from a normal new game.~~ *Settled in Phase 1E: there is no defect; touch testing can
+  start from a normal new game.*

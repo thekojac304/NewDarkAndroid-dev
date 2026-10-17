@@ -229,7 +229,83 @@ static void on_event(const PlatEvent *e, void *user) {
     }
     for (int i = 0; i < nlisteners; i++) listeners[i](e);
 }
-void input_pump(void) { plat_video_poll(on_event, NULL); }
+/* SS2PORT_INPUT_SCRIPT=<file>: input for tests, the same on every backend (null included), fed in as if it came from the
+ * platform. One command per line, at a time in milliseconds after the first presented frame (lines in time order):
+ *   <ms> down KEY | up KEY | tap KEY         KEY: a-z 0-9 esc enter space tab backspace lshift lctrl lalt minus semicolon
+ *                                             period comma slash f1-f12 up down left right, or a DirectInput code (0x39)
+ *   <ms> type TEXT                           a key press and its character per character (':' and '_' with shift), all at
+ *                                             once: fine for text fields, too fast for key bindings
+ *   <ms> char C                              only the character C (WM_CHAR); "char space" for a space
+ *   <ms> move DX DY | btn N down|up | click N    relative mouse motion, mouse button (1 left, 2 right, 3 middle)
+ *   <ms> quit                                ends the process with exit code 0
+ * '#' starts a comment. Each command is logged. */
+typedef struct { uint32_t ms; char cmd[8]; char arg[64]; int a, b; } ScriptLine;
+static ScriptLine *script; static int script_n, script_i; static uint64_t script_t0;
+static int script_key(const char *k) {
+    static const struct { const char *n; int d; } t[] = { { "esc", 0x01 }, { "enter", 0x1C }, { "space", 0x39 }, { "tab", 0x0F }, { "backspace", 0x0E },
+        { "lshift", 0x2A }, { "lctrl", 0x1D }, { "lalt", 0x38 }, { "minus", 0x0C }, { "semicolon", 0x27 }, { "period", 0x34 }, { "comma", 0x33 },
+        { "slash", 0x35 }, { "up", 0xC8 }, { "down", 0xD0 }, { "left", 0xCB }, { "right", 0xCD } };
+    static const char letters[] = "qwertyuiop\0\0\0\0asdfghjkl\0\0\0\0\0zxcvbnm";     /* DIK 0x10 onwards */
+    if (k[0] && !k[1]) {
+        if (k[0] >= '1' && k[0] <= '9') return 0x02 + (k[0] - '1');
+        if (k[0] == '0') return 0x0B;
+        for (int i = 0; i < (int)sizeof letters - 1; i++) if (letters[i] && letters[i] == k[0]) return 0x10 + i;
+    }
+    if (k[0] == 'f' && k[1] >= '1' && k[1] <= '9') { int n = atoi(k + 1); if (n >= 1 && n <= 10) return 0x3A + n; if (n == 11) return 0x57; if (n == 12) return 0x58; }
+    if (k[0] == '0' && k[1] == 'x') return (int)strtol(k, NULL, 16);
+    for (size_t i = 0; i < sizeof t / sizeof *t; i++) if (!strcmp(k, t[i].n)) return t[i].d;
+    return 0;
+}
+static void script_load(void) {
+    static int done; if (done) return; done = 1;
+    const char *path = getenv("SS2PORT_INPUT_SCRIPT"); if (!path || !*path) return;
+    FILE *f = fopen(path, "r"); if (!f) { port_warn("input script %s: cannot open", path); return; }
+    char l[256]; int cap = 0;
+    while (fgets(l, sizeof l, f)) {
+        char *h = strchr(l, '#'); if (h) *h = 0;
+        ScriptLine s; memset(&s, 0, sizeof s); unsigned ms; int n = 0;
+        if (sscanf(l, "%u %7s %n", &ms, s.cmd, &n) < 2) continue;
+        s.ms = ms; char *rest = l + n; size_t rl = strlen(rest); while (rl && (rest[rl - 1] == '\n' || rest[rl - 1] == '\r')) rest[--rl] = 0;
+        snprintf(s.arg, sizeof s.arg, "%s", rest); sscanf(rest, "%d %d", &s.a, &s.b);
+        if (script_n == cap) { cap = cap ? cap * 2 : 64; script = realloc(script, (size_t)cap * sizeof *script); }
+        script[script_n++] = s;
+    }
+    fclose(f); port_log("input script %s: %d commands", path, script_n);
+}
+static void script_keyev(int dik, int down) { PlatEvent e; memset(&e, 0, sizeof e); e.type = PLAT_EV_KEY; e.key = dik; e.down = down; on_event(&e, NULL); }
+static void script_run(const ScriptLine *s) {
+    PlatEvent e; memset(&e, 0, sizeof e); char k[64] = ""; sscanf(s->arg, "%63s", k);
+    port_log("input script %u ms: %s %s", s->ms, s->cmd, s->arg);
+    if (!strcmp(s->cmd, "down") || !strcmp(s->cmd, "up") || !strcmp(s->cmd, "tap")) {
+        int d = script_key(k); if (!d) { port_warn("input script: unknown key %s", k); return; }
+        if (strcmp(s->cmd, "up")) script_keyev(d, 1);
+        if (strcmp(s->cmd, "down")) script_keyev(d, 0);
+    } else if (!strcmp(s->cmd, "type")) {
+        for (const char *p = s->arg; *p; p++) {
+            char one[2] = { (char)tolower((unsigned char)*p), 0 }; int shift = *p == ':' || *p == '_' || isupper((unsigned char)*p);
+            int d = *p == ':' ? 0x27 : *p == '_' ? 0x0C : *p == ' ' ? 0x39 : script_key(one);
+            if (shift) script_keyev(0x2A, 1);
+            if (d) script_keyev(d, 1);
+            e.type = PLAT_EV_TEXT; e.text = (uint32_t)(unsigned char)*p; on_event(&e, NULL);
+            if (d) script_keyev(d, 0);
+            if (shift) script_keyev(0x2A, 0);
+        }
+    } else if (!strcmp(s->cmd, "char")) { e.type = PLAT_EV_TEXT; e.text = !strcmp(k, "space") ? ' ' : (uint32_t)(unsigned char)k[0]; if (e.text) on_event(&e, NULL); }
+    else if (!strcmp(s->cmd, "move")) { e.type = PLAT_EV_MOUSE_MOVE; e.dx = s->a; e.dy = s->b; on_event(&e, NULL); }
+    else if (!strcmp(s->cmd, "btn") || !strcmp(s->cmd, "click")) {
+        static const int map[4] = { 0, 0, 1, 2 }; e.type = PLAT_EV_MOUSE_BUTTON; e.button = s->a >= 1 && s->a <= 3 ? map[s->a] : 0;
+        int click = !strcmp(s->cmd, "click");
+        if (click || strstr(s->arg, "down")) { e.down = 1; on_event(&e, NULL); }
+        if (click || strstr(s->arg, "up")) { e.down = 0; on_event(&e, NULL); }
+    } else if (!strcmp(s->cmd, "quit")) port_exit(0);
+    else port_warn("input script: unknown command %s", s->cmd);
+}
+static void script_pump(void) {
+    script_load(); if (script_i >= script_n || !g_frames) return;
+    uint64_t now = plat_time_ns(); if (!script_t0) script_t0 = now;
+    while (script_i < script_n && (now - script_t0) / 1000000u >= script[script_i].ms) script_run(&script[script_i++]);
+}
+void input_pump(void) { script_pump(); plat_video_poll(on_event, NULL); }
 static int msg_waiting(void) { input_pump(); return qt != qh || quit_posted; }
 static int match(const QMsg *m, uint32_t h, uint32_t lo, uint32_t hi) { return (!h || m->hwnd == h) && ((!lo && !hi) || (m->msg >= lo && m->msg <= hi)); }
 /* takes (remove) or looks at the first queued message that matches into the guest MSG at p */

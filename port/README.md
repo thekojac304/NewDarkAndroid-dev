@@ -88,6 +88,9 @@ Use `1` for on/off switches. Command Prompt: `set SS2PORT_NOVSYNC=1`.
 | `SS2PORT_MOUSE_SCALE` | multiply mouse motion, e.g. `0.5` |
 | `SS2PORT_MOUSE_WARP=1` | capture the mouse by re-centring the pointer, for systems where pointer capture does not work (known to feel bad under WSLg) |
 | `SS2PORT_MOUSE_DEBUG=1` | log raw mouse motion and the cursor position the game reads and sets |
+| `SS2PORT_PROFILE=1` | (SDL2 backend) every 5 s, log frame rate, frame times, stalls, resident memory and audio callback statistics |
+| `SS2PORT_INPUT_DEBUG=1` | (SDL2 backend) log every key, text, mouse button, window and app event |
+| `SS2PORT_INPUT_SCRIPT=<file>` | test input: keys, characters, mouse motion and buttons at set times after the first frame, fed in as if from the platform, on any backend including `null` (format in `win32/user32.c`). With the game's `log_player_pos` command bound to a key, gameplay can be compared headless across platforms (docs/android-audit/PHASE1E_RESULTS.md) |
 
 ## Build details
 

@@ -31,6 +31,7 @@ especially SCP.
 | [PHASE1B_RESULTS.md](PHASE1B_RESULTS.md) | Phase 1B: the APK (`android/`), conformance inside the app process, game-file and graphics preparation |
 | [PHASE1C_RESULTS.md](PHASE1C_RESULTS.md) | Phase 1C: the recompiled NewDark 2.48 game running in the app, headless and with SDL2 + OpenGL ES; first frames on the S26 Ultra |
 | [PHASE1D_RESULTS.md](PHASE1D_RESULTS.md) | Phase 1D: gameplay on the S26 Ultra (Earth and MedSci: movement, mouse look, frob, inventory, PDA, melee, save/load), input, audio, performance, lifecycle, write-folder regression test |
+| [PHASE1E_RESULTS.md](PHASE1E_RESULTS.md) | Phase 1E: the Earth grav-shaft "defect" was a test error (only the low-gravity descent shaft was tried). The lift shaft works on Android and a Windows desktop build, with matching scripted position traces. |
 
 ## Overall feasibility
 

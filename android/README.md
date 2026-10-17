@@ -73,6 +73,7 @@ keeps its mouse in relative mode even in its menus, so a tap cannot place its cu
 | `SS2PORT_PROFILE=1` | Every 5 s: fps, frame-time mean/median/p95/p99/max, frames over 50 and 100 ms, time in SwapWindow, resident memory, audio callbacks (count, longest gap, peak level, silent buffers) |
 | `SS2PORT_INPUT_DEBUG=1` | Every key, text, mouse-button, finger, window and app event SDL delivers |
 | `SS2PORT_MOUSE_DEBUG=1` | Mouse capture changes and every motion event |
+| `SS2PORT_INPUT_SCRIPT=<file>` | Not a log: plays scripted input at set times, in `game` or headless `game-null`. Put the file where the app can read it, for example `run-as local.newdarkandroid.ss2 cp /data/local/tmp/x.txt files/x.txt`, then `--es env SS2PORT_INPUT_SCRIPT=/data/user/0/local.newdarkandroid.ss2/files/x.txt` (see `port/README.md` and docs/android-audit/PHASE1E_RESULTS.md) |
 
 **Lifecycle.** Home, then the app icon or Recents, resumes the running game where it was: same process, sound resumes
 and mouse capture comes back. The launcher does not open a second copy on top. Back is passed to the game and does not
