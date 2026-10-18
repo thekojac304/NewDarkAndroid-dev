@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -77,6 +78,34 @@ public class LauncherActivity extends Activity {
     private boolean resumed;
     private TextView info, status, results, log;
     private final List<Button> buttons = new ArrayList<>();
+    private static final int REQUEST_IMPORT = 0x5353;
+    private TextView importStatus;
+    private volatile boolean importing;
+
+    /** The picked folder is copied into games/NAME on a worker thread (GameImport); the new folder becomes the game folder. */
+    @Override
+    protected void onActivityResult(int request, int result, Intent data) {
+        super.onActivityResult(request, result, data);
+        if (request != REQUEST_IMPORT) return;
+        Uri tree = data != null ? data.getData() : null;
+        if (result != RESULT_OK || tree == null) { importStatus.setText("Import: no folder was picked."); return; }
+        importing = true;
+        importStatus.setText("Importing...");
+        new Thread(() -> {
+            String msg;
+            try {
+                GameImport.Result r = new GameImport(getContentResolver(), tree, m -> runOnUiThread(() -> importStatus.setText(m))).run(gamesDir());
+                state.edit().putString("game", r.name).apply();
+                msg = String.format(Locale.US, "Imported %d files (%.0f MB) into the game folder %s. It is now the selected game folder.", r.files, r.bytes / 1048576.0, r.name);
+                Log.i(TAG, "import: " + msg);
+            } catch (Exception e) {
+                msg = "Import failed: " + e.getMessage() + " Nothing was changed.";
+                Log.e(TAG, "import failed", e);
+            }
+            final String m = msg;
+            runOnUiThread(() -> { importing = false; importStatus.setText(m); buildUi(); importStatus.setText(m); refresh(); });
+        }, "game-import").start();
+    }
 
     @Override
     protected void onCreate(Bundle saved) {
@@ -125,19 +154,22 @@ public class LauncherActivity extends Activity {
     }
 
     private void buildUi() {
+        buttons.clear();                                                      // rebuilt after an import
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
         col.setPadding(40, 40, 40, 40);
-        TextView title = text(20, false);
+        TextView title = text(22, false);
         title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setText("NewDark SS2: runtime conformance and first game runs (Phase 1C)");
+        title.setText("System Shock 2 (NewDark, recompiled)");
         col.addView(title);
-        col.addView(info = text(12, true));
-        addButton(col, "Run default lift", "default");
-        addButton(col, "Run --cache-regs --abi-check", "cr");
-        addButton(col, "Run both", "all");
-        addButton(col, "Game: headless, 600 frames", "game-null");
-        addButton(col, "Game: SDL2 window (play, no frame limit)", "game");
+        // Normal play: one obvious button. Touch controls on, no frame limit, the Interface size below.
+        Button play = new Button(this);
+        play.setAllCaps(false);
+        play.setTextSize(20);
+        play.setText("Play");
+        play.setOnClickListener(v -> { state.edit().putInt("frames", -1).putString("env", "").putString("portargs", "").putBoolean("touch", true).apply(); startQueue("game"); });
+        col.addView(play);
+        buttons.add(play);
         Button folder = new Button(this);
         folder.setAllCaps(false);
         folder.setText(gameLabel());
@@ -157,6 +189,28 @@ public class LauncherActivity extends Activity {
             size.setText("Interface size: " + uiSize()[2]);
         });
         col.addView(size);
+        Button imp = new Button(this);
+        imp.setAllCaps(false);
+        imp.setText("Import a game folder...");
+        imp.setOnClickListener(v -> {                                          // Android's folder picker; no storage permission
+            if (importing) return;
+            try { startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), REQUEST_IMPORT); }
+            catch (android.content.ActivityNotFoundException e) { importStatus.setText("This device has no folder picker. Copy the game with adb push (android/README.md)."); }
+        });
+        col.addView(imp);
+        col.addView(importStatus = text(13, false));
+        importStatus.setText("Game folders: " + (installedGames().isEmpty() ? "none yet. Import your System Shock 2 folder (NewDark 2.48, modded or not), or copy it with adb push." : String.join(", ", installedGames())));
+        TextView diag = text(14, false);
+        diag.setTypeface(Typeface.DEFAULT_BOLD);
+        diag.setText(BuildConfig.DIAGNOSTICS ? "Diagnostics" : "About");
+        col.addView(diag);
+        col.addView(info = text(12, true));
+        if (BuildConfig.DIAGNOSTICS) {                                        // the dev build: conformance and the headless game
+            addButton(col, "Conformance: default lift", "default");
+            addButton(col, "Conformance: --cache-regs --abi-check", "cr");
+            addButton(col, "Conformance: both", "all");
+            addButton(col, "Game: headless, 600 frames", "game-null");
+        }
         col.addView(status = text(15, false));
         status.setTypeface(Typeface.DEFAULT_BOLD);
         col.addView(results = text(12, true));
@@ -194,7 +248,7 @@ public class LauncherActivity extends Activity {
     private List<String> installedGames() {
         List<String> g = new ArrayList<>();
         File[] d = gamesDir().listFiles();
-        if (d != null) for (File f : d) if (new File(f, "SS2.exe").isFile()) g.add(f.getName());
+        if (d != null) for (File f : d) if (!f.getName().endsWith(".importing") && new File(f, "SS2.exe").isFile()) g.add(f.getName());   // not a half import
         java.util.Collections.sort(g);
         return g;
     }
@@ -249,6 +303,7 @@ public class LauncherActivity extends Activity {
         }
         String q = which.equals("all") ? "default,cr" : which.equals("neg") ? "neg-exe,neg-crash" : which;
         for (String m : q.split(",")) if (mode(m) == null) { Log.e(TAG, "unknown mode " + m); return; }
+        if (!BuildConfig.DIAGNOSTICS && !q.equals("game")) { Log.e(TAG, q + ": not in the play build (install the dev build for diagnostics)"); return; }
         state.edit().putString("queue", q).apply();
         startNext();
     }
@@ -266,7 +321,8 @@ public class LauncherActivity extends Activity {
             Files.deleteTree(dir);
             if (!dir.mkdirs()) throw new IOException("cannot create " + dir);
             if (!isGame(m)) Files.copy(getAssets().open("conformance/conformance.exe"), new File(dir, "conformance.exe"));
-            else if (!exe.isFile()) throw new IOException("no game: " + exe + " not found (copy the game folder there with adb push)");
+            else if (!exe.isFile()) throw new IOException("there is no System Shock 2 in the game folder \"" + game() + "\" (" + exe
+                + " not found). Tap Import a game folder to copy your NewDark 2.48 installation, pick another Game folder, or copy one with adb push.");
             else if (!profile.isDirectory() && !profile.mkdirs()) throw new IOException("cannot create " + profile);
             if (isGame(m)) applyUiSize(new File(profile, "user.cfg"));
         } catch (IOException e) {

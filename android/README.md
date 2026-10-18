@@ -6,7 +6,8 @@ contains code generated from your game files: it is a personal build, never to b
 
 | Part | What it is |
 | --- | --- |
-| `LauncherActivity` (main process) | The test screen, later the launcher. It prepares a run directory, starts `NewDarkActivity`, and shows the verdict, preflight checks and log once the run's process has ended. |
+| `LauncherActivity` (main process) | The launcher: **Play**, **Game folder** (`games/NAME`, each with its own write folder), **Interface size**, **Import a game folder...** (`GameImport`), then the diagnostics (dev build). It prepares a run directory, starts `NewDarkActivity`, and shows the verdict, preflight checks and log once the run's process has ended. |
+| `GameImport` | Copies a folder picked with Android's folder picker (no storage permission) into `games/NAME/` through `NAME.importing/`, keeping its layout (modded installs too), never replacing an existing folder or touching saves |
 | `NewDarkActivity` (`:game` process) | An `SDLActivity`. SDL loads `libSDL2.so` and the library named by the `lib` extra, then calls its `SDL_main` (`port/backends/android/`) with the `args` extra. A log overlay shows progress. |
 | `build_native.py` | Builds SDL 2 and the native libraries with the NDK, and stages them with their assets in `build/android/`. With `--game SS2.exe` it also lifts the game (default lift) and builds `libss2null.so` (headless) and `libss2game.so` (SDL2 + OpenGL ES). |
 | `tools/` | Test tools that run outside the app: `uhid_input.c`, a USB keyboard and mouse made from adb ([tools/README.md](tools/README.md)). |
@@ -29,13 +30,14 @@ git clone -b release-2.32.10 https://github.com/libsdl-org/SDL build/deps/SDL2
 python android/build_native.py          # about 1.5 min: SDL2, conformance.exe, two lifts, two libraries
 python android/build_native.py --no-rebuild-guest --game "/path/to/SS2.exe"   # + the game: ~8 min the first time (lifts), then seconds
 python android/build_native.py --no-rebuild-guest --game "/path/to/SS2.exe" --nvscript "/path/to/DMM/SCP_beta8/NVScript.osm"   # + NVScript, for SCP
-cd android && ./gradlew assembleDebug   # app/build/outputs/apk/debug/app-debug.apk
+cd android && ./gradlew assembleDevDebug    # app/build/outputs/apk/dev/debug/app-dev-debug.apk: everything (diagnostics, tests)
+cd android && ./gradlew assemblePlayDebug   # app/build/outputs/apk/play/debug/app-play-debug.apk: the game only, about half the size
 ```
 
 ## Run
 
 ```sh
-adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+adb install -r android/app/build/outputs/apk/dev/debug/app-dev-debug.apk   # or the play APK; same package, data kept
 adb shell am start -n local.newdarkandroid.ss2/.LauncherActivity --es autorun all   # or default, cr; neg = negative tests
 adb logcat -s NewDarkLauncher ss2port                                                 # RESULT mode=... verdict=PASS ...
 adb shell run-as local.newdarkandroid.ss2 cat files/results/history.txt

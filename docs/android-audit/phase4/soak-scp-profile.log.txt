@@ -1,0 +1,136 @@
+[sdl] profile: 15.2 fps | frame ms mean 65.7 p50 65.7 p95 75.3 p99 81.1 max 81.1 | >50ms 75 >100ms 0 | swap 1% | rss 205 MB | audio 218 callbacks, longest gap 41.4 ms, peak 11366, 1 silent
+[sdl] profile: 48.7 fps | frame ms mean 20.5 p50 10.6 p95 68.5 p99 71.9 max 76.9 | >50ms 44 >100ms 0 | swap 1% | rss 208 MB | audio 216 callbacks, longest gap 41.2 ms, peak 31076, 3 silent
+[sdl] profile: 99.9 fps | frame ms mean 10.0 p50 10.1 p95 12.4 p99 13.7 max 25.4 | >50ms 0 >100ms 0 | swap 3% | rss 210 MB | audio 215 callbacks, longest gap 40.9 ms, peak 13390, 0 silent
+[port] allobjs.osm: 1954 calls from outside it in the last 20 s (1954 in all)
+[port] Squirrel.osm: 660 calls from outside it in the last 20 s (660 in all)
+[port] lgvid.dll: 5383 calls from outside it in the last 20 s (5383 in all)
+[port] NVScript.osm: 674 calls from outside it in the last 20 s (674 in all)
+[sdl] profile: 82.1 fps | frame ms mean 12.2 p50 10.0 p95 12.5 p99 42.7 max 512.1 | >50ms 4 >100ms 2 | swap 3% | rss 278 MB | audio 230 callbacks, longest gap 40.7 ms, peak 11013, 0 silent
+[sdl] profile: 97.9 fps | frame ms mean 10.2 p50 10.1 p95 10.7 p99 11.0 max 111.1 | >50ms 1 >100ms 1 | swap 2% | rss 305 MB | audio 215 callbacks, longest gap 40.1 ms, peak 6004, 1 silent
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.1 p95 10.7 p99 11.0 max 11.2 | >50ms 0 >100ms 0 | swap 2% | rss 305 MB | audio 215 callbacks, longest gap 40.1 ms, peak 6026, 0 silent
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.1 p95 10.7 p99 11.0 max 14.2 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 216 callbacks, longest gap 40.3 ms, peak 18150, 0 silent
+[port] allobjs.osm: 4535 calls from outside it in the last 20 s (6489 in all)
+[port] Squirrel.osm: 1831 calls from outside it in the last 20 s (2491 in all)
+[port] NVScript.osm: 5808 calls from outside it in the last 20 s (6482 in all)
+[sdl] profile: 98.7 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.2 max 12.5 | >50ms 0 >100ms 0 | swap 3% | rss 302 MB | audio 216 callbacks, longest gap 41.0 ms, peak 19498, 0 silent
+[sdl] profile: 98.8 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.6 max 14.0 | >50ms 0 >100ms 0 | swap 3% | rss 301 MB | audio 215 callbacks, longest gap 40.7 ms, peak 17952, 0 silent
+[sdl] profile: 98.9 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.1 max 13.0 | >50ms 0 >100ms 0 | swap 2% | rss 300 MB | audio 215 callbacks, longest gap 40.6 ms, peak 15590, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.5 max 19.1 | >50ms 0 >100ms 0 | swap 2% | rss 304 MB | audio 217 callbacks, longest gap 40.7 ms, peak 20180, 0 silent
+[port] allobjs.osm: 1334 calls from outside it in the last 20 s (7823 in all)
+[port] Squirrel.osm: 409 calls from outside it in the last 20 s (2900 in all)
+[port] NVScript.osm: 6138 calls from outside it in the last 20 s (12620 in all)
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.3 max 13.9 | >50ms 0 >100ms 0 | swap 2% | rss 304 MB | audio 215 callbacks, longest gap 41.0 ms, peak 19832, 0 silent
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 12.7 | >50ms 0 >100ms 0 | swap 2% | rss 305 MB | audio 215 callbacks, longest gap 40.3 ms, peak 22408, 0 silent
+[sdl] profile: 99.2 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 11.6 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 216 callbacks, longest gap 40.7 ms, peak 20697, 0 silent
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.2 max 12.3 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 216 callbacks, longest gap 40.6 ms, peak 20962, 0 silent
+[port] allobjs.osm: 1301 calls from outside it in the last 20 s (9124 in all)
+[port] Squirrel.osm: 395 calls from outside it in the last 20 s (3295 in all)
+[port] NVScript.osm: 6157 calls from outside it in the last 20 s (18777 in all)
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 13.2 | >50ms 0 >100ms 0 | swap 3% | rss 306 MB | audio 215 callbacks, longest gap 40.5 ms, peak 7610, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 12.0 | >50ms 0 >100ms 0 | swap 3% | rss 305 MB | audio 215 callbacks, longest gap 40.7 ms, peak 15643, 0 silent
+[sdl] profile: 98.6 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.1 max 15.3 | >50ms 0 >100ms 0 | swap 2% | rss 305 MB | audio 216 callbacks, longest gap 40.8 ms, peak 6920, 0 silent
+[sdl] profile: 99.2 fps | frame ms mean 10.1 p50 10.0 p95 10.8 p99 11.1 max 13.2 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 216 callbacks, longest gap 40.4 ms, peak 7109, 0 silent
+[port] allobjs.osm: 1350 calls from outside it in the last 20 s (10474 in all)
+[port] Squirrel.osm: 391 calls from outside it in the last 20 s (3686 in all)
+[port] NVScript.osm: 6145 calls from outside it in the last 20 s (24922 in all)
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.0 p95 10.7 p99 11.0 max 12.4 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 215 callbacks, longest gap 40.6 ms, peak 6882, 0 silent
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.1 p95 10.7 p99 11.1 max 11.5 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 216 callbacks, longest gap 40.6 ms, peak 5243, 0 silent
+[sdl] profile: 98.7 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.3 max 29.9 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 215 callbacks, longest gap 40.5 ms, peak 3930, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 11.5 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 215 callbacks, longest gap 40.2 ms, peak 3829, 0 silent
+[port] allobjs.osm: 1284 calls from outside it in the last 20 s (11758 in all)
+[port] Squirrel.osm: 382 calls from outside it in the last 20 s (4068 in all)
+[port] NVScript.osm: 6147 calls from outside it in the last 20 s (31069 in all)
+[sdl] profile: 98.9 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.3 max 15.2 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 216 callbacks, longest gap 40.6 ms, peak 6209, 0 silent
+[sdl] profile: 98.9 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.3 max 12.1 | >50ms 0 >100ms 0 | swap 3% | rss 307 MB | audio 216 callbacks, longest gap 40.9 ms, peak 7382, 0 silent
+[sdl] profile: 98.7 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.3 max 13.6 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 215 callbacks, longest gap 40.7 ms, peak 6484, 0 silent
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 12.1 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 215 callbacks, longest gap 40.4 ms, peak 6006, 0 silent
+[port] allobjs.osm: 1292 calls from outside it in the last 20 s (13050 in all)
+[port] Squirrel.osm: 384 calls from outside it in the last 20 s (4452 in all)
+[port] NVScript.osm: 6147 calls from outside it in the last 20 s (37216 in all)
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 12.3 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 216 callbacks, longest gap 40.6 ms, peak 7701, 0 silent
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 12.2 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 216 callbacks, longest gap 40.4 ms, peak 4446, 0 silent
+[sdl] profile: 98.8 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.5 max 13.1 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 215 callbacks, longest gap 40.6 ms, peak 3458, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 12.3 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 216 callbacks, longest gap 40.6 ms, peak 4129, 0 silent
+[port] allobjs.osm: 1287 calls from outside it in the last 20 s (14337 in all)
+[port] Squirrel.osm: 388 calls from outside it in the last 20 s (4840 in all)
+[port] NVScript.osm: 6147 calls from outside it in the last 20 s (43363 in all)
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 11.3 | >50ms 0 >100ms 0 | swap 3% | rss 306 MB | audio 215 callbacks, longest gap 40.5 ms, peak 6869, 0 silent
+[sdl] profile: 98.7 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.3 max 13.4 | >50ms 0 >100ms 0 | swap 3% | rss 306 MB | audio 215 callbacks, longest gap 41.5 ms, peak 6547, 0 silent
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 14.1 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 215 callbacks, longest gap 40.6 ms, peak 15874, 0 silent
+[sdl] profile: 99.3 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 12.6 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 216 callbacks, longest gap 40.5 ms, peak 9133, 0 silent
+[port] allobjs.osm: 1304 calls from outside it in the last 20 s (15641 in all)
+[port] Squirrel.osm: 390 calls from outside it in the last 20 s (5230 in all)
+[port] NVScript.osm: 6151 calls from outside it in the last 20 s (49514 in all)
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.0 p95 10.7 p99 11.0 max 29.0 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 215 callbacks, longest gap 40.4 ms, peak 5457, 0 silent
+[sdl] profile: 99.2 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 13.2 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 215 callbacks, longest gap 41.0 ms, peak 4769, 0 silent
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.2 max 13.3 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 217 callbacks, longest gap 40.8 ms, peak 3981, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.4 max 12.1 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 215 callbacks, longest gap 40.2 ms, peak 5788, 0 silent
+[port] allobjs.osm: 1297 calls from outside it in the last 20 s (16938 in all)
+[port] Squirrel.osm: 388 calls from outside it in the last 20 s (5618 in all)
+[port] NVScript.osm: 6147 calls from outside it in the last 20 s (55661 in all)
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.2 max 11.4 | >50ms 0 >100ms 0 | swap 3% | rss 306 MB | audio 215 callbacks, longest gap 40.8 ms, peak 6120, 0 silent
+[sdl] profile: 98.8 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.2 max 13.3 | >50ms 0 >100ms 0 | swap 3% | rss 306 MB | audio 216 callbacks, longest gap 40.2 ms, peak 7137, 0 silent
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.0 p95 10.8 p99 11.0 max 11.5 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 216 callbacks, longest gap 40.1 ms, peak 16173, 0 silent
+[sdl] profile: 99.2 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 13.7 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 215 callbacks, longest gap 40.3 ms, peak 8589, 0 silent
+[port] allobjs.osm: 1332 calls from outside it in the last 20 s (18270 in all)
+[port] Squirrel.osm: 397 calls from outside it in the last 20 s (6015 in all)
+[port] NVScript.osm: 6153 calls from outside it in the last 20 s (61814 in all)
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 11.8 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 216 callbacks, longest gap 40.1 ms, peak 5783, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.3 max 12.8 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 216 callbacks, longest gap 41.1 ms, peak 4094, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 14.6 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 215 callbacks, longest gap 40.3 ms, peak 4459, 0 silent
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.2 max 11.7 | >50ms 0 >100ms 0 | swap 3% | rss 307 MB | audio 215 callbacks, longest gap 41.2 ms, peak 7917, 0 silent
+[port] allobjs.osm: 1286 calls from outside it in the last 20 s (19556 in all)
+[port] Squirrel.osm: 389 calls from outside it in the last 20 s (6404 in all)
+[port] NVScript.osm: 6148 calls from outside it in the last 20 s (67962 in all)
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 11.3 | >50ms 0 >100ms 0 | swap 3% | rss 307 MB | audio 217 callbacks, longest gap 40.4 ms, peak 7622, 0 silent
+[sdl] profile: 99.3 fps | frame ms mean 10.1 p50 10.1 p95 10.7 p99 11.0 max 12.2 | >50ms 0 >100ms 0 | swap 3% | rss 306 MB | audio 215 callbacks, longest gap 41.0 ms, peak 13390, 0 silent
+[sdl] profile: 98.8 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 28.1 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 215 callbacks, longest gap 40.5 ms, peak 13585, 0 silent
+[sdl] profile: 99.2 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 13.0 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 216 callbacks, longest gap 40.2 ms, peak 8537, 0 silent
+[port] allobjs.osm: 1315 calls from outside it in the last 20 s (20871 in all)
+[port] Squirrel.osm: 396 calls from outside it in the last 20 s (6800 in all)
+[port] NVScript.osm: 6151 calls from outside it in the last 20 s (74113 in all)
+[sdl] profile: 99.5 fps | frame ms mean 10.1 p50 10.1 p95 10.7 p99 10.9 max 11.1 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 215 callbacks, longest gap 40.6 ms, peak 4760, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.2 max 13.5 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 216 callbacks, longest gap 40.7 ms, peak 3675, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.2 max 12.7 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 215 callbacks, longest gap 41.2 ms, peak 3357, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 13.7 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 216 callbacks, longest gap 40.9 ms, peak 5585, 0 silent
+[port] allobjs.osm: 1292 calls from outside it in the last 20 s (22163 in all)
+[port] Squirrel.osm: 389 calls from outside it in the last 20 s (7189 in all)
+[port] NVScript.osm: 6145 calls from outside it in the last 20 s (80258 in all)
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.4 max 13.6 | >50ms 0 >100ms 0 | swap 3% | rss 305 MB | audio 215 callbacks, longest gap 40.4 ms, peak 5551, 0 silent
+[sdl] profile: 99.3 fps | frame ms mean 10.1 p50 10.0 p95 10.8 p99 11.1 max 11.7 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 215 callbacks, longest gap 40.6 ms, peak 14782, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.2 max 13.1 | >50ms 0 >100ms 0 | swap 2% | rss 306 MB | audio 217 callbacks, longest gap 40.7 ms, peak 15355, 0 silent
+[sdl] profile: 99.5 fps | frame ms mean 10.1 p50 10.0 p95 10.8 p99 10.9 max 11.9 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 215 callbacks, longest gap 40.3 ms, peak 8607, 0 silent
+[port] allobjs.osm: 1355 calls from outside it in the last 20 s (23518 in all)
+[port] Squirrel.osm: 398 calls from outside it in the last 20 s (7587 in all)
+[port] NVScript.osm: 6156 calls from outside it in the last 20 s (86414 in all)
+[sdl] profile: 99.2 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 13.0 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 215 callbacks, longest gap 40.2 ms, peak 6599, 0 silent
+[sdl] profile: 99.2 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 13.9 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 216 callbacks, longest gap 41.8 ms, peak 3864, 0 silent
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 12.4 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 216 callbacks, longest gap 40.3 ms, peak 3524, 0 silent
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 13.9 | >50ms 0 >100ms 0 | swap 3% | rss 308 MB | audio 215 callbacks, longest gap 40.5 ms, peak 6999, 0 silent
+[port] allobjs.osm: 1309 calls from outside it in the last 20 s (24827 in all)
+[port] Squirrel.osm: 388 calls from outside it in the last 20 s (7975 in all)
+[port] NVScript.osm: 6147 calls from outside it in the last 20 s (92561 in all)
+[sdl] profile: 98.6 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.3 max 28.7 | >50ms 0 >100ms 0 | swap 3% | rss 307 MB | audio 215 callbacks, longest gap 40.8 ms, peak 8570, 0 silent
+[sdl] profile: 99.2 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 11.7 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 216 callbacks, longest gap 40.2 ms, peak 6962, 0 silent
+[sdl] profile: 99.3 fps | frame ms mean 10.1 p50 10.0 p95 10.8 p99 11.1 max 13.1 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 216 callbacks, longest gap 40.2 ms, peak 7250, 0 silent
+[sdl] profile: 99.2 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.4 max 13.3 | >50ms 0 >100ms 0 | swap 2% | rss 308 MB | audio 215 callbacks, longest gap 40.2 ms, peak 8194, 0 silent
+[port] allobjs.osm: 1286 calls from outside it in the last 20 s (26113 in all)
+[port] Squirrel.osm: 381 calls from outside it in the last 20 s (8356 in all)
+[port] NVScript.osm: 6153 calls from outside it in the last 20 s (98714 in all)
+[sdl] profile: 98.9 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 12.1 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 216 callbacks, longest gap 40.5 ms, peak 4269, 0 silent
+[sdl] profile: 99.3 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 12.5 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 215 callbacks, longest gap 40.3 ms, peak 4141, 0 silent
+[sdl] profile: 98.8 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.4 max 13.5 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 215 callbacks, longest gap 40.8 ms, peak 8040, 0 silent
+[sdl] profile: 98.8 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.4 max 14.1 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 217 callbacks, longest gap 40.9 ms, peak 6138, 0 silent
+[port] allobjs.osm: 1286 calls from outside it in the last 20 s (27399 in all)
+[port] Squirrel.osm: 389 calls from outside it in the last 20 s (8745 in all)
+[port] NVScript.osm: 6139 calls from outside it in the last 20 s (104853 in all)
+[sdl] profile: 98.9 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 11.3 max 13.2 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 215 callbacks, longest gap 40.9 ms, peak 9371, 0 silent
+[sdl] profile: 99.3 fps | frame ms mean 10.1 p50 10.0 p95 10.8 p99 11.0 max 11.6 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 215 callbacks, longest gap 40.3 ms, peak 14954, 0 silent
+[sdl] profile: 99.3 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 12.2 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 216 callbacks, longest gap 40.6 ms, peak 9406, 0 silent
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 13.4 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 215 callbacks, longest gap 40.4 ms, peak 7264, 0 silent
+[port] allobjs.osm: 1308 calls from outside it in the last 20 s (28707 in all)
+[port] Squirrel.osm: 387 calls from outside it in the last 20 s (9132 in all)
+[port] NVScript.osm: 6153 calls from outside it in the last 20 s (111006 in all)
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 12.5 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 216 callbacks, longest gap 40.6 ms, peak 4330, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.1 max 11.9 | >50ms 0 >100ms 0 | swap 2% | rss 307 MB | audio 215 callbacks, longest gap 40.9 ms, peak 4120, 0 silent
+[android] process exit(0) after 390.903 s
