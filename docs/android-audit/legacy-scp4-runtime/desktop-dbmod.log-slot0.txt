@@ -1,0 +1,44 @@
+
+INFO: found file 'gamesys.dml' in path '.\patch_ext\', loading... (40200)
+INFO: patch queued
+
+INFO: found file 'gamesys.dml' in path '.\DMM\obj_fixes_v12\', loading... (40200)
+INFO: patch queued
+
+INFO: found file 'gamesys.dml' in path '.\DMM\ss2_quest_note_notifier\', loading... (40200)
+INFO: patch queued
+
+INFO: found file 'gamesys.dml' in path '.\DMM\Vurt's SS2 Flora Overhaul 1.0k\', loading... (40200)
+INFO: patch queued
+
+INFO: found file 'gamesys.dml' in path '.\DMM\SS2_Rebirth_v05a\', loading... (40200)
+INFO: patch rejected by fingerprint identification
+
+INFO: found file 'gamesys.dml' in path '.\patch_ext\', loading... (40200)
+WARNING: property "RenderAlpha" does not exist for object -865, skipping delete
+WARNING: property "RenderAlpha" does not exist for object -601, skipping delete
+WARNING: property "RenderAlpha" does not exist for object -857, skipping delete
+WARNING: property "RenderAlpha" does not exist for object -864, skipping delete
+WARNING: property "RenderAlpha" does not exist for object -858, skipping delete
+WARNING: property "RenderAlpha" does not exist for object -959, skipping delete
+WARNING: property "RenderAlpha" does not exist for object -781, skipping delete
+WARNING: property "RenderAlpha" does not exist for object -957, skipping delete
+WARNING: property "RenderAlpha" does not exist for object -958, skipping delete
+WARNING: property "RenderAlpha" does not exist for object -462, skipping
+WARNING: link 0060003F does not link -188 -> -228 as expected, skipping
+WARNING: property "Scripts" does not exist for object -13, skipping delete
+WARNING: property "RenderType" does not exist for object -1593, skipping delete
+WARNING: no stim source found for obj -1309 and stim "Standard Impact", skipping
+INFO: patch done
+
+INFO: found file 'gamesys.dml' in path '.\DMM\obj_fixes_v12\', loading... (40200)
+WARNING: property "RenderType" does not exist for object -1593, skipping
+INFO: patch done
+
+INFO: found file 'gamesys.dml' in path '.\DMM\ss2_quest_note_notifier\', loading... (40200)
+INFO: patch done
+
+INFO: found file 'gamesys.dml' in path '.\DMM\Vurt's SS2 Flora Overhaul 1.0k\', loading... (40200)
+WARNING: property "RenderAlpha" does not exist for object -1855, skipping delete
+WARNING: property "RenderAlpha" does not exist for object -1266, skipping delete
+INFO: patch done

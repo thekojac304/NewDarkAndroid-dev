@@ -1,0 +1,46 @@
+[port] guest address space: 4096 MB at 0000017397930000 (4096 MB backed)
+[port] vm: heap arena 00d30000 +2000000
+[port] vm: thread stack 02d30000 +410000
+[port] vm: PEB 00010000 +10000
+[port] running the recompiled entry point 006f7105 (364 imports, 0 without an implementation)
+[port] vm: VirtualAlloc 03140000 +4000000
+[port] lgvid.dll: first call into its code (30303d97, thread 1004)
+[port] lgvid.dll: loaded the recompiled module at 30300000 (60 imports bound), DllMain -> 1
+[port] LoadLibraryA(openal32.dll): not available on this host
+[port] Direct3D 9: device 1280x720 fullscreen, back buffer format 35, depth buffer
+[port] Direct3D: 2D picture at 0,0 1280x720 of 1280x720
+[port] first frame presented
+[port] Direct3D: 2D picture at 160,0 960x720 of 1280x720
+[port] vm: thread stack 07990000 +110000
+[port] thread 1008 (_beginthreadex) started at 006a1e50
+[port] vm: heap arena 09c90000 +2000000
+[port] allobjs.osm: first call into its code (1004c9d5, thread 1004)
+[port] allobjs.osm: 1 calls from outside it in the last 20 s (1 in all)
+[port] lgvid.dll: 3 calls from outside it in the last 20 s (3 in all)
+[port] allobjs.osm: loaded the recompiled module at 10000000 (61 imports bound), DllMain -> 1
+[port] GetProcAddress(IsTNT): not available
+[port] NVScript.osm: first call into its code (3045f1e9, thread 1004)
+[port] GetProcAddress(FlsAlloc): not available
+[port] GetProcAddress(FlsGetValue): not available
+[port] GetProcAddress(FlsSetValue): not available
+[port] GetProcAddress(FlsFree): not available
+[port] NVScript.osm: loaded the recompiled module at 30400000 (78 imports bound), DllMain -> 1
+[port] Squirrel.osm: first call into its code (30209829, thread 1004)
+[port] GetProcAddress(FlsAlloc): not available
+[port] GetProcAddress(FlsGetValue): not available
+[port] GetProcAddress(FlsSetValue): not available
+[port] GetProcAddress(FlsFree): not available
+[port] Squirrel.osm: loaded the recompiled module at 30000000 (112 imports bound), DllMain -> 1
+[port] vm: heap arena 0c510000 +2000000
+[port] vm: heap arena 10090000 +2000000
+[port] LoadLibraryA(psapi.dll): not available on this host
+[port] thread 1008 (_beginthreadex) ended with 0
+[port] Direct3D: 2D picture at 0,0 1280x720 of 1280x720
+[port] vm: heap arena 12090000 +2000000
+[port] LoadLibraryA(psapi.dll): not available on this host
+[port] allobjs.osm: 7898 calls from outside it in the last 20 s (7899 in all)
+[port] Squirrel.osm: 610 calls from outside it in the last 20 s (610 in all)
+[port] NVScript.osm: 5619 calls from outside it in the last 20 s (5619 in all)
+[port] allobjs.osm: 793 calls from outside it in the last 20 s (8692 in all)
+[port] Squirrel.osm: 339 calls from outside it in the last 20 s (949 in all)
+[port] NVScript.osm: 3529 calls from outside it in the last 20 s (9148 in all)

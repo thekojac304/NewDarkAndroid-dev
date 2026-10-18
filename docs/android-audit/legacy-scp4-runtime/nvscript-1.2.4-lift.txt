@@ -1,0 +1,8 @@
+NVScript 1.2.4 (this phase, build/android-scp4): 4288 functions, 175962 instructions, 78 imports, SMC sites 0
+  left as run-time faults: {'mov': 18, 'int': 16}
+NVScript Beta 8 (Phase 3A, build/android): 4521 functions, 203322 instructions, 77 imports, SMC sites 0
+  left as run-time faults: {'mov': 25, 'palignr': 18, 'int': 6, 'hlt': 4, 'outsd': 4, 'pcmpistri': 3, 'in': 2, 'lcall': 2, 'out': 2, 'vxorps': 2, 'vpmovmskb': 2, 'vzeroupper': 2, 'iretd': 1, 'aaa': 1, 'push': 1, 'aam': 1, 'insb': 1, 'xgetbv': 1, 'pinsrb': 1, 'vpcmpeqb': 1, 'vpcmpeqw': 1}
+Squirrel 1.02 (shipped since Phase 1C): 14375 functions, 628115 instructions, 112 imports, SMC sites 0
+  left as run-time faults: {'pop': 69, 'mov': 18, 'int': 16, 'bound': 5, 'push': 3, 'in': 1, '<undecodable>': 1}
+
+const RecompModDesc nv_desc = { "NVScript.osm", 0x30400000u, 0xa8000u, 0x3045f1e9u, 0x10000000u, 0x83eb1ef4u, 1, 1, code_lo, code_hi, nv_table, &nv_table_n, nv_lookup };

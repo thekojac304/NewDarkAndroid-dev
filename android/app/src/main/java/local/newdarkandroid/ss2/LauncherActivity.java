@@ -192,7 +192,8 @@ public class LauncherActivity extends Activity {
             if (!r.isEmpty()) state.edit().putString("recovered", "An earlier import did not finish: " + r).apply();
         }
         buildUi();
-        Log.i(TAG, "onCreate" + (saved != null ? " (restored)" : "") + ", autorun=" + getIntent().getStringExtra("autorun"));
+        Log.i(TAG, "onCreate" + (saved != null ? " (restored)" : "") + ", autorun=" + getIntent().getStringExtra("autorun")
+                + (BuildConfig.SIDE_LABEL.isEmpty() ? "" : ", side-by-side build \"" + BuildConfig.SIDE_LABEL + "\" " + getPackageName() + " " + versionName()));
         if (saved == null) autorun(getIntent());
     }
 
@@ -241,6 +242,12 @@ public class LauncherActivity extends Activity {
         title.setTypeface(Typeface.DEFAULT_BOLD);
         title.setText("System Shock 2 (NewDark, recompiled)");
         col.addView(title);
+        if (!BuildConfig.SIDE_LABEL.isEmpty()) {                               // a side-by-side build (build.gradle -Pside)
+            TextView side = text(16, false);
+            side.setTypeface(Typeface.DEFAULT_BOLD);
+            side.setText(BuildConfig.SIDE_LABEL + " build (" + getPackageName() + "): separate app, separate games and saves");
+            col.addView(side);
+        }
         // Normal play: one obvious button. Touch controls on, no frame limit, the Interface size below.
         Button play = new Button(this);
         play.setAllCaps(false);

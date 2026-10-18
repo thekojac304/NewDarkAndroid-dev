@@ -1,0 +1,138 @@
+[android] native entry SDL_main; run directory /data/user/0/local.newdarkandroid.ss2.legacytest/files/runs/game; port arguments: --verbose --android-env SS2PORT_WRITE_DIR=/data/user/0/local.newdarkandroid.ss2.legacytest/files/profiles/scp4 --android-env SS2PORT_INPUT_SCRIPT=/data/user/0/local.newdarkandroid.ss2.legacytest/files/s.txt --android-env SS2PORT_SHOT_DIR=/data/user/0/local.newdarkandroid.ss2.legacytest/files/shots --android-env SS2PORT_MODSTATS=1 /storage/emulated/0/Android/data/local.newdarkandroid.ss2.legacytest/files/games/scp4/ss2.exe
+[android] device SM-S948U1 (SM8850), Android 17 (API 37), page size 4096, 8 CPUs
+[android] library /data/app/~~i01OFO9rTDEhRMbxuWrotQ==/local.newdarkandroid.ss2.legacytest-aei5Hs8QcQPy5rE0QmgfJw==/base.apk!/lib/arm64-v8a/libss2game.so
+[android] check app process: OK (pid 17306, process local.newdarkandroid.ss2.legacytest:game, uid 10035, SELinux u:r:untrusted_app_34:s0:c35,c256,c512,c768)
+[android] check 4 GB guest reservation: OK (at 0x7480000000, zero-filled, written and read back at 6 places from 0 to 4 GB-1, discard reads back zero, released; 0.1 ms)
+[android] check deep stack: OK (thread with the game thread's attributes: stack 65551 KB + guard 16 KB; recursion used 49256 KB of it)
+[android] check threads and locks: OK (4 threads x 100000 locked increments = 400000 in 5.9 ms; a 20 ms timed wait timed out after 20.0 ms)
+[android] preflight: 0 of 4 checks failed
+[android] environment SS2PORT_WRITE_DIR=/data/user/0/local.newdarkandroid.ss2.legacytest/files/profiles/scp4
+[android] environment SS2PORT_INPUT_SCRIPT=/data/user/0/local.newdarkandroid.ss2.legacytest/files/s.txt
+[android] environment SS2PORT_SHOT_DIR=/data/user/0/local.newdarkandroid.ss2.legacytest/files/shots
+[android] environment SS2PORT_MODSTATS=1
+[android] backend sdl2: OpenGL ES, fullscreen landscape, renderer on the game thread
+[android] starting port_main after 0.059 s
+[android] game thread: stack 65551 KB + guard 16 KB at 0x760c896000-0x7610899e40
+[port] guest address space: 4096 MB at 0x7480000000 (4096 MB backed)
+[port] vm: heap arena 00d30000 +2000000
+[port] vm: thread stack 02d30000 +410000
+[port] vm: PEB 00010000 +10000
+[port] running the recompiled entry point 006f7105 (364 imports, 0 without an implementation)
+[port] vm: VirtualAlloc 03140000 +4000000
+[port] lgvid.dll: first call into its code (30303d97, thread 1004)
+[port] lgvid.dll: loaded the recompiled module at 30300000 (60 imports bound), DllMain -> 1
+INFO: pixel format wanted SDL_PIXELFORMAT_RGBX8888 (2), got SDL_PIXELFORMAT_RGBX8888 (2)
+[gl] OpenGL ES 3.2 V@0842.19.13 (GIT@089d643e2a, Icecd8f0534, 1782882597) (Date:07/01/26) / Adreno (TM) 840
+[touch] touch controls on; settings /data/data/local.newdarkandroid.ss2.legacytest/files/touch-settings.cfg (defaults)
+[touch] mode CURSOR (game interface/menu)
+[port] LoadLibraryA(openal32.dll): not available on this host
+[port] Direct3D 9: device 1280x720 fullscreen, back buffer format 35, depth buffer
+[port] Direct3D: pixel shaders are translated to GLSL
+[port] Direct3D: 2D picture at 0,0 1280x720 of 1280x720
+[port] first frame presented
+[port] Direct3D: 2D picture at 160,0 960x720 of 1280x720
+[sdl] frame capture: /data/user/0/local.newdarkandroid.ss2.legacytest/files/shots/shot_000.bmp (1170x540)
+[port] vm: thread stack 07990000 +110000
+[port] thread 1008 (_beginthreadex) started at 006a1e50
+[port] vm: heap arena 09c90000 +2000000
+[port] allobjs.osm: first call into its code (1004c9d5, thread 1004)
+[port] allobjs.osm: 1 calls from outside it in the last 20 s (1 in all)
+[port] lgvid.dll: 3 calls from outside it in the last 20 s (3 in all)
+[port] allobjs.osm: loaded the recompiled module at 10000000 (61 imports bound), DllMain -> 1
+[port] GetProcAddress(IsTNT): not available
+[port] NVScript.osm: first call into its code (3045f1e9, thread 1004)
+[port] GetProcAddress(FlsAlloc): not available
+[port] GetProcAddress(FlsGetValue): not available
+[port] GetProcAddress(FlsSetValue): not available
+[port] GetProcAddress(FlsFree): not available
+[port] NVScript.osm: loaded the recompiled module at 30400000 (78 imports bound), DllMain -> 1
+[port] Squirrel.osm: first call into its code (30209829, thread 1004)
+[port] GetProcAddress(FlsAlloc): not available
+[port] GetProcAddress(FlsGetValue): not available
+[port] GetProcAddress(FlsSetValue): not available
+[port] GetProcAddress(FlsFree): not available
+[port] Squirrel.osm: loaded the recompiled module at 30000000 (112 imports bound), DllMain -> 1
+[port] vm: heap arena 0c510000 +2000000
+[port] vm: heap arena 10090000 +2000000
+[port] LoadLibraryA(psapi.dll): not available on this host
+[port] thread 1008 (_beginthreadex) ended with 0
+[port] Direct3D: 2D picture at 0,0 1280x720 of 1280x720
+[port] vm: heap arena 12090000 +2000000
+[port] LoadLibraryA(psapi.dll): not available on this host
+[touch] mode LOOK (game shoot)
+[port] allobjs.osm: 7906 calls from outside it in the last 20 s (7907 in all)
+[port] Squirrel.osm: 618 calls from outside it in the last 20 s (618 in all)
+[port] NVScript.osm: 5728 calls from outside it in the last 20 s (5728 in all)
+[sdl] frame capture: /data/user/0/local.newdarkandroid.ss2.legacytest/files/shots/shot_001.bmp (1170x540)
+[sdl] frame capture: /data/user/0/local.newdarkandroid.ss2.legacytest/files/shots/shot_002.bmp (1170x540)
+[sdl] frame capture: /data/user/0/local.newdarkandroid.ss2.legacytest/files/shots/shot_003.bmp (1170x540)
+[touch] mode CURSOR (game interface/menu)
+[sdl] frame capture: /data/user/0/local.newdarkandroid.ss2.legacytest/files/shots/shot_004.bmp (1170x540)
+[touch] mode LOOK (game shoot)
+[port] allobjs.osm: 792 calls from outside it in the last 20 s (8699 in all)
+[port] Squirrel.osm: 339 calls from outside it in the last 20 s (957 in all)
+[port] NVScript.osm: 3543 calls from outside it in the last 20 s (9271 in all)
+[port] Direct3D: 2D picture at 160,0 960x720 of 1280x720
+[touch] mode CURSOR (game interface/menu)
+[sdl] frame capture: /data/user/0/local.newdarkandroid.ss2.legacytest/files/shots/shot_005.bmp (1170x540)
+[port] guest memory touched: 223 MB of 4096 MB (longest touched run 55 MB)
+[port]   region 00020000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 00150000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 00280000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 00400000 +9408 KB: 7876 KB touched, highest touched page ends at +9364 KB
+[port]   region 00d30000 +32768 KB: 32768 KB touched, highest touched page ends at +32768 KB
+[port]   region 02d30000 +4160 KB: 56 KB touched, highest touched page ends at +4100 KB
+[port]   region 03140000 +65536 KB: 616 KB touched, highest touched page ends at +616 KB
+[port]   region 07140000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 07270000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 073a0000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 074d0000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 07600000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 07730000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 07860000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 07aa0000 +3328 KB: 3320 KB touched, highest touched page ends at +3320 KB
+[port]   region 07de0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 07ef0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08000000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08110000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08220000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08330000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08440000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08550000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08660000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08770000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08880000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08990000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08aa0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08bb0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08cc0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08dd0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08ee0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 08ff0000 +2112 KB: 2052 KB touched, highest touched page ends at +2052 KB
+[port]   region 09200000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 09310000 +2112 KB: 2052 KB touched, highest touched page ends at +2052 KB
+[port]   region 09520000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 09630000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 09740000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 09850000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 09960000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 09a70000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 09b80000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 09c90000 +32768 KB: 32768 KB touched, highest touched page ends at +32768 KB
+[port]   region 0bc90000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 0bda0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 0beb0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 0bfc0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 0c0d0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 0c1e0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 0c2f0000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 0c400000 +1088 KB: 1028 KB touched, highest touched page ends at +1028 KB
+[port]   region 0c510000 +32768 KB: 32768 KB touched, highest touched page ends at +32768 KB
+[port]   region 0e510000 +2752 KB: 2692 KB touched, highest touched page ends at +2692 KB
+[port]   region 0e7c0000 +1408 KB: 1368 KB touched, highest touched page ends at +1368 KB
+[port]   region 0e920000 +1216 KB: 1204 KB touched, highest touched page ends at +1204 KB
+[port]   region 10090000 +32768 KB: 32768 KB touched, highest touched page ends at +32768 KB
+[port]   region 12090000 +32768 KB: 24264 KB touched, highest touched page ends at +32768 KB
+[port]   region 30000000 +2688 KB: 2688 KB touched, highest touched page ends at +2688 KB
+[port]   region f0000000 +262080 KB: 2048 KB touched, highest touched page ends at +2048 KB
+[android] process exit(0) after 75.727 s

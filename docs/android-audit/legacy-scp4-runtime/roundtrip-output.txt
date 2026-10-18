@@ -1,0 +1,1220 @@
+# save_roundtrip.py output: original legacy save (A) vs the save the port wrote after loading it and playing ~10-15 s (B)
+# --gam = SCP Beta 4 shockscp.gam (430b1793...). Desktop: Windows x86-64 null backend. Phone: S26 Ultra arm64, legacytest app.
+
+################ DESKTOP slot 0
+A build/scp4/pc-write/save_0
+B build/scp4/runs/rt-slot0/save_15
+
+campaign: QUEST_CMP 107 / 107 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1627 / 1613, unresolved in shockscp.gam: none; only A 14, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 305 / 298 records (timer messages 11999 / 12713 bytes): only A 7, only B 0, value changed 16
+    only A: TransluceInOut.KillMe x3  e.g. obj 1540: (1, 1)
+    only A: TransluceInOut.Rate x3  e.g. obj 1542: (2, 0.05)
+    only A: CreatureContainer.dead x1  e.g. obj 2074: (1, 1)
+    changed: TriggerEcologyDiff.ecotimer x6  e.g. obj 700: 35999 -> 36582
+    changed: TriggerEcology.ecotimer x5  e.g. obj 1644: 35987 -> 36092
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 35901 -> 36587
+    changed: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 762: 36006 -> 36093
+    changed: scpCameraHelper.HackTimer x1  e.g. obj 528: 35899 -> 36611
+medsci1.mis: archetype links 1504 / 1504, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6268 / 6268 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 107, 'arch_links': 8713, 'arch_unresolved': 0, 'arch_changed': 14, 'records': 1824, 'nv': 822, 'only_a': 7, 'only_b': 0, 'changed': 16, 'quest_db_diff': 0, 'nv_changed': 2}
+
+################ DESKTOP slot 1
+A build/scp4/pc-write/save_1
+B build/scp4/runs/rt-slot1/save_15
+
+campaign: QUEST_CMP 107 / 107 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1567 / 1567, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 266 / 266 records (timer messages 11429 / 11429 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 422 / 422, unresolved in shockscp.gam: none; only A 1, only B 1
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 55 / 54 records (timer messages 714 / 711 bytes): only A 1, only B 0, value changed 3
+    only A: TrapNewTripwire.subbed x1  e.g. obj 327: (1, 1)
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 15 -> 354
+    changed: TriggerEcology.ecotimer x1  e.g. obj 144: 9 -> 72
+medsci1.mis: archetype links 1504 / 1504, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6268 / 6268 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 107, 'arch_links': 9075, 'arch_unresolved': 0, 'arch_changed': 2, 'records': 1840, 'nv': 819, 'only_a': 1, 'only_b': 0, 'changed': 3, 'quest_db_diff': 0, 'nv_changed': 0}
+
+################ DESKTOP slot 2
+A build/scp4/pc-write/save_2
+B build/scp4/runs/rt-slot2/save_15
+
+campaign: QUEST_CMP 110 / 110 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1603 / 1603, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 13813 / 14913 bytes): only A 0, only B 0, value changed 22
+    changed: TriggerEcologyDiff.ecotimer x6  e.g. obj 700: 46066 -> 46661
+    changed: StdDoor.Timer x6  e.g. obj 262: 45914 -> 46372
+    changed: TriggerEcology.ecotimer x5  e.g. obj 1644: 43470 -> 46165
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 46080 -> 46663
+    changed: scpElevatorHelper.LastMsg x1  e.g. obj 1688: PhysExit -> PhysEnter
+    changed: cScr_NVRelayTrap.m_hTimerHandle x1  e.g. obj 1019: 42518 -> 46178
+    changed: scpCameraHelper.HackTimer x1  e.g. obj 528: 46123 -> 46694
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 110, 'arch_links': 8970, 'arch_unresolved': 0, 'arch_changed': 0, 'records': 1824, 'nv': 809, 'only_a': 0, 'only_b': 0, 'changed': 22, 'quest_db_diff': 0, 'nv_changed': 1}
+
+################ DESKTOP slot 3
+A build/scp4/pc-write/save_3
+B build/scp4/runs/rt-slot3/save_15
+
+campaign: QUEST_CMP 111 / 111 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 1044 / 1046, unresolved in shockscp.gam: none; only A 2, only B 4
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 308 records (timer messages 2419 / 2716 bytes): only A 1, only B 17, value changed 8
+    only A: CreatureContainer.dead x1  e.g. obj 1768: (1, 1)
+    only B: cScrNVGeneric.m_iOffCapacitor x2  e.g. obj 1699: (1, 0)
+    only B: cScrNVGeneric.m_iOffCapacitorTime x2  e.g. obj 1700: (1, 0)
+    only B: cScr_NVRelayTrap.m_bRepeatingOn x2  e.g. obj 1699: (1, 0)
+    only B: cScr_NVRelayTrap.m_iRepeat x2  e.g. obj 1700: (1, 0)
+    only B: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 1699: (1, 10493)
+    only B: cScrNVGeneric.m_iOnCapacitorTime x2  e.g. obj 1700: (1, 0)
+    only B: cScrNVGeneric.m_iUseCount x2  e.g. obj 1700: (1, 0)
+    only B: cScrNVGeneric.m_iOnCapacitor x2  e.g. obj 1699: (1, 0)
+    only B: CreatureContainer.dead x1  e.g. obj 1699: (1, 0)
+    changed: TriggerEcology.ecotimer x3  e.g. obj 1047: 10128 -> 10492
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 10135 -> 10686
+    changed: scpCameraHelper.HackTimer x1  e.g. obj 339: 10154 -> 10714
+    changed: TriggerEcologyDiff.ecotimer x1  e.g. obj 341: 10131 -> 10688
+    changed: cScr_NVRelayTrap.m_hTimerHandle x1  e.g. obj 893: 10133 -> 10197
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 111, 'arch_links': 10199, 'arch_unresolved': 0, 'arch_changed': 6, 'records': 2347, 'nv': 1156, 'only_a': 1, 'only_b': 17, 'changed': 8, 'quest_db_diff': 0, 'nv_changed': 17}
+
+################ DESKTOP slot 4
+A build/scp4/pc-write/save_4
+B build/scp4/runs/rt-slot4/save_15
+
+campaign: QUEST_CMP 113 / 113 variables (parsed fully: True/True); differ: 1
+    Arach._Organ_ResearchTime: 813230 -> 980265
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 1037 / 1029, unresolved in shockscp.gam: none; only A 8, only B 0
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 340 / 339 records (timer messages 2214 / 2511 bytes): only A 1, only B 0, value changed 11
+    only A: CreatureContainer.dead x1  e.g. obj 74: (1, 1)
+    changed: cScr_NVRelayTrap.m_hTimerHandle x4  e.g. obj 1160: 15990 -> 16044
+    changed: TriggerEcology.ecotimer x3  e.g. obj 1047: 15989 -> 16036
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 15908 -> 16514
+    changed: StdDoor.Timer x1  e.g. obj 720: 15591 -> 16434
+    changed: TriggerEcologyDiff.ecotimer x1  e.g. obj 341: 15907 -> 16518
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 1, 'quest_cmp': 113, 'arch_links': 10192, 'arch_unresolved': 0, 'arch_changed': 8, 'records': 2395, 'nv': 1200, 'only_a': 1, 'only_b': 0, 'changed': 11, 'quest_db_diff': 0, 'nv_changed': 4}
+
+################ DESKTOP slot 5
+A build/scp4/pc-write/save_5
+B build/scp4/runs/rt-slot5/save_15
+
+campaign: QUEST_CMP 117 / 117 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 964 / 964, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 282 / 282 records (timer messages 1925 / 1925 bytes): only A 0, only B 0, value changed 0
+ops3.mis: archetype links 947 / 951, unresolved in shockscp.gam: none; only A 0, only B 4
+    obj 1469: A ['Once Router']  B ['Once Router']
+    obj 1478: A ['Once Router']  B ['Once Router']
+    obj 636: A ['Swarmer Floor Pod']  B ['Swarmer Floor Pod']
+
+ops3.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 337 / 355 records (timer messages 1533 / 2134 bytes): only A 0, only B 18, value changed 13
+    only B: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 1582: (1, 453)
+    only B: cScr_NVRelayTrap.m_bRepeatingOn x2  e.g. obj 1587: (1, 0)
+    only B: cScrNVGeneric.m_iOffCapacitorTime x2  e.g. obj 1587: (1, 0)
+    only B: cScrNVGeneric.m_iOffCapacitor x2  e.g. obj 1587: (1, 0)
+    only B: cScrNVGeneric.m_iOnCapacitorTime x2  e.g. obj 1582: (1, 0)
+    only B: cScrNVGeneric.m_iOnCapacitor x2  e.g. obj 1587: (1, 0)
+    only B: cScr_NVRelayTrap.m_iRepeat x2  e.g. obj 1587: (1, 0)
+    only B: cScrNVGeneric.m_iUseCount x2  e.g. obj 1587: (1, 0)
+    only B: CreatureContainer.dead x1  e.g. obj 1582: (1, 0)
+    only B: TriggerEcologyDiff.victim x1  e.g. obj 341: (1, 48)
+    changed: scpCameraHelper.HackTimer x3  e.g. obj 268: 4 -> 480
+    changed: TriggerEcology.ecotimer x3  e.g. obj 1251: 9 -> 493
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 27 -> 448
+    changed: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 1743: 20 -> 92
+    changed: TriggerEcologyDiff.ecotimer x2  e.g. obj 341: 19 -> 449
+    changed: TriggerEcologyDiff.RecoverTime x1  e.g. obj 341: -1 -> 436
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 117, 'arch_links': 11066, 'arch_unresolved': 0, 'arch_changed': 4, 'records': 2674, 'nv': 1416, 'only_a': 0, 'only_b': 18, 'changed': 13, 'quest_db_diff': 0, 'nv_changed': 18}
+
+################ DESKTOP slot 6
+A build/scp4/pc-write/save_6
+B build/scp4/runs/rt-slot6/save_15
+
+campaign: QUEST_CMP 128 / 128 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 1003 / 1003, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 322 / 322 records (timer messages 4511 / 4911 bytes): only A 0, only B 0, value changed 12
+    changed: TriggerEcology.ecotimer x3  e.g. obj 1047: 38234 -> 39244
+    changed: cScr_NVRelayTrap.m_hTimerHandle x3  e.g. obj 1622: 34949 -> 39248
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 39133 -> 39926
+    changed: StdDoor.Timer x2  e.g. obj 532: 38538 -> 39946
+    changed: scpElevatorHelper.LastMsg x1  e.g. obj 1645: PhysExit -> PhysEnter
+    changed: TriggerEcologyDiff.ecotimer x1  e.g. obj 341: 39135 -> 39927
+ops3.mis: archetype links 829 / 829, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1469: A ['Once Router']  B ['Once Router']
+    obj 1478: A ['Once Router']  B ['Once Router']
+    obj 636: A ['Swarmer Floor Pod']  B ['Swarmer Floor Pod']
+
+ops3.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 287 / 287 records (timer messages 2711 / 2711 bytes): only A 0, only B 0, value changed 0
+ops4.mis: archetype links 993 / 993, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops4.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 211 / 211 records (timer messages 716 / 716 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 128, 'arch_links': 11980, 'arch_unresolved': 0, 'arch_changed': 0, 'records': 2875, 'nv': 1474, 'only_a': 0, 'only_b': 0, 'changed': 12, 'quest_db_diff': 0, 'nv_changed': 3}
+
+################ DESKTOP slot 7
+A build/scp4/pc-write/save_7
+B build/scp4/runs/rt-slot7/save_15
+
+campaign: QUEST_CMP 132 / 132 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 934 / 934, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 283 / 283 records (timer messages 4108 / 4108 bytes): only A 0, only B 0, value changed 0
+ops3.mis: archetype links 829 / 829, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1469: A ['Once Router']  B ['Once Router']
+    obj 1478: A ['Once Router']  B ['Once Router']
+    obj 636: A ['Swarmer Floor Pod']  B ['Swarmer Floor Pod']
+
+ops3.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 287 / 287 records (timer messages 2711 / 2711 bytes): only A 0, only B 0, value changed 0
+ops4.mis: archetype links 993 / 993, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops4.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 211 / 211 records (timer messages 716 / 716 bytes): only A 0, only B 0, value changed 0
+rec1.mis: archetype links 1324 / 1324, unresolved in shockscp.gam: none; only A 0, only B 0
+
+rec1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 684 / 684 records (timer messages 2231 / 2523 bytes): only A 0, only B 0, value changed 17
+    changed: scpCameraHelper.HackTimer x5  e.g. obj 159: 206 -> 674
+    changed: TriggerEcology.ecotimer x4  e.g. obj 1827: 15 -> 251
+    changed: TriggerEcologyDiff.ecotimer x3  e.g. obj 182: 164 -> 644
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 163 -> 646
+    changed: LightSoundOn.LastLight x1  e.g. obj 826: 120.0 -> 0.0
+    changed: scpElevatorHelper.LastMsg x1  e.g. obj 1760: PhysExit -> PhysEnter
+    changed: StdDoor.Timer x1  e.g. obj 117: 143 -> 665
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 132, 'arch_links': 13235, 'arch_unresolved': 0, 'arch_changed': 0, 'records': 3520, 'nv': 2008, 'only_a': 0, 'only_b': 0, 'changed': 17, 'quest_db_diff': 0, 'nv_changed': 0}
+
+################ DESKTOP slot 8
+A build/scp4/pc-write/save_8
+B build/scp4/runs/rt-slot8/save_15
+
+campaign: QUEST_CMP 88 / 88 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1447 / 1449, unresolved in shockscp.gam: none; only A 2, only B 4
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 359 / 376 records (timer messages 5832 / 6627 bytes): only A 1, only B 18, value changed 21
+    only A: CreatureContainer.dead x1  e.g. obj 1311: (1, 1)
+    only B: cScrNVGeneric.m_iOnCapacitor x2  e.g. obj 2047: (1, 0)
+    only B: cScrNVGeneric.m_iUseCount x2  e.g. obj 2096: (1, 0)
+    only B: cScrNVGeneric.m_iOffCapacitorTime x2  e.g. obj 2047: (1, 0)
+    only B: cScrNVGeneric.m_iOnCapacitorTime x2  e.g. obj 2047: (1, 0)
+    only B: cScrNVGeneric.m_iOffCapacitor x2  e.g. obj 2096: (1, 0)
+    only B: cScr_NVRelayTrap.m_bRepeatingOn x2  e.g. obj 2047: (1, 0)
+    only B: cScr_NVRelayTrap.m_iRepeat x2  e.g. obj 2096: (1, 0)
+    only B: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 2096: (1, 0)
+    only B: CreatureContainer.dead x1  e.g. obj 2047: (1, 0)
+    only B: zbQuestNotifier.noteState x1  e.g. obj 14: (3, 'note_1_4:1,note_1_5:0,note_1_6:0,note_5_7:0,note_1_8:0,note_5_5:0,note_5_4:0,note_5_3:0,note_4_9:0,note_5_13:0,note_4_8:0,note_4_5:0,note_5_12:0,note_4_3:0,note_4_4:0,note_7_7:0,note_7_8:0,note_2_1:1,note_6_1:0,note_3_4:0,note_3_3:0,note_7_6:0,note_5_2:0,note_2_8:0,note_6_9:0,note_1_1:1,note_6_6:0,note_1_3:1,note_6_14:0,note_6_13:0,note_6_15:0,note_6_10:0,note_6_12:0,note_6_11:0,note_9_1:0,note_3_2:0,note_3_1:0,note_8_2:0,note_8_1:0,note_7_9:0,note_7_4:0,note_7_3:0,note_7_2:0,note_7_1:0,note_6_7:0,note_6_5:0,note_1_12:0,note_6_3:0,note_5_14:0,note_4_1:1,note_5_6:0,note_4_2:0,note_1_14:0,note_5_8:0,note_5_10:0,note_5_11:0,note_4_6:0')
+    changed: cScr_NVRelayTrap.m_hTimerHandle x7  e.g. obj 728: 29935 -> 30921
+    changed: TriggerEcologyDiff.ecotimer x6  e.g. obj 333: 30840 -> 31343
+    changed: TriggerEcology.ecotimer x4  e.g. obj 842: 29981 -> 31269
+    changed: scpCameraHelper.HackTimer x2  e.g. obj 337: 30856 -> 31375
+    changed: StdDoor.Timer x2  e.g. obj 1382: 29755 -> 31335
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1508 / 1508, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 291 / 291 records (timer messages 4116 / 4116 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 88, 'arch_links': 6434, 'arch_unresolved': 0, 'arch_changed': 6, 'records': 1455, 'nv': 701, 'only_a': 1, 'only_b': 18, 'changed': 21, 'quest_db_diff': 0, 'nv_changed': 23}
+
+################ DESKTOP slot 9
+A build/scp4/pc-write/save_9
+B build/scp4/runs/rt-slot9/save_15
+
+campaign: QUEST_CMP 88 / 88 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1445 / 1445, unresolved in shockscp.gam: none; only A 1, only B 1
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 361 / 364 records (timer messages 6729 / 7627 bytes): only A 1, only B 4, value changed 23
+    only A: TrapNewTripwire.subbed x1  e.g. obj 160: (1, 1)
+    only B: StdDoor.Timer x3  e.g. obj 1826: (1, 33238)
+    only B: zbQuestNotifier.noteState x1  e.g. obj 14: (3, 'note_1_4:1,note_1_5:0,note_1_6:0,note_5_7:0,note_1_8:0,note_5_5:0,note_5_4:0,note_5_3:0,note_4_9:0,note_5_13:0,note_4_8:0,note_4_5:0,note_5_12:0,note_4_3:0,note_4_4:0,note_7_7:0,note_7_8:0,note_2_1:1,note_6_1:0,note_3_4:0,note_3_3:0,note_7_6:0,note_5_2:0,note_2_8:0,note_6_9:0,note_1_1:1,note_6_6:0,note_1_3:1,note_6_14:0,note_6_13:0,note_6_15:0,note_6_10:0,note_6_12:0,note_6_11:0,note_9_1:0,note_3_2:0,note_3_1:0,note_8_2:0,note_8_1:0,note_7_9:0,note_7_4:0,note_7_3:0,note_7_2:0,note_7_1:0,note_6_7:0,note_6_5:0,note_1_12:0,note_6_3:0,note_5_14:0,note_4_1:1,note_5_6:0,note_4_2:0,note_1_14:0,note_5_8:0,note_5_10:0,note_5_11:0,note_4_6:0')
+    changed: cScr_NVRelayTrap.m_hTimerHandle x7  e.g. obj 728: 30921 -> 33019
+    changed: TriggerEcologyDiff.ecotimer x6  e.g. obj 333: 32937 -> 33442
+    changed: StdDoor.Timer x4  e.g. obj 1735: 32898 -> 33049
+    changed: TriggerEcology.ecotimer x4  e.g. obj 842: 32497 -> 33432
+    changed: scpCameraHelper.HackTimer x2  e.g. obj 337: 32955 -> 33474
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1508 / 1508, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 291 / 291 records (timer messages 4116 / 4116 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 88, 'arch_links': 6432, 'arch_unresolved': 0, 'arch_changed': 2, 'records': 1457, 'nv': 701, 'only_a': 1, 'only_b': 4, 'changed': 23, 'quest_db_diff': 0, 'nv_changed': 7}
+
+################ DESKTOP slot 10
+A build/scp4/pc-write/save_10
+B build/scp4/runs/rt-slot10/save_15
+
+campaign: QUEST_CMP 93 / 93 variables (parsed fully: True/True); differ: 1
+    INT_Boost_ResearchTime: 670510 -> 738252
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1408 / 1408, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 320 / 321 records (timer messages 6315 / 7315 bytes): only A 0, only B 1, value changed 15
+    only B: zbQuestNotifier.noteState x1  e.g. obj 14: (3, 'note_4_1:1,note_4_2:0,note_1_6:0,note_5_7:0,note_1_8:0,note_5_5:0,note_5_4:0,note_5_3:0,note_4_9:0,note_5_13:0,note_5_14:0,note_4_5:0,note_4_6:0,note_4_3:0,note_4_4:0,note_7_7:0,note_7_8:0,note_2_1:1,note_6_1:0,note_3_4:0,note_3_3:0,note_7_6:0,note_5_2:0,note_2_8:0,note_6_9:0,note_6_3:0,note_6_6:0,note_6_5:0,note_6_14:0,note_6_13:0,note_6_15:0,note_6_10:0,note_6_12:0,note_6_11:0,note_3_2:0,note_3_1:0,note_9_1:0,note_8_2:0,note_8_1:0,note_7_9:0,note_7_4:0,note_7_3:0,note_1_12:0,note_7_2:0,note_7_1:0,note_6_7:0,note_4_8:0,note_5_8:0,note_1_14:1,note_5_10:0,note_5_11:0,note_5_12:0,note_5_6:0')
+    changed: TriggerEcologyDiff.ecotimer x6  e.g. obj 333: 44630 -> 45083
+    changed: cScr_NVRelayTrap.m_hTimerHandle x4  e.g. obj 1413: 40299 -> 44701
+    changed: TriggerEcology.ecotimer x4  e.g. obj 842: 43981 -> 44828
+    changed: scpElevatorHelper.LastMsg x1  e.g. obj 175: PhysExit -> PhysEnter
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1508 / 1508, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 291 / 291 records (timer messages 4116 / 4116 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 1, 'quest_cmp': 93, 'arch_links': 6395, 'arch_unresolved': 0, 'arch_changed': 0, 'records': 1416, 'nv': 642, 'only_a': 0, 'only_b': 1, 'changed': 15, 'quest_db_diff': 0, 'nv_changed': 4}
+
+################ DESKTOP slot 11
+A build/scp4/pc-write/save_11
+B build/scp4/runs/rt-slot11/save_15
+
+campaign: QUEST_CMP 97 / 97 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1369 / 1369, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 308 / 308 records (timer messages 6008 / 6008 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1827 / 1827, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 358 / 361 records (timer messages 3445 / 4545 bytes): only A 0, only B 3, value changed 24
+    only B: scpElevatorHelper.LastMsg x1  e.g. obj 1688: (3, 'PhysEnter')
+    only B: scpElevatorHelper.LastObj x1  e.g. obj 1688: (1, 4)
+    only B: zbQuestNotifier.noteState x1  e.g. obj 4: (3, 'note_4_1:1,note_4_2:0,note_1_6:0,note_5_7:0,note_1_8:0,note_5_5:0,note_5_4:0,note_5_3:0,note_4_9:0,note_5_13:0,note_5_14:0,note_4_5:0,note_4_6:0,note_4_3:0,note_4_4:0,note_7_7:0,note_7_8:0,note_2_1:1,note_6_1:0,note_3_4:0,note_3_3:0,note_7_6:0,note_5_2:0,note_2_8:0,note_6_9:0,note_6_3:0,note_6_6:0,note_6_5:0,note_6_14:0,note_6_13:0,note_6_15:0,note_6_10:0,note_6_12:0,note_6_11:0,note_3_2:0,note_3_1:1,note_9_1:0,note_8_2:0,note_8_1:0,note_7_9:0,note_7_4:0,note_7_3:0,note_1_12:0,note_7_2:0,note_7_1:0,note_6_7:0,note_4_8:0,note_5_8:0,note_1_14:1,note_5_10:0,note_5_11:0,note_5_12:0,note_5_6:0')
+    changed: scpCameraHelper.HackTimer x7  e.g. obj 1670: 1619 -> 2164
+    changed: cScr_NVRelayTrap.m_hTimerHandle x6  e.g. obj 1705: 104 -> 1688
+    changed: TriggerEcologyDiff.ecotimer x6  e.g. obj 700: 1605 -> 2117
+    changed: TriggerEcology.ecotimer x5  e.g. obj 1644: 93 -> 1677
+medsci1.mis: archetype links 1507 / 1507, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 4916 / 4916 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 97, 'arch_links': 8182, 'arch_unresolved': 0, 'arch_changed': 0, 'records': 1768, 'nv': 862, 'only_a': 0, 'only_b': 3, 'changed': 24, 'quest_db_diff': 0, 'nv_changed': 6}
+
+################ DESKTOP slot 12
+A build/scp4/pc-write/save_12
+B build/scp4/runs/rt-slot12/save_15
+
+campaign: QUEST_CMP 107 / 107 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 888 / 888, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 170 / 170 records (timer messages 2113 / 2613 bytes): only A 0, only B 0, value changed 10
+    changed: TriggerEcology.ecotimer x3  e.g. obj 150: 5421 -> 5809
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 5354 -> 5812
+    changed: TriggerEcologyDiff.ecotimer x2  e.g. obj 336: 5423 -> 5810
+    changed: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 1003: 5244 -> 5478
+    changed: scpCameraHelper.HackTimer x1  e.g. obj 149: 5433 -> 5845
+hydro2.mis: archetype links 1579 / 1579, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 245 / 245 records (timer messages 10113 / 10113 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1504 / 1504, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6268 / 6268 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 107, 'arch_links': 8817, 'arch_unresolved': 0, 'arch_changed': 0, 'records': 1809, 'nv': 815, 'only_a': 0, 'only_b': 0, 'changed': 10, 'quest_db_diff': 0, 'nv_changed': 2}
+
+################ DESKTOP slot 13
+A build/scp4/pc-write/save_13
+B build/scp4/runs/rt-slot13/save_15
+
+campaign: QUEST_CMP 115 / 115 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 1002 / 995, unresolved in shockscp.gam: none; only A 7, only B 0
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 322 / 303 records (timer messages 2422 / 2614 bytes): only A 19, only B 0, value changed 8
+    only A: cScrNVGeneric.m_iOnCapacitor x2  e.g. obj 893: (1, 0)
+    only A: cScr_NVRelayTrap.m_iRepeat x2  e.g. obj 893: (1, 0)
+    only A: cScrNVGeneric.m_iOnCapacitorTime x2  e.g. obj 893: (1, 0)
+    only A: cScrNVTrigger.m_iTriggerCount x2  e.g. obj 1500: (1, 0)
+    only A: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 1500: (1, 0)
+    only A: cScrNVGeneric.m_iUseCount x2  e.g. obj 893: (1, 1)
+    only A: cScr_NVRelayTrap.m_bRepeatingOn x2  e.g. obj 893: (1, 0)
+    only A: cScrNVGeneric.m_iOffCapacitor x2  e.g. obj 1500: (1, 0)
+    only A: cScrNVGeneric.m_iOffCapacitorTime x2  e.g. obj 893: (1, 0)
+    only A: CreatureContainer.dead x1  e.g. obj 893: (1, 1)
+    changed: TriggerEcology.ecotimer x3  e.g. obj 1047: 31195 -> 32069
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 31486 -> 32054
+    changed: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 1848: 11569 -> 31581
+    changed: TriggerEcologyDiff.ecotimer x1  e.g. obj 341: 31517 -> 32085
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 115, 'arch_links': 10157, 'arch_unresolved': 0, 'arch_changed': 7, 'records': 2377, 'nv': 1184, 'only_a': 19, 'only_b': 0, 'changed': 8, 'quest_db_diff': 0, 'nv_changed': 20}
+
+################ DESKTOP slot 14
+A build/scp4/pc-write/save_14
+B build/scp4/runs/rt-slot14/save_15
+
+campaign: QUEST_CMP 132 / 132 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 934 / 934, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 282 / 282 records (timer messages 4712 / 4712 bytes): only A 0, only B 0, value changed 0
+ops3.mis: archetype links 829 / 829, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1469: A ['Once Router']  B ['Once Router']
+    obj 1478: A ['Once Router']  B ['Once Router']
+    obj 636: A ['Swarmer Floor Pod']  B ['Swarmer Floor Pod']
+
+ops3.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 287 / 287 records (timer messages 2711 / 2711 bytes): only A 0, only B 0, value changed 0
+ops4.mis: archetype links 993 / 993, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops4.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 211 / 211 records (timer messages 716 / 716 bytes): only A 0, only B 0, value changed 0
+rec1.mis: archetype links 1324 / 1324, unresolved in shockscp.gam: none; only A 0, only B 0
+
+rec1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 679 / 679 records (timer messages 4605 / 3821 bytes): only A 0, only B 0, value changed 16
+    changed: scpCameraHelper.HackTimer x5  e.g. obj 159: 318 -> 832
+    changed: TriggerEcology.ecotimer x4  e.g. obj 1827: 311 -> 370
+    changed: TriggerEcologyDiff.ecotimer x3  e.g. obj 182: 327 -> 808
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 316 -> 790
+    changed: scpElevatorHelper.LastMsg x1  e.g. obj 1760: PhysExit -> PhysEnter
+    changed: StdDoor.Timer x1  e.g. obj 117: 143 -> 412
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 132, 'arch_links': 13235, 'arch_unresolved': 0, 'arch_changed': 0, 'records': 3514, 'nv': 2008, 'only_a': 0, 'only_b': 0, 'changed': 16, 'quest_db_diff': 0, 'nv_changed': 0}
+
+################ PHONE slot 0
+A build/scp4/pc-write/save_0
+B build/scp4/phone/slot0-rt/save_15
+
+campaign: QUEST_CMP 107 / 107 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1627 / 1613, unresolved in shockscp.gam: none; only A 14, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 305 / 298 records (timer messages 11999 / 12713 bytes): only A 7, only B 0, value changed 16
+    only A: TransluceInOut.KillMe x3  e.g. obj 1540: (1, 1)
+    only A: TransluceInOut.Rate x3  e.g. obj 1542: (2, 0.05)
+    only A: CreatureContainer.dead x1  e.g. obj 2074: (1, 1)
+    changed: TriggerEcologyDiff.ecotimer x6  e.g. obj 700: 35999 -> 36583
+    changed: TriggerEcology.ecotimer x5  e.g. obj 1644: 35987 -> 36092
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 35901 -> 36588
+    changed: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 762: 36006 -> 36093
+    changed: scpCameraHelper.HackTimer x1  e.g. obj 528: 35899 -> 36655
+medsci1.mis: archetype links 1504 / 1504, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6268 / 6268 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 107, 'arch_links': 8713, 'arch_unresolved': 0, 'arch_changed': 14, 'records': 1824, 'nv': 822, 'only_a': 7, 'only_b': 0, 'changed': 16, 'quest_db_diff': 0, 'nv_changed': 2}
+
+################ PHONE slot 12
+A build/scp4/pc-write/save_12
+B build/scp4/phone/slot12-rt/save_15
+
+campaign: QUEST_CMP 107 / 107 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 888 / 888, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 170 / 170 records (timer messages 2113 / 2613 bytes): only A 0, only B 0, value changed 10
+    changed: TriggerEcology.ecotimer x3  e.g. obj 150: 5421 -> 5816
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 5354 -> 5819
+    changed: TriggerEcologyDiff.ecotimer x2  e.g. obj 336: 5423 -> 5817
+    changed: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 1003: 5244 -> 5478
+    changed: scpCameraHelper.HackTimer x1  e.g. obj 149: 5433 -> 5875
+hydro2.mis: archetype links 1579 / 1579, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 245 / 245 records (timer messages 10113 / 10113 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1504 / 1504, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6268 / 6268 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 107, 'arch_links': 8817, 'arch_unresolved': 0, 'arch_changed': 0, 'records': 1809, 'nv': 815, 'only_a': 0, 'only_b': 0, 'changed': 10, 'quest_db_diff': 0, 'nv_changed': 2}
+
+################ PHONE slot 8
+A build/scp4/pc-write/save_8
+B build/scp4/phone/slot8-rt/save_15
+
+campaign: QUEST_CMP 88 / 88 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1447 / 1449, unresolved in shockscp.gam: none; only A 2, only B 4
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 359 / 376 records (timer messages 5832 / 6627 bytes): only A 1, only B 18, value changed 21
+    only A: CreatureContainer.dead x1  e.g. obj 1311: (1, 1)
+    only B: cScrNVGeneric.m_iOnCapacitor x2  e.g. obj 2047: (1, 0)
+    only B: cScrNVGeneric.m_iUseCount x2  e.g. obj 2096: (1, 0)
+    only B: cScrNVGeneric.m_iOffCapacitorTime x2  e.g. obj 2047: (1, 0)
+    only B: cScrNVGeneric.m_iOnCapacitorTime x2  e.g. obj 2047: (1, 0)
+    only B: cScrNVGeneric.m_iOffCapacitor x2  e.g. obj 2096: (1, 0)
+    only B: cScr_NVRelayTrap.m_bRepeatingOn x2  e.g. obj 2047: (1, 0)
+    only B: cScr_NVRelayTrap.m_iRepeat x2  e.g. obj 2096: (1, 0)
+    only B: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 2096: (1, 0)
+    only B: CreatureContainer.dead x1  e.g. obj 2047: (1, 0)
+    only B: zbQuestNotifier.noteState x1  e.g. obj 14: (3, 'note_1_4:1,note_1_5:0,note_1_6:0,note_5_7:0,note_1_8:0,note_5_5:0,note_5_4:0,note_5_3:0,note_4_9:0,note_5_13:0,note_4_8:0,note_4_5:0,note_5_12:0,note_4_3:0,note_4_4:0,note_7_7:0,note_7_8:0,note_2_1:1,note_6_1:0,note_3_4:0,note_3_3:0,note_7_6:0,note_5_2:0,note_2_8:0,note_6_9:0,note_1_1:1,note_6_6:0,note_1_3:1,note_6_14:0,note_6_13:0,note_6_15:0,note_6_10:0,note_6_12:0,note_6_11:0,note_9_1:0,note_3_2:0,note_3_1:0,note_8_2:0,note_8_1:0,note_7_9:0,note_7_4:0,note_7_3:0,note_7_2:0,note_7_1:0,note_6_7:0,note_6_5:0,note_1_12:0,note_6_3:0,note_5_14:0,note_4_1:1,note_5_6:0,note_4_2:0,note_1_14:0,note_5_8:0,note_5_10:0,note_5_11:0,note_4_6:0')
+    changed: cScr_NVRelayTrap.m_hTimerHandle x7  e.g. obj 728: 29935 -> 30921
+    changed: TriggerEcologyDiff.ecotimer x6  e.g. obj 333: 30840 -> 31346
+    changed: TriggerEcology.ecotimer x4  e.g. obj 842: 29981 -> 31271
+    changed: scpCameraHelper.HackTimer x2  e.g. obj 337: 30856 -> 31377
+    changed: StdDoor.Timer x2  e.g. obj 1382: 29755 -> 31337
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1508 / 1508, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 291 / 291 records (timer messages 4116 / 4116 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 88, 'arch_links': 6434, 'arch_unresolved': 0, 'arch_changed': 6, 'records': 1455, 'nv': 701, 'only_a': 1, 'only_b': 18, 'changed': 21, 'quest_db_diff': 0, 'nv_changed': 23}
+
+################ PHONE slot 13
+A build/scp4/pc-write/save_13
+B build/scp4/phone/slot13-rt/save_15
+
+campaign: QUEST_CMP 115 / 115 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 1002 / 995, unresolved in shockscp.gam: none; only A 7, only B 0
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 322 / 303 records (timer messages 2422 / 2614 bytes): only A 19, only B 0, value changed 8
+    only A: cScrNVGeneric.m_iOnCapacitor x2  e.g. obj 893: (1, 0)
+    only A: cScr_NVRelayTrap.m_iRepeat x2  e.g. obj 893: (1, 0)
+    only A: cScrNVGeneric.m_iOnCapacitorTime x2  e.g. obj 893: (1, 0)
+    only A: cScrNVTrigger.m_iTriggerCount x2  e.g. obj 1500: (1, 0)
+    only A: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 1500: (1, 0)
+    only A: cScrNVGeneric.m_iUseCount x2  e.g. obj 893: (1, 1)
+    only A: cScr_NVRelayTrap.m_bRepeatingOn x2  e.g. obj 893: (1, 0)
+    only A: cScrNVGeneric.m_iOffCapacitor x2  e.g. obj 1500: (1, 0)
+    only A: cScrNVGeneric.m_iOffCapacitorTime x2  e.g. obj 893: (1, 0)
+    only A: CreatureContainer.dead x1  e.g. obj 893: (1, 1)
+    changed: TriggerEcology.ecotimer x3  e.g. obj 1047: 31195 -> 32070
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 31486 -> 32055
+    changed: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 1848: 11569 -> 31581
+    changed: TriggerEcologyDiff.ecotimer x1  e.g. obj 341: 31517 -> 32086
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 115, 'arch_links': 10157, 'arch_unresolved': 0, 'arch_changed': 7, 'records': 2377, 'nv': 1184, 'only_a': 19, 'only_b': 0, 'changed': 8, 'quest_db_diff': 0, 'nv_changed': 20}
+
+################ PHONE slot 5
+A build/scp4/pc-write/save_5
+B build/scp4/phone/slot5-rt/save_15
+
+campaign: QUEST_CMP 117 / 117 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 964 / 964, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 282 / 282 records (timer messages 1925 / 1925 bytes): only A 0, only B 0, value changed 0
+ops3.mis: archetype links 947 / 948, unresolved in shockscp.gam: none; only A 0, only B 1
+    obj 1469: A ['Once Router']  B ['Once Router']
+    obj 1478: A ['Once Router']  B ['Once Router']
+    obj 636: A ['Swarmer Floor Pod']  B ['Swarmer Floor Pod']
+
+ops3.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 337 / 339 records (timer messages 1533 / 2134 bytes): only A 0, only B 2, value changed 13
+    only B: TriggerEcologyDiff.victim x1  e.g. obj 341: (1, 48)
+    only B: CreatureContainer.dead x1  e.g. obj 1587: (1, 0)
+    changed: scpCameraHelper.HackTimer x3  e.g. obj 268: 4 -> 496
+    changed: TriggerEcology.ecotimer x3  e.g. obj 1251: 9 -> 508
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 27 -> 448
+    changed: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 1743: 20 -> 92
+    changed: TriggerEcologyDiff.ecotimer x2  e.g. obj 341: 19 -> 449
+    changed: TriggerEcologyDiff.RecoverTime x1  e.g. obj 341: -1 -> 441
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 117, 'arch_links': 11066, 'arch_unresolved': 0, 'arch_changed': 1, 'records': 2674, 'nv': 1416, 'only_a': 0, 'only_b': 2, 'changed': 13, 'quest_db_diff': 0, 'nv_changed': 2}
+
+################ PHONE slot 7
+A build/scp4/pc-write/save_7
+B build/scp4/phone/slot7-rt/save_15
+
+campaign: QUEST_CMP 132 / 132 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 934 / 934, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 283 / 283 records (timer messages 4108 / 4108 bytes): only A 0, only B 0, value changed 0
+ops3.mis: archetype links 829 / 829, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1469: A ['Once Router']  B ['Once Router']
+    obj 1478: A ['Once Router']  B ['Once Router']
+    obj 636: A ['Swarmer Floor Pod']  B ['Swarmer Floor Pod']
+
+ops3.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 287 / 287 records (timer messages 2711 / 2711 bytes): only A 0, only B 0, value changed 0
+ops4.mis: archetype links 993 / 993, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops4.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 211 / 211 records (timer messages 716 / 716 bytes): only A 0, only B 0, value changed 0
+rec1.mis: archetype links 1324 / 1324, unresolved in shockscp.gam: none; only A 0, only B 0
+
+rec1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 684 / 684 records (timer messages 2231 / 2523 bytes): only A 0, only B 0, value changed 17
+    changed: scpCameraHelper.HackTimer x5  e.g. obj 159: 206 -> 678
+    changed: TriggerEcology.ecotimer x4  e.g. obj 1827: 15 -> 251
+    changed: TriggerEcologyDiff.ecotimer x3  e.g. obj 182: 164 -> 646
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 163 -> 648
+    changed: LightSoundOn.LastLight x1  e.g. obj 826: 120.0 -> 0.0
+    changed: scpElevatorHelper.LastMsg x1  e.g. obj 1760: PhysExit -> PhysEnter
+    changed: StdDoor.Timer x1  e.g. obj 117: 143 -> 663
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 132, 'arch_links': 13235, 'arch_unresolved': 0, 'arch_changed': 0, 'records': 3520, 'nv': 2008, 'only_a': 0, 'only_b': 0, 'changed': 17, 'quest_db_diff': 0, 'nv_changed': 0}
+
+################ PHONE slot 14
+A build/scp4/pc-write/save_14
+B build/scp4/phone/slot14-rt/save_15
+
+campaign: QUEST_CMP 132 / 132 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 934 / 934, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 282 / 282 records (timer messages 4712 / 4712 bytes): only A 0, only B 0, value changed 0
+ops3.mis: archetype links 829 / 829, unresolved in shockscp.gam: none; only A 0, only B 0
+    obj 1469: A ['Once Router']  B ['Once Router']
+    obj 1478: A ['Once Router']  B ['Once Router']
+    obj 636: A ['Swarmer Floor Pod']  B ['Swarmer Floor Pod']
+
+ops3.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 287 / 287 records (timer messages 2711 / 2711 bytes): only A 0, only B 0, value changed 0
+ops4.mis: archetype links 993 / 993, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops4.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 211 / 211 records (timer messages 716 / 716 bytes): only A 0, only B 0, value changed 0
+rec1.mis: archetype links 1324 / 1324, unresolved in shockscp.gam: none; only A 0, only B 0
+
+rec1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 679 / 679 records (timer messages 4605 / 3821 bytes): only A 0, only B 0, value changed 16
+    changed: scpCameraHelper.HackTimer x5  e.g. obj 159: 318 -> 846
+    changed: TriggerEcology.ecotimer x4  e.g. obj 1827: 311 -> 370
+    changed: TriggerEcologyDiff.ecotimer x3  e.g. obj 182: 327 -> 812
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 316 -> 791
+    changed: scpElevatorHelper.LastMsg x1  e.g. obj 1760: PhysExit -> PhysEnter
+    changed: StdDoor.Timer x1  e.g. obj 117: 143 -> 753
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 132, 'arch_links': 13235, 'arch_unresolved': 0, 'arch_changed': 0, 'records': 3514, 'nv': 2008, 'only_a': 0, 'only_b': 0, 'changed': 16, 'quest_db_diff': 0, 'nv_changed': 0}
+
+################ PHONE slot 3
+A build/scp4/pc-write/save_3
+B build/scp4/phone/slot3-rt/save_15
+
+campaign: QUEST_CMP 111 / 111 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1549 / 1549, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 271 / 271 records (timer messages 14512 / 14512 bytes): only A 0, only B 0, value changed 0
+hydro3.mis: archetype links 282 / 282, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro3.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 13 / 13 records (timer messages 208 / 208 bytes): only A 0, only B 0, value changed 0
+medsci1.mis: archetype links 1503 / 1503, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6516 / 6516 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+ops1.mis: archetype links 239 / 239, unresolved in shockscp.gam: none; only A 0, only B 0
+
+ops1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 252 / 252 records (timer messages 8 / 8 bytes): only A 0, only B 0, value changed 0
+ops2.mis: archetype links 1044 / 1046, unresolved in shockscp.gam: none; only A 2, only B 4
+    obj 1647: A ['Once Router']  B ['Once Router']
+    obj 1646: A ['Ecology']  B ['Ecology']
+    obj 1651: A ['Sound Trap']  B ['Sound Trap']
+
+ops2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 308 records (timer messages 2419 / 2716 bytes): only A 1, only B 17, value changed 9
+    only A: CreatureContainer.dead x1  e.g. obj 1768: (1, 1)
+    only B: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 1703: (1, 0)
+    only B: cScrNVGeneric.m_iOnCapacitor x2  e.g. obj 1701: (1, 0)
+    only B: cScrNVGeneric.m_iOffCapacitor x2  e.g. obj 1701: (1, 0)
+    only B: cScrNVGeneric.m_iOffCapacitorTime x2  e.g. obj 1703: (1, 0)
+    only B: cScr_NVRelayTrap.m_iRepeat x2  e.g. obj 1703: (1, 0)
+    only B: cScr_NVRelayTrap.m_bRepeatingOn x2  e.g. obj 1701: (1, 0)
+    only B: cScrNVGeneric.m_iUseCount x2  e.g. obj 1701: (1, 1)
+    only B: cScrNVGeneric.m_iOnCapacitorTime x2  e.g. obj 1701: (1, 0)
+    only B: CreatureContainer.dead x1  e.g. obj 1701: (1, 0)
+    changed: TriggerEcology.ecotimer x3  e.g. obj 1047: 10128 -> 10492
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 10135 -> 10687
+    changed: scpCameraHelper.HackTimer x1  e.g. obj 339: 10154 -> 10746
+    changed: StdDoor.Timer x1  e.g. obj 323: 9883 -> 10670
+    changed: TriggerEcologyDiff.ecotimer x1  e.g. obj 341: 10131 -> 10689
+    changed: cScr_NVRelayTrap.m_hTimerHandle x1  e.g. obj 893: 10133 -> 10197
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 111, 'arch_links': 10199, 'arch_unresolved': 0, 'arch_changed': 6, 'records': 2347, 'nv': 1156, 'only_a': 1, 'only_b': 17, 'changed': 9, 'quest_db_diff': 0, 'nv_changed': 17}
+
+################ PHONE slot 0 + hypo use (B) vs original
+A build/scp4/pc-write/save_0
+B build/scp4/phone/slot0-hypo/save_15
+
+campaign: QUEST_CMP 107 / 107 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1627 / 1613, unresolved in shockscp.gam: none; only A 14, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 305 / 298 records (timer messages 11999 / 12812 bytes): only A 7, only B 0, value changed 19
+    only A: TransluceInOut.KillMe x3  e.g. obj 1540: (1, 1)
+    only A: TransluceInOut.Rate x3  e.g. obj 1542: (2, 0.05)
+    only A: CreatureContainer.dead x1  e.g. obj 2074: (1, 1)
+    changed: TriggerEcologyDiff.ecotimer x6  e.g. obj 700: 35999 -> 36587
+    changed: TriggerEcology.ecotimer x5  e.g. obj 1644: 35987 -> 36092
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 35901 -> 36592
+    changed: cScr_NVRelayTrap.m_hTimerHandle x2  e.g. obj 762: 36006 -> 36093
+    changed: cScr_NVMedPatchScript.m_fHealAmt x1  e.g. obj 23: 0.0 -> 2.0
+    changed: cScr_NVMedPatchScript.m_iPatient x1  e.g. obj 23: 0 -> 40
+    changed: cScr_NVMedPatchScript.m_hTimerHandle x1  e.g. obj 23: 0 -> 36600
+    changed: scpCameraHelper.HackTimer x1  e.g. obj 528: 35899 -> 36578
+medsci1.mis: archetype links 1504 / 1504, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6268 / 6268 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 107, 'arch_links': 8713, 'arch_unresolved': 0, 'arch_changed': 14, 'records': 1824, 'nv': 822, 'only_a': 7, 'only_b': 0, 'changed': 19, 'quest_db_diff': 0, 'nv_changed': 5}
+
+################ PHONE vs DESKTOP, slot 0, same input (A desktop, B phone)
+A build/scp4/runs/rt-slot0/save_15
+B build/scp4/phone/slot0-rt/save_15
+
+campaign: QUEST_CMP 107 / 107 variables (parsed fully: True/True); differ: 0
+earth.mis: archetype links 703 / 703, unresolved in shockscp.gam: none; only A 0, only B 0
+
+earth.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 1 vars, differ 0; script data 222 / 222 records (timer messages 2189 / 2189 bytes): only A 0, only B 0, value changed 0
+eng1.mis: archetype links 1367 / 1367, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 7538 / 7538 bytes): only A 0, only B 0, value changed 0
+eng2.mis: archetype links 1024 / 1024, unresolved in shockscp.gam: none; only A 0, only B 0
+
+eng2.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 3 vars, differ 0; script data 200 / 200 records (timer messages 4531 / 4531 bytes): only A 0, only B 0, value changed 0
+hydro1.mis: archetype links 736 / 736, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro1.mis: modules nvscript allobjs squirrel | nvscript allobjs squirrel; QUEST_DB 2 vars, differ 0; script data 125 / 125 records (timer messages 2113 / 2113 bytes): only A 0, only B 0, value changed 0
+hydro2.mis: archetype links 1613 / 1613, unresolved in shockscp.gam: none; only A 0, only B 0
+
+hydro2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 298 / 298 records (timer messages 12713 / 12713 bytes): only A 0, only B 0, value changed 10
+    changed: TriggerEcologyDiff.ecotimer x4  e.g. obj 700: 36582 -> 36583
+    changed: TriggerEcology.ecotimer x3  e.g. obj 507: 36583 -> 36584
+    changed: StatBoostImplant.timer x2  e.g. obj 38: 36587 -> 36588
+    changed: scpCameraHelper.HackTimer x1  e.g. obj 528: 36611 -> 36655
+medsci1.mis: archetype links 1504 / 1504, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci1.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 297 / 297 records (timer messages 6268 / 6268 bytes): only A 0, only B 0, value changed 0
+medsci2.mis: archetype links 1081 / 1081, unresolved in shockscp.gam: none; only A 0, only B 0
+
+medsci2.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 3 vars, differ 0; script data 292 / 292 records (timer messages 4629 / 4629 bytes): only A 0, only B 0, value changed 0
+station.mis: archetype links 671 / 671, unresolved in shockscp.gam: none; only A 0, only B 0
+
+station.mis: modules allobjs nvscript squirrel | allobjs nvscript squirrel; QUEST_DB 2 vars, differ 0; script data 91 / 91 records (timer messages 950 / 950 bytes): only A 0, only B 0, value changed 0
+
+totals: {'quest_cmp_diff': 0, 'quest_cmp': 107, 'arch_links': 8699, 'arch_unresolved': 0, 'arch_changed': 0, 'records': 1817, 'nv': 822, 'only_a': 0, 'only_b': 0, 'changed': 10, 'quest_db_diff': 0, 'nv_changed': 0}

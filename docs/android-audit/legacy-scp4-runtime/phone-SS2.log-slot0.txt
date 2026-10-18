@@ -1,0 +1,112 @@
+: PID: 256
+: CPU: arch=x86-64 , fam=586 , cpus=1
+: SIMD: SSE=0 , 3DNow=0 , MMX=0
+: OS Version: 5.1.2600 
+: Desktop resolution: 2340 x 1080
+: Virtual desktop resolution: 2340 x 1080
+: -----------------------------------------------------------
+: Command line: SS2.exe
+: -----------------------------------------------------------
+: unsupported mode 2340 x 1080 x 32 (not in mode table)
+: CWD: C:\
+: -----------------------------------------------------------
+: App Version: System Shock 2 Patch Final 2.48
+: --------------------- misc config -------------------------
+: resname_base .\+.\Data+.\Data\res
+: load_path .\+.\misdml+.\Data
+: script_module_path .\+.\Data
+: movie_path .\cutscenes+.\Data\cutscenes
+: mod_path .\DMM\SCP_beta4+.\DMM\SS2_Rebirth_v05a+.\DMM\SHTUP-ND_beta1+.\DMM\thelovebat-SS2-altMusic+.\DMM\Vurt_Env_map_for_SS2_water+.\DMM\Vurt-Goo-(GrubPodVanilla-1.04)+.\DMM\Vurt's SS2 Water v5.1+.\DMM\Vurt's SS2 Flora Overhaul 1.0k+.\DMM\Vurt's Pool Water (Resource)+.\DMM\Vurt's Hi-Res Space v1.1+.\DMM\SS2_Vaxquis_VintageSongRemake+.\DMM\ss2_quest_note_notifier+.\DMM\SS2 Black Egg 1.02+.\DMM\obj_fixes_v12+.\DMM\Kolya-Crosshair-Hazard-Amber+.\DMM\Tacticool_complete_v1.05+.\DMM\AccFam_20+.\patch_ext
+: uber_mod_path osm+ubermod
+: language english
+: game_screen_size 1280 720
+: game_screen_depth 32
+: game_screen_flags 47
+: game_full_screen 1
+: screen_size 640,480
+: screen_depth 16
+: game_hardware 1
+: single_display_mode 2
+: ui_scale_mode 2
+: use_d3d_display
+: d3d_disp_scaled_2d_overlay 640 480
+: framerate_cap 60.0
+: SlowFrame 4
+: SlowFrameUI 10
+: force_32bit
+: force_32bit_textures
+: mipmap_mode 2
+: lm_mipmap_mode 0
+: lm_init_texmem 2
+: lm_filter_margin 1
+: tex_edge_padding 2
+: alpha_test_as_opaque
+: d3d_disp_enable_atoc 2
+: d3d_disp_sw_cc
+: d3d_disp_enable_hdr 32
+: multisampletype 8
+: postprocess 1
+: d3d_disp_enable_distortionfx
+: sfx_device 4
+: sfx_channels 48
+: sfx_vol_music -497
+: sfx_vol_2d 0
+: sfx_vol_3d 0
+: sfx_mixer_timeout 200
+: game shock
+: obj_min -6144
+: obj_max 8000
+: max_refs 32768
+: gui_font fonts\mainfont
+: phys_freq 60
+: enhanced_sky 1
+: skip_intro
+: crop_movies
+: new_mantle
+: z_far 512
+: wr_render_zcomp
+: render_weapon_particles
+: legacy_force_match_unrefs 0
+: shock_single_bind_set
+: shock_quicksave_slot 13
+: shock_autosave_slot 14
+: edit_screen_size 1024,768  
+: edit_screen_depth 16
+: -----------------------------------------------------------
+: Enumerating D3D9 adapters (1)...
+:    Adapter 0
+:       device name: \\.\DISPLAY1
+:       driver     : portable.dll
+:       descr      : darkrecomp portable renderer
+:       driver ver : 0x00060000-00010000
+:       vendor id  : 0x000010DE
+:       device id  : 0x00000391
+:       subsys id  : 0x00000000
+:       device guid: 00000000-0000-0000-0000-00000100
+:       desktop res: 2340 x 1080
+:       Modes
+:          unsupported mode 2340 x 1080 x 16 (not in mode table)
+:       Device Validation
+:          validated ok, device added (0, E390000)
+: Enumeration done
+: OpenAL Init...
+:    OpenAL not found on system or failed to load, install AL redist package or chose other sound driver
+: D3DProvider: Enumerating adapter 0 modes
+:    unsupported mode 2340 x 1080 x 16 (not in mode table)
+: D3DProvider: Enumeration done
+: sw framerate cap requested (16666 us)
+: D3DProvider StartMode: smode 1280x720x32 ; mode 640x480x32 (5 9 0 2D) ; 2d_surf_mode: 0
+:    CreateDevice: res = D3D_OK ; 1280x720 fmt=35 zfmt=71 cnt=1 ms=0 swap=1 fs=1 hz=0 pres=1 flags=2
+: Loaded script module "allobjs.osm" []
+: Loaded script module "nvscript.osm" []
+: Loaded script module "squirrel.osm" []
+: failed to load psapi.dll
+: sw framerate cap requested (16666 us)
+: D3DProvider StartMode: smode 1280x720x32 ; mode 852x480x32 (7 9 1 3D) ; 2d_surf_mode: 3
+: failed to load psapi.dll
+: OSM: SQUIRREL> Quest Note Notifier initialized
+: PLAYER POS: -92.0434 -169.932 7.00275
+: PLAYER POS: -68.5012 -169.587 6.00385
+: PLAYER POS: -66.9667 -169.566 6.00385
+: sw framerate cap requested (16666 us)
+: D3DProvider StartMode: smode 1280x720x32 ; mode 640x480x32 (5 9 1 2D) ; 2d_surf_mode: 0

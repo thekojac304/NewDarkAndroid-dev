@@ -35,6 +35,18 @@ cd android && ./gradlew assembleDevDebug    # app/build/outputs/apk/dev/debug/ap
 cd android && ./gradlew assemblePlayDebug   # app/build/outputs/apk/play/debug/app-play-debug.apk: the game only, about half the size
 ```
 
+**Side-by-side build** (for example a legacy SCP Beta 4 setup with NVScript 1.2.4, docs/android-audit/LEGACY_SCP4_RUNTIME_RESULTS.md).
+`-Pside=NAME` gives the app the ID `local.newdarkandroid.ss2.NAME`, the launcher name `SS2 <label>` and the version suffix
+`-NAME`, so it installs next to the regular app with its own games, profiles and settings. Build its native libraries into
+their own folder and point Gradle at it (an absolute path):
+
+```sh
+python android/build_native.py --build build/android-scp4 --game "<2.48 SS2.exe>" --nvscript "<legacy NVScript.osm>"
+cd android && ./gradlew -Pside=legacytest "-Pside.label=Legacy test" -Pnative.dir=C:/path/to/build/android-scp4 assemblePlayDebug
+```
+
+Without `-Pside` and `-Pnative.dir` the app is built exactly as before.
+
 ## Run
 
 ```sh

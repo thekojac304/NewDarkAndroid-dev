@@ -6,6 +6,14 @@ def repo = rootProject.file('..')
 def sdl2 = file(project.findProperty('sdl2.dir') ?: System.getenv('SDL2_SOURCE') ?: "${repo}/build/deps/SDL2")
 def nativeOut = file(project.findProperty('native.dir') ?: "${repo}/build/android")
 
+// A side-by-side build (-Pside=legacytest -Pside.label="Legacy test"): application ID local.newdarkandroid.ss2.<side>,
+// so it has its own data folders, launcher name and version suffix, and installs next to the regular app instead of
+// replacing it. Pair it with its own native libraries (-Pnative.dir=..., from build_native.py --build ...). Without
+// -Pside the app is built exactly as before.
+def side = project.findProperty('side') ?: ''
+def sideLabel = project.findProperty('side.label') ?: side
+if (side && !(side ==~ /[a-z][a-z0-9_]*/)) throw new GradleException("-Pside=${side}: use lower-case letters, digits and _")
+
 // What the recompiled game was generated from, so the launcher can check a game folder before copying or starting it:
 // SS2.exe "size:crc32" (host.c refuses any other file) and each recompiled module "name:SizeOfImage:ImageBase" (modules.c
 // skips another version). Read from build_native.py's generated sources; empty when they are missing (no check then).
@@ -38,6 +46,9 @@ android {
         ndk { abiFilters 'arm64-v8a' }
         buildConfigField 'String', 'GAME_EXE', "\"${gameIdentity[0]}\""
         buildConfigField 'String', 'GAME_MODULES', "\"${gameIdentity[1]}\""
+        buildConfigField 'String', 'SIDE_LABEL', "\"${sideLabel}\""
+        manifestPlaceholders = [appLabel: side ? "SS2 ${sideLabel}" : 'NewDark SS2']
+        if (side) { applicationIdSuffix ".${side}"; versionNameSuffix "-${side}" }
     }
 
     // Two builds of the same app (same package: one replaces the other and keeps its data):

@@ -1,0 +1,47 @@
+# Hashes (sha256) for LEGACY_SCP4_RUNTIME_RESULTS.md
+## Native modules
+abed4ee229dda567553b7d805f219008b6390c2d2da37459629eb28ac9ee6a9a  662016 bytes  Launchbox/Games/PC Games/System Shock 2/osm/NVScript.osm
+abed4ee229dda567553b7d805f219008b6390c2d2da37459629eb28ac9ee6a9a  662016 bytes  Launchbox/Games/PC Games/System Shock 2/DMM/SCP_beta4/NVScript.osm
+50f569ad495129c3c4734ddd1e886943eb9a212ff0a081d0d7a4a6a038aa26f0  2721280 bytes  Launchbox/Games/PC Games/System Shock 2/osm/squirrel.osm
+4199aac1d9af1e41385ba83d63470ca8b68c6f9ab684616c73fd6b94fd7a5a55  5116416 bytes  Launchbox/Games/PC Games/System Shock 2/ss2.exe
+096c3a1e25f9751e71cf3e05c834866ad61ebd9fbced8cf3917a4a6e3466a645  547840 bytes  Launchbox/Games/PC Games/System Shock 2/Data/allobjs.osm
+64d55311637315ffcff83eb193a05470a9fb8ded2a2704efcb649d751d8b4eec  21504 bytes  Launchbox/Games/PC Games/System Shock 2/lgvid.dll
+c7ff08c5a1837942410cc2328b4a6579ddb1d5a2678b8274db8b0347ce19823e  5121024 bytes  Steam Games/steamapps/common/SS2/SS2.exe
+d95b441565365525c3a208fc7f7ae5d513daac624e85d9a87703de2b5f763dc4  2726400 bytes  Steam Games/steamapps/common/SS2/osm/squirrel.osm
+096c3a1e25f9751e71cf3e05c834866ad61ebd9fbced8cf3917a4a6e3466a645  547840 bytes  Steam Games/steamapps/common/SS2/Data/allobjs.osm
+64d55311637315ffcff83eb193a05470a9fb8ded2a2704efcb649d751d8b4eec  21504 bytes  Steam Games/steamapps/common/SS2/lgvid.dll
+f15fc91b276e73ad52d5026a86a7d51b83e5644a20c3e58a53a10a4b52d4f11a  704512 bytes  build/scp/SCP_beta8/NVScript.osm
+
+## Legacy game copy build/scp4/game-scp4 (6,448 files) vs the original install minus save_*/ and current/ (6,448 files): differing files
+6394c6394
+< 50f569ad495129c3c4734ddd1e886943eb9a212ff0a081d0d7a4a6a038aa26f0  ./osm/squirrel.osm
+---
+> d95b441565365525c3a208fc7f7ae5d513daac624e85d9a87703de2b5f763dc4  ./osm/squirrel.osm
+6436c6436
+< 4199aac1d9af1e41385ba83d63470ca8b68c6f9ab684616c73fd6b94fd7a5a55  ./ss2.exe
+---
+> c7ff08c5a1837942410cc2328b4a6579ddb1d5a2678b8274db8b0347ce19823e  ./ss2.exe
+
+## Other legacy data (in the copy, identical to the original)
+430b17930f7dd1e8b3633de1e896e5156141d2e89c50f644842bc421af2ffdc3  DMM/SCP_beta4/shockscp.gam
+a8e6cce782af1abb66831126d4984c655cb08563aa775eb069ea7d8a1f1b7391  DMM/SCP_beta4/sq_scripts/scpScript.nut
+99a2d2c7a8eea9e69ddf67b3a565d1e38ab72684380c77559594eac01a713b9a  patch_ext/gamesys.dml
+a2e8adf5aac28f49c0aed79385e3924819675371a56d33c8a5f6cf929d80f937  cam_mod.ini
+21cb77d8390cc25cfd10ebe038ab57fc9cbe932237148ff8d8f3a4775b95b1fc  cam_ext.cfg
+ae018d27f2b4a9a699cdc3cbf76d38d3458a50a3d4710cf617183e90d74f2d72  User.cfg
+
+## Profile files (phone profiles/scp4 and desktop pc-write)
+5453ac742066c8b272b2440208d4a3bf615775bc5079c20545351b1b28c6549d  cam.cfg (original, game_screen_size 2560 1440 -> 1280 720)
+a5f53fe8d691ace5b5100acd01de4dfdd00639b2f7dc26e21cfa219609e7c31c  user.cfg (original User.cfg + the launcher's 2 Interface-size lines)
+
+## Builds
+0e443ea2cfad35f37925e3829b7cf3c6b2b5221e01162916742fd305af99e6d2  build/android-scp4/libs/arm64-v8a/libss2game.so
+fc8c8c9619a2ff5f6bd72d0d6c49f43f8c55705d1108b22cbf5843af2c6bab55  build/android-scp4/libs/arm64-v8a/libss2null.so
+3b990571a1486be2eafa4fb4a36e4403239c82f83e2da4b5f1d4c05bb4de25cb  build/desktop-win-null-scp4/ss2port.exe
+d2f38c35b7e369cbb121176f6cbbdc8db0919a0bc568b8aa12d6cb59977be8a7  build/desktop-win-sdl2-scp4/ss2port.exe
+ea4b8b2073d9a9e9b12a105139815e5d94deafcdeca5112d07fe2c6d1d004043  libss2game.so as packaged (stripped) in the legacytest APKs
+
+## APKs (build/android/baseline/legacytest/SHA256SUMS)
+8d60f4d3006f8f72224e25007be6aea190e4494c83ef56f361b0ed1da5a03d58  app-dev-debug-legacytest.apk
+192824dc8eb31d5781d17c7a8d7a0c7109e6cdd85532bfd83899f8fc3e5d2543  app-play-debug-legacytest.apk
+2a5ad3535a2586b9e16f7c67c5f86d08e204e9513d6d71f8e8f502d9c988efb6  accepted app local.newdarkandroid.ss2 0.8.1-import-fix-play (installed before and after; not replaced)

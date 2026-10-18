@@ -1,0 +1,30 @@
+# Per-run summary. mods = 'Loaded script module' lines in SS2.log; notifier = 'Quest Note Notifier initialized'; monolog = bytes;
+# errs = FATAL/RaiseException/ABI violation/'different version' lines in the port log; NV calls = engine->NVScript.osm calls (SS2PORT_MODSTATS)
+desktop slot 0 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5616 | exit 0, save written |  -92.0434 -169.932 7.00275; -68.5012 -169.587 6.00385; -66.9667 -169.566 6.00385;
+desktop slot 1 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 4747 | exit 0, save written |  -65.5104 -56.9988 5.03052; -65.7102 -33.7638 4.00558; -65.7225 -32.2323 4.00558;
+desktop slot 2 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5481 | exit 0, save written |  -10.5887 -1.87111 -1.99208; -17.286 -6.02777 -1.99208; -17.286 -6.02777 -1.99208;
+desktop slot 3 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5375 | exit 0, save written |  -171.694 202.152 -24.9884; -164.064 226.239 -24.9884; -163.596 227.715 -24.9884;
+desktop slot 4 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5614 | exit 0, save written |  -148.15 345.088 -22.9824; -160.662 342.275 -20.9984; -161.261 342.275 -20.9984;
+desktop slot 5 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5879 | exit 0, save written |  -155.25 362 -20.9695; -137.205 361.755 -20.9695; -137.205 361.755 -20.9695;
+desktop slot 6 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5605 | exit 0, save written |  -42.6584 -6.20694 -20.9972; -49.2737 -7.22388 -20.9972; -49.2737 -7.22388 -20.9972;
+desktop slot 7 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 6712 | exit 0, save written |  15.4703 -322.977 -9.99526; 10.4766 -322.856 -9.99526; 10.4766 -322.856 -9.99526;
+desktop slot 8 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5953 | exit 0, save written |  -10.798 -432.995 -3.98919; -4.98073 -434.731 -3.98919; -4.98073 -434.731 -3.98919;
+desktop slot 9 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5938 | exit 0, save written |  -6.18766 -42.1213 -28.9967; -3.72356 -22.7709 -28.9967; -3.58664 -21.5586 -28.9967;
+desktop slot 10 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5353 | exit 0, save written |  32.6657 -282.545 -38.4942; 24.7099 -282.011 -38.4942; 24.7099 -282.011 -38.4942;
+desktop slot 11 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 6305 | exit 0, save written |  -11.1961 -3.11253 -1.98944; -17.2902 -3.02722 -1.98944; -17.2902 -3.02722 -1.98944;
+desktop slot 12 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5354 | exit 0, save written |  -46.0503 78.1273 2.00062; -48.8407 53.2711 2.00062; -49.0135 51.7315 2.00062;
+desktop slot 13 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5624 | exit 0, save written |  -176.045 289.703 -36.9926; -170.29 268.923 -36.9926; -169.51 267.682 -35.98;
+desktop slot 14 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 6714 | exit 0, save written |  14.75 -322.75 -9.99208; 10.4779 -322.761 -9.99208; 10.4779 -322.761 -9.99208;
+phone slot 0 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 9271 | verdict=PASS first_frame=yes frames=? modules=4 fatal=no |  -92.0434 -169.932 7.00275; -68.5012 -169.587 6.00385; -66.9667 -169.566 6.00385;
+phone slot 12 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5283 | verdict=PASS first_frame=yes frames=? modules=4 fatal=no |  -46.0503 78.1273 2.00062; -48.8293 53.3726 2.00062; -48.9852 51.9839 2.00062;
+phone slot 8 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 6016 | verdict=PASS first_frame=yes frames=? modules=4 fatal=no |  -10.798 -432.995 -3.98919; -4.98057 -434.73 -3.98919; -4.98057 -434.73 -3.98919;
+phone slot 13 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5701 | verdict=PASS first_frame=yes frames=? modules=4 fatal=no |  -176.045 289.703 -36.9926; -170.21 268.795 -36.9926; -169.51 267.682 -35.98;
+phone slot 5 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5979 | verdict=PASS first_frame=yes frames=? modules=4 fatal=no |  -155.25 362 -20.9695; -137.205 361.755 -20.9695; -137.205 361.755 -20.9695;
+phone slot 7 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 6799 | verdict=PASS first_frame=yes frames=? modules=4 fatal=no |  15.4703 -322.977 -9.99526; 10.4766 -322.856 -9.99526; 10.4766 -322.856 -9.99526;
+phone slot 14 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 6817 | verdict=PASS first_frame=yes frames=? modules=4 fatal=no |  14.75 -322.75 -9.99208; 10.4779 -322.761 -9.99208; 10.4779 -322.761 -9.99208;
+phone slot 3 | mods 3 | notifier 1 | monolog 0 | errs 0 | NV calls 5477 | verdict=PASS first_frame=yes frames=? modules=4 fatal=no |  -171.694 202.152 -24.9884; -164.094 226.141 -24.9884; -163.672 227.473 -24.9884;
+phone slot0-hypo | verdict=PASS first_frame=yes frames=? modules=4 fatal=no | 
+phone slot15-reload | verdict=PASS first_frame=yes frames=? modules=4 fatal=no |  -92.0434 -169.932 7.00275;
+phone elev-cal | verdict=PASS first_frame=yes frames=? modules=4 fatal=no | 
+phone elev-in | verdict=PASS first_frame=yes frames=? modules=4 fatal=no |  14.75 -322.75 -9.99208; -2.39318 -322.836 -9.99312;
+phone play-smoke-slot7 | verdict=PASS first_frame=yes frames=? modules=4 fatal=no |  15.4703 -322.977 -9.99526; 10.4766 -322.856 -9.99526;

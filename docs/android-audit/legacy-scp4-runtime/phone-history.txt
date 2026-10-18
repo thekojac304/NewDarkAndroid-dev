@@ -1,0 +1,13 @@
+2026-10-18 15:43:08 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=17306 seconds=75.727
+2026-10-18 15:44:56 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=18428 seconds=72.293
+2026-10-18 15:46:15 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=19121 seconds=72.312
+2026-10-18 15:47:34 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=19688 seconds=72.297
+2026-10-18 15:48:54 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=20306 seconds=72.292
+2026-10-18 15:50:13 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=21314 seconds=72.294
+2026-10-18 15:51:33 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=21806 seconds=72.295
+2026-10-18 15:52:53 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=22386 seconds=72.307
+2026-10-18 15:54:56 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=23552 seconds=66.098
+2026-10-18 15:56:26 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=24068 seconds=51.805
+2026-10-18 16:01:01 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=24633 seconds=49.104
+2026-10-18 16:02:24 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=25545 seconds=64.232
+2026-10-18 16:04:32 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=27185 seconds=53.650

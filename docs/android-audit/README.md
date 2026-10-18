@@ -43,6 +43,7 @@ especially SCP.
 | [GAME_IMPORT_FIX.md](GAME_IMPORT_FIX.md) | Import fix: `games/` belongs to the adb shell, so imports go to the app-owned `imported/`; scan-then-confirm import with saves into the new game's own profile, crash recovery, `SS2.exe` version check (the user's install is NewDark 2.47); validated on the S26 Ultra |
 | [LEGACY_SAVE_COMPATIBILITY.md](LEGACY_SAVE_COMPATIBILITY.md) | The user's 15 NewDark 2.47 / SCP Beta 4 saves under the port's SCP Beta 8 setup: they load and play in short tests, with SCP's "mid-game activation" warning, one reused archetype ID in Operations and two missing models |
 | [LEGACY_SCP4_FEASIBILITY.md](LEGACY_SCP4_FEASIBILITY.md) | Audit: running the original SCP Beta 4 mod set on the 2.48 port. Every save dependency resolves in the original set; the blocker is recompiling NVScript 1.2.4; recommends a side-by-side build and a PC-referenced validation |
+| [LEGACY_SCP4_RUNTIME_RESULTS.md](LEGACY_SCP4_RUNTIME_RESULTS.md) | Phase 3C: NVScript 1.2.4 recompiled; the original SCP Beta 4 + 17-mod setup runs in a side-by-side app (`…ss2.legacytest`). All 15 saves load on desktop and 8 on the phone; saving keeps every quest variable and NVScript record. Level changes, replicators and psi are not yet tested |
 
 ## Overall feasibility
 
