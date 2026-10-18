@@ -1,0 +1,35 @@
+# Final integrated run (APK 59d5f447, real profile scp4, normal launcher path; scripted input: load slot 0, walk, Tab, quit)
+8000 tap esc;8500 tap esc;9000 tap esc;9550 place 976 190;9750 btn 1 down;9850 btn 1 up;11250 place 667 91;11450 btn 1 down;11550 btn 1 up;11950 place 1147 288;12150 btn 1 down;12250 btn 1 up;32600 down w;34600 up w;34800 tap tab;36600 shot;38500 tap tab;40300 quit;
+: App Version: System Shock 2 Patch Final 2.48
+: mod_path .\DMM\SCP_beta4+.\DMM\SS2_Rebirth_v05a+.\DMM\SHTUP-ND_beta1+.\DMM\thelovebat-SS2-altMusic+.\DMM\Vurt_Env_map_for_SS2_water+.\DMM\Vurt-Goo-(GrubPodVanilla-1.04)+.\DMM\Vurt's SS2 Water v5.1+.\DMM\Vurt's SS2 Flora Overhaul 1.0k+.\DMM\Vurt's Pool Water (Resource)+.\DMM\Vurt's Hi-Res Space v1.1+.\DMM\SS2_Vaxquis_VintageSongRemake+.\DMM\ss2_quest_note_notifier+.\DMM\SS2 Black Egg 1.02+.\DMM\obj_fixes_v12+.\DMM\Kolya-Crosshair-Hazard-Amber+.\DMM\Tacticool_complete_v1.05+.\DMM\AccFam_20+.\patch_ext
+: uber_mod_path osm+ubermod
+: sfx_device 1
+: Loaded script module "allobjs.osm" []
+: Loaded script module "nvscript.osm" []
+: Loaded script module "squirrel.osm" []
+: OSM: SQUIRREL> Quest Note Notifier initialized
+[port] lgvid.dll: loaded the recompiled module at 30300000 (60 imports bound), DllMain -> 1
+[touch] touch controls on; settings /data/data/local.newdarkandroid.ss2.legacytest/files/touch-settings.cfg (defaults); cursor direct, speed 1.00
+[port] DirectSound: mixing to 44100 Hz stereo
+[sdl] profile: 62.9 fps | frame ms mean 15.9 p50 10.0 p95 12.3 p99 15.4 max 1857.8 | >50ms 1 >100ms 1 | swap 2% | rss 278 MB | audio 215 callbacks, longest gap 41.0 ms, peak 12742, 79 silent
+[sdl] profile: 90.4 fps | frame ms mean 11.1 p50 10.0 p95 12.3 p99 15.5 max 515.2 | >50ms 1 >100ms 1 | swap 3% | rss 264 MB | audio 233 callbacks, longest gap 41.3 ms, peak 18312, 14 silent
+[port] allobjs.osm: loaded the recompiled module at 10000000 (61 imports bound), DllMain -> 1
+[port] NVScript.osm: loaded the recompiled module at 30400000 (78 imports bound), DllMain -> 1
+[port] Squirrel.osm: loaded the recompiled module at 30000000 (112 imports bound), DllMain -> 1
+[sdl] profile: 46.7 fps | frame ms mean 21.4 p50 10.1 p95 17.7 p99 636.5 max 840.6 | >50ms 5 >100ms 4 | swap 1% | rss 480 MB | audio 216 callbacks, longest gap 40.9 ms, peak 19941, 3 silent
+[sdl] profile: 62.1 fps | frame ms mean 16.1 p50 16.1 p95 16.8 p99 18.3 max 20.2 | >50ms 0 >100ms 0 | swap 1% | rss 479 MB | audio 215 callbacks, longest gap 40.3 ms, peak 13143, 0 silent
+[sdl] profile: 62.1 fps | frame ms mean 16.1 p50 16.1 p95 16.9 p99 17.9 max 19.0 | >50ms 0 >100ms 0 | swap 1% | rss 481 MB | audio 216 callbacks, longest gap 40.3 ms, peak 12172, 0 silent
+[sdl] profile: 62.2 fps | frame ms mean 16.1 p50 16.1 p95 16.8 p99 17.0 max 17.9 | >50ms 0 >100ms 0 | swap 1% | rss 481 MB | audio 216 callbacks, longest gap 40.2 ms, peak 12172, 0 silent
+[sdl] profile: 61.8 fps | frame ms mean 16.2 p50 16.1 p95 16.9 p99 17.3 max 44.0 | >50ms 0 >100ms 0 | swap 1% | rss 484 MB | audio 215 callbacks, longest gap 40.5 ms, peak 15814, 0 silent
+[android] process exit(0) after 40.576 s
+2026-10-18 18:00:39 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=21276 seconds=40.576
+
+# Conformance (phone, adb shell)
+=== variant: default
+conformance: 0 of 511 checks failed
+=== variant: --cache-regs --abi-check
+conformance: 0 of 511 checks failed
+ABI check: 0 call site(s) broke the calling-convention contract
+=== variant: --write-dir
+conformance: 0 of 113 checks failed
+game folder unchanged: yes

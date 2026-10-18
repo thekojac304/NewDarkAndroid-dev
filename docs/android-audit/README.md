@@ -46,6 +46,7 @@ especially SCP.
 | [LEGACY_SCP4_RUNTIME_RESULTS.md](LEGACY_SCP4_RUNTIME_RESULTS.md) | Phase 3C: NVScript 1.2.4 recompiled; the original SCP Beta 4 + 17-mod setup runs in a side-by-side app (`…ss2.legacytest`). All 15 saves load on desktop and 8 on the phone; saving keeps every quest variable and NVScript record. Level changes, replicators and psi are not yet tested |
 | [LEGACY_AUDIO_RESULTS.md](LEGACY_AUDIO_RESULTS.md) | Phase 3D-A: the legacy app was silent because the PC's `cam.cfg` selects OpenAL (`sfx_device 4`), which the port does not have; the launcher now switches that one line to DirectSound. PCM, Android player and lifecycle verified; listening is the user's |
 | [RELATIVE_CURSOR_RESULTS.md](RELATIVE_CURSOR_RESULTS.md) | Phase 3D-B: an optional relative (trackpad) cursor style next to the default direct one (SET, MORE, CURSOR; speed 0.25-4); hold to drag. Verified on the phone through the real touchscreen path at three resolutions; comfort is the user's |
+| [AUDIO_CURSOR_INTEGRATION_RESULTS.md](AUDIO_CURSOR_INTEGRATION_RESULTS.md) | Phase 3D integration: audio root cause and fix, both cursor styles, conformance 0/511, 0/511 (ABI), 0/113, touch 345/345, core suites, final run on the real profile, APK identities, the player's checklist |
 
 ## Overall feasibility
 
