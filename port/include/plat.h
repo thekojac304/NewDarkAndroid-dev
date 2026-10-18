@@ -107,6 +107,8 @@ typedef struct {
     uint32_t text;         /* TEXT */
     int x, y, dx, dy;      /* MOUSE_MOVE, MOUSE_WHEEL, RESIZE (x, y = new client size) */
     int repeat;            /* KEY: auto-repeat */
+    int abs;               /* MOUSE_MOVE: put the cursor the game reads at x, y even while the pointer is captured (touch
+                              placing the game's interface cursor); dx, dy are then ignored. 0 for ordinary motion. */
 } PlatEvent;
 
 typedef struct {

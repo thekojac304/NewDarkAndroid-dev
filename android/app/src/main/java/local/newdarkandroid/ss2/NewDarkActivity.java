@@ -1,16 +1,21 @@
 package local.newdarkandroid.ss2;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.libsdl.app.SDLActivity;
+import org.libsdl.app.SDLSurface;
 
 import java.io.File;
 
@@ -21,7 +26,7 @@ import java.io.File;
  * run starts in a fresh process; LauncherActivity reads the result from the main process.
  */
 public class NewDarkActivity extends SDLActivity {
-    static final String EXTRA_LIB = "lib", EXTRA_ARGS = "args", EXTRA_TITLE = "title", EXTRA_OVERLAY = "overlay";
+    static final String EXTRA_LIB = "lib", EXTRA_ARGS = "args", EXTRA_TITLE = "title", EXTRA_OVERLAY = "overlay", EXTRA_TOUCH = "touch";
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private TextView overlay;
@@ -38,6 +43,25 @@ public class NewDarkActivity extends SDLActivity {
     protected String[] getArguments() {
         String[] a = getIntent().getStringArrayExtra(EXTRA_ARGS);
         return a != null ? a : new String[0];
+    }
+
+    /** Touch controls (game runs of a library built with them): raw touchscreen events go to them, not to SDL. */
+    @Override
+    protected SDLSurface createSDLSurface(Context context) {
+        return getIntent().getBooleanExtra(EXTRA_TOUCH, false) ? new TouchSurface(context) : super.createSDLSurface(context);
+    }
+
+    /** Called by the touch controls for accepted control edges when haptics are on (as ShockolateActivity's). */
+    public void touchHaptic(int strength, int level) {
+        if (!hasWindowFocus() || isFinishing()) return;
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator == null || !vibrator.hasVibrator()) return;
+        int safeStrength = Math.max(1, Math.min(3, strength));
+        boolean confirmation = level >= 2;
+        int duration = confirmation ? 20 : 10;
+        int amplitude = Math.min(180, (confirmation ? 52 : 28) * safeStrength);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) vibrator.vibrate(VibrationEffect.createOneShot(duration, amplitude));
+        else vibrator.vibrate(duration);
     }
 
     @Override

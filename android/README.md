@@ -61,10 +61,20 @@ to `files/profiles/ss2/` through `SS2PORT_WRITE_DIR`. A file placed there (for e
 preference to the game folder's copy. The game window is landscape and fullscreen, with no overlay. There are no touch
 controls yet.
 
-**Input.** A physical keyboard and mouse (USB or Bluetooth) work through SDL. Mouse look uses Android pointer capture.
-For scripted tests without hardware, `tools/uhid_input.c` makes Android see a real USB keyboard and mouse
-([tools/README.md](tools/README.md)). Injected `adb shell input` taps arrive only as SDL's touch-emulated mouse. The game
-keeps its mouse in relative mode even in its menus, so a tap cannot place its cursor. Use the HID tool instead.
+**Touch controls.** The `game` mode has the Shockolate touch controls ([port/backends/android/touch/README.md](../port/backends/android/touch/README.md)):
+- a floating stick in the left 45 % of the screen and swipe-to-look on the right;
+- FIRE (drag to aim), USE, JUMP, CROUCH, RELOAD, AMMO, weapon `<` `>` and II (menu, skip);
+- SET, the settings and layout editor, saved to `files/touch-settings.cfg`;
+- a LOOK / CURSOR toggle that also switches the game between shoot and interface mode, and follows the game when it
+  switches by itself.
+
+In cursor mode a tap puts the game's own cursor there and clicks; a drag drags. `--ez touch false` starts a game without
+them; touches then reach SDL as before. Touches never become SDL mouse events while the controls are on.
+
+**Input.** A physical keyboard and mouse (USB or Bluetooth) work through SDL, alongside the touch controls. Neither can
+release a key or button the other holds. Mouse look uses Android pointer capture. For scripted tests without hardware,
+`tools/uhid_input.c` makes Android see a real USB keyboard and mouse, or (`-t`) a multitouch touchscreen
+([tools/README.md](tools/README.md)).
 
 **Diagnostics** (off by default, set with `--es env`):
 
@@ -73,6 +83,7 @@ keeps its mouse in relative mode even in its menus, so a tap cannot place its cu
 | `SS2PORT_PROFILE=1` | Every 5 s: fps, frame-time mean/median/p95/p99/max, frames over 50 and 100 ms, time in SwapWindow, resident memory, audio callbacks (count, longest gap, peak level, silent buffers) |
 | `SS2PORT_INPUT_DEBUG=1` | Every key, text, mouse-button, finger, window and app event SDL delivers |
 | `SS2PORT_MOUSE_DEBUG=1` | Mouse capture changes and every motion event |
+| `SS2PORT_TOUCH_DEBUG=1` | Touch controls: every finger, and the keys, buttons and cursor placements they send |
 | `SS2PORT_INPUT_SCRIPT=<file>` | Not a log: plays scripted input at set times, in `game` or headless `game-null`. Put the file where the app can read it, for example `run-as local.newdarkandroid.ss2 cp /data/local/tmp/x.txt files/x.txt`, then `--es env SS2PORT_INPUT_SCRIPT=/data/user/0/local.newdarkandroid.ss2/files/x.txt` (see `port/README.md` and docs/android-audit/PHASE1E_RESULTS.md) |
 
 **Lifecycle.** Home, then the app icon or Recents, resumes the running game where it was: same process, sound resumes

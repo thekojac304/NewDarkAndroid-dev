@@ -15,6 +15,17 @@
 #include <SDL.h>
 #include "plat.h"
 #include "gl_render.h"
+#ifdef __ANDROID__   /* the touch controls (backends/android/touch/); weak: absent from builds without them */
+void android_touch_init(void) __attribute__((weak));
+int  android_touch_event(const SDL_Event *e) __attribute__((weak));
+int  android_touch_filter(const PlatEvent *p) __attribute__((weak));
+void android_touch_poll(void (*sink)(const PlatEvent *, void *), void *user, int dw, int dh, int bx, int by, int bw, int bh,
+                        int game_w, int game_h, int focused) __attribute__((weak));
+void android_touch_draw(int w, int h) __attribute__((weak));
+#define FORWARD(p) (!android_touch_filter || android_touch_filter(p))   /* a physical key/button touch does not already hold */
+#else
+#define FORWARD(p) 1
+#endif
 
 static SDL_Window *win; static SDL_GLContext ctx;
 static void port_log_plat_early(const char *m) { char b[200]; snprintf(b, sizeof b, "[sdl] %s", m); plat_log_write(PLAT_LOG_INFO, b); }
@@ -57,7 +68,12 @@ static void prof_frame(uint64_t t_before, uint64_t t_after) {
                   au_calls, au_gap_us / 1000.0, au_peak, au_silent);
     t0 = t_after; n = 0; swap_ns = 0; au_calls = au_silent = au_peak = au_gap_us = 0;
 }
-void gl_swap(void) { uint64_t t = plat_time_ns(); SDL_GL_SwapWindow(win); prof_frame(t, plat_time_ns()); }
+void gl_swap(void) {
+#ifdef __ANDROID__
+    if (android_touch_draw) { int dw, dh; SDL_GL_GetDrawableSize(win, &dw, &dh); android_touch_draw(dw, dh); }   /* over the picture and bars */
+#endif
+    uint64_t t = plat_time_ns(); SDL_GL_SwapWindow(win); prof_frame(t, plat_time_ns());
+}
 int gl_thread_spawn(void (*fn)(void *), void *arg) { return plat_thread_start(fn, arg, "render"); }
 /* GL set-up, run on the GL thread (the render thread, or this one) */
 typedef struct { int gles, ret, w, h; } GlSetup;
@@ -213,6 +229,9 @@ void plat_video_poll(void (*sink)(const PlatEvent *, void *), void *user) {
 #endif
     while (SDL_PollEvent(&e)) {
         memset(&p, 0, sizeof p); input_debug(&e);
+#ifdef __ANDROID__
+        if (android_touch_event && android_touch_event(&e)) continue;      /* a touch: the touch controls' (touch_ss2.c) */
+#endif
         switch (e.type) {
         case SDL_QUIT: p.type = PLAT_EV_QUIT; sink(&p, user); break;
 #ifdef __ANDROID__
@@ -222,7 +241,7 @@ void plat_video_poll(void (*sink)(const PlatEvent *, void *), void *user) {
 #endif
         case SDL_KEYDOWN: case SDL_KEYUP:
             if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_RETURN && (e.key.keysym.mod & KMOD_ALT)) { want_fullscreen = !want_fullscreen; SDL_SetWindowFullscreen(win, want_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0); break; }
-            p.type = PLAT_EV_KEY; p.down = e.type == SDL_KEYDOWN; p.repeat = e.key.repeat; p.key = dik_of(e.key.keysym.scancode); if (p.key) sink(&p, user); break;
+            p.type = PLAT_EV_KEY; p.down = e.type == SDL_KEYDOWN; p.repeat = e.key.repeat; p.key = dik_of(e.key.keysym.scancode); if (p.key && FORWARD(&p)) sink(&p, user); break;
         case SDL_TEXTINPUT: { const char *t = e.text.text; while (*t) { p.type = PLAT_EV_TEXT; p.text = utf8_next(&t); sink(&p, user); } break; }
         case SDL_MOUSEMOTION: {
             p.type = PLAT_EV_MOUSE_MOVE; to_surface(e.motion.x, e.motion.y, &p.x, &p.y);
@@ -235,7 +254,7 @@ void plat_video_poll(void (*sink)(const PlatEvent *, void *), void *user) {
             sink(&p, user); break; }
         case SDL_MOUSEBUTTONDOWN: case SDL_MOUSEBUTTONUP: {
             static const int map[6] = { -1, 0, 2, 1, 3, 4 }; int b = e.button.button < 6 ? map[e.button.button] : -1; if (b < 0) break;
-            p.type = PLAT_EV_MOUSE_BUTTON; p.down = e.type == SDL_MOUSEBUTTONDOWN; p.button = b; sink(&p, user); break; }
+            p.type = PLAT_EV_MOUSE_BUTTON; p.down = e.type == SDL_MOUSEBUTTONDOWN; p.button = b; if (FORWARD(&p)) sink(&p, user); break; }
         case SDL_MOUSEWHEEL: p.type = PLAT_EV_MOUSE_WHEEL; p.dy = (e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? -e.wheel.y : e.wheel.y) * 120; if (p.dy) sink(&p, user); break;
         case SDL_WINDOWEVENT:
             if (e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED || e.window.event == SDL_WINDOWEVENT_FOCUS_LOST) { p.type = PLAT_EV_FOCUS; p.down = e.window.event == SDL_WINDOWEVENT_FOCUS_GAINED; sink(&p, user); if (p.down && rel_mode) SDL_SetRelativeMouseMode(SDL_TRUE); }
@@ -243,6 +262,12 @@ void plat_video_poll(void (*sink)(const PlatEvent *, void *), void *user) {
             break;
         }
     }
+#ifdef __ANDROID__
+    if (android_touch_poll) {               /* the touch controls' events, after the platform's */
+        int bx, by, bw, bh, dw, dh; letterbox(&bx, &by, &bw, &bh); SDL_GL_GetDrawableSize(win, &dw, &dh);
+        android_touch_poll(sink, user, dw, dh, bx, by, bw, bh, surf_w, surf_h, (SDL_GetWindowFlags(win) & SDL_WINDOW_INPUT_FOCUS) != 0);
+    }
+#endif
 }
 
 /* ---------------------------------------------------------------- audio */
@@ -281,6 +306,9 @@ int main(int argc, char **argv) {
     const char *mw = getenv("SS2PORT_MOUSE_WARP"); SDL_SetHint(SDL_HINT_MOUSE_RELATIVE_MODE_WARP, mw && *mw == '1' ? "1" : "0");
     const char *ms = getenv("SS2PORT_MOUSE_SCALE"); if (ms && atof(ms) > 0) mouse_scale = (float)atof(ms);
     SDL_SetMainReady();
+#ifdef __ANDROID__
+    if (android_touch_init) android_touch_init();   /* before SDL_Init: SDL must not turn touches into mouse events */
+#endif
     if (SDL_Init(0)) { fprintf(stderr, "SDL: %s\n", SDL_GetError()); return 1; }
     int r = port_main(argc, argv);
     SDL_Quit(); return r;

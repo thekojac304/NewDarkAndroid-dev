@@ -131,6 +131,11 @@ if(ANDROID)
   target_link_libraries(${PORT_ANDROID_LIB} PRIVATE m Threads::Threads log)
   if(PORT_BACKEND STREQUAL "sdl2")
     target_link_libraries(${PORT_ANDROID_LIB} PRIVATE SDL2::SDL2)
+    # the touch controls (Shockolate's, GPL-3.0-or-later; backends/android/touch/README.md), reached through weak
+    # references in backends/sdl2/plat_sdl2.c
+    file(GLOB TOUCH_SRC ${CMAKE_CURRENT_SOURCE_DIR}/backends/android/touch/*.c)
+    target_sources(${PORT_ANDROID_LIB} PRIVATE ${TOUCH_SRC})
+    target_include_directories(${PORT_ANDROID_LIB} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/backends/android/touch)
   endif()
   # exit: record the status for the app and end the process with _exit; plat_log_write: logcat and the run log
   target_link_options(${PORT_ANDROID_LIB} PRIVATE -Wl,--wrap=exit -Wl,--wrap=plat_log_write)

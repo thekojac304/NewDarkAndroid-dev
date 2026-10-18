@@ -1,0 +1,72 @@
+# Touch controls (`backends/android/touch/`)
+
+The Shockolate touchscreen controls (System Shock, Halo-derived: floating stick, swipe look, FIRE with drag-to-aim,
+USE, action buttons, a MODE toggle between look and cursor, a settings panel with a layout editor), driving System
+Shock 2 through the portable host. **GPL-3.0-or-later** (as in Shockolate). The rest of NewDarkRecompiled is MIT, so an
+APK that contains this directory is GPL as a whole. Personal builds are not distributed.
+
+## Where the code comes from
+
+Imported from `C:\Dev\system-shock-android`, branch `touch-controls`, commit
+`750237049b2e9906f5e3345ff05522558b9a9f47` (`AndroidProject/app/jni/touch/`, the accepted baseline of the Phase 0
+audit). It was taken with `git archive`; the working tree's uncommitted changes were not used.
+
+| File | From 7502370 | Change |
+| --- | --- | --- |
+| `touch_controls.c/.h` | unchanged, except one line | `in_circle` ignores radius-0 controls (hidden in the SS2 layout) |
+| `touch_editor.c`, `touch_radial.c/.h`, `touch_settings.h` | unchanged | |
+| `touch_settings.c` | defaults table only | SS2 labels: CONS → RELOAD; explosive, sprint and target hidden; AMMO moved into the left letterbox bar. Keys, schema (v3) and positions otherwise kept |
+| `touch_surface.c/.h` | JNI name only | `Java_local_newdarkandroid_ss2_TouchSurface_onNativeSurfaceTouch` |
+| `touch_render_gles.c` | from `touch_render.c` | the same drawing code, colours, layout and font; `SDL_Renderer` calls replaced by one batched GLES 2 triangle list; QA and visual-compare panels left out |
+| `android/.../TouchSurface.java` | from the `SDLSurface.java` patch | as a subclass (`NewDarkActivity.createSDLSurface`), so SDL's Java sources stay stock |
+| `touch_ss2.c/.h` | new | the SS2 bridge, replacing `touch_shock_bridge.c` (which is System Shock engine code) |
+| `touch_ss2_android.c` | new | SDL events, lifecycle, settings file, haptics (`NewDarkActivity.touchHaptic`, as `ShockolateActivity`'s), drawing |
+
+## How it fits
+
+```
+Android touchscreen -> TouchSurface (raw surface pixels) -> touch_surface.c (SDL user event)
+  -> touch_controls.c (fingers, roles, stick, look, fire/use, cursor, MODE)  [Shockolate core]
+  -> touch_ss2.c (edges -> PlatEvents: keys, mouse motion, buttons, wheel, cursor placement)  [SS2 bridge]
+  -> plat_video_poll's sink -> win32/user32.c + dx/dinput.c -> the recompiled game
+```
+
+- `plat_sdl2.c` (`#ifdef __ANDROID__`, weak references) calls `android_touch_init`, `android_touch_event` (each SDL
+  event), `android_touch_filter` (physical keys and buttons), `android_touch_poll` (after the SDL events) and
+  `android_touch_draw` (in `gl_swap`, before the swap).
+- SDL's touch-to-mouse emulation is off. The launcher's `--ez touch false` turns the controls off (`SS2PORT_TOUCH=0`),
+  and the game then gets SDL's touch events as before.
+- Shared code: `PlatEvent.abs` (put the game's cursor at x, y even while the mouse is captured; `win32/user32.c`,
+  `dx/dinput.c`), and `user32_cursor_recentred_ns()` (when the game last recentred its cursor).
+
+## SS2 mapping
+
+The keys are the bindings of the game's `user.bnd`, which replaces `SHOCK.BND`.
+
+| Control | Sends |
+| --- | --- |
+| Stick | W / A / S / D held (`+walkfast`, `+moveleftfast`, `+backfast`, `+moverightfast`). Press at 30 % deflection, release at 20 %. |
+| Look swipe | Relative mouse motion: 1 game pixel per game-pixel width of swipe, times Look X/Y |
+| FIRE | Left button held (`+fire_weapon`). The finger also aims. |
+| USE | Right click (`frob_object`) |
+| JUMP / CROUCH | Space held (`+jump`) / Shift (`crouch`, a toggle) |
+| `<` / `>` | Mouse wheel down / up (`cycle_weapon -1` / `1`) |
+| RELOAD / AMMO | R (`reload_gun`) / B (`cycle_ammo`). In cursor mode the AMMO button is a right click at the cursor, labelled USE. |
+| II | Esc (`sim_menu`; also skips cutscenes) |
+| MODE (LOOK / CURSOR) | Tab (`toggle_mouse`): the game switches between shoot and interface mode |
+| Cursor mode | A tap places the game's cursor and clicks. A drag presses at the start point, moves and releases. |
+
+- Every press lasts at least 60 ms, so a 100 fps game sees it.
+- A key or button a physical keyboard or mouse holds is never released by touch, and the other way round.
+- **Mode:** the game recentres its cursor every frame in shoot mode and never in interface mode or menus. The touch mode
+  follows that, needing 3 recentred frames within 250 ms. After the player's own MODE press it waits 600 ms, then
+  follows the game again.
+
+## Tests
+
+`tests/run.sh` builds `tests/touch_ss2_test.c` with the bridge and the core and runs it on the PC, for example with
+`CC="python -m ziglang cc"`. It checks press/release order and minimum hold, several fingers, stick ownership and
+hysteresis, a modifier held across frames, relative look scaling, cursor placement before a click (corners, centre,
+bars), drags, focus-loss release, mode following, weapon wheel and physical/touch aggregation. Shockolate's own core
+suites (`touch_controls`, `alpha11`, `alpha2`, `alpha3`, `alpha4`, `ammo` from 7502370) also pass against this
+directory's core.

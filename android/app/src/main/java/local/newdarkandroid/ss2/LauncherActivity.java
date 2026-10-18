@@ -46,7 +46,8 @@ public class LauncherActivity extends Activity {
         // Phase 1C: the recompiled game, run from games/ss2/ (read only); saves and configuration go to files/profiles/ss2/.
         // Arguments are built in startNext. From adb, --ei frames N changes the frame limit (0: none), and
         // --es env NAME=value,NAME=value adds settings (e.g. SS2PORT_PROFILE=1,SS2PORT_INPUT_DEBUG=1), and --es portargs
-        // adds port arguments before the executable (e.g. "--trace-only GetKeyState,MapVirtualKeyA").
+        // adds port arguments before the executable (e.g. "--trace-only GetKeyState,MapVirtualKeyA"). The game mode has
+        // touch controls; --ez touch false turns them off (touches then reach SDL as before).
         { "game-null", "ss2null", "game, headless (null backend)", "" },
         { "game", "ss2game", "game, SDL2 + OpenGL ES", "" },
     };
@@ -141,7 +142,7 @@ public class LauncherActivity extends Activity {
         Button b = new Button(this);
         b.setText(label);
         b.setAllCaps(false);
-        b.setOnClickListener(v -> { state.edit().putInt("frames", -1).putString("env", "").putString("portargs", "").apply(); startQueue(which); });
+        b.setOnClickListener(v -> { state.edit().putInt("frames", -1).putString("env", "").putString("portargs", "").putBoolean("touch", true).apply(); startQueue(which); });
         col.addView(b);
         buttons.add(b);
     }
@@ -186,7 +187,8 @@ public class LauncherActivity extends Activity {
         if (which == null) return;
         String env = intent.getStringExtra("env"), pa = intent.getStringExtra("portargs");   // game runs: NAME=value settings; port arguments
         state.edit().putInt("frames", intent.getIntExtra("frames", -1))                // -1: each game mode's default
-            .putString("env", env != null ? env.trim() : "").putString("portargs", pa != null ? pa.trim() : "").apply();
+            .putString("env", env != null ? env.trim() : "").putString("portargs", pa != null ? pa.trim() : "")
+            .putBoolean("touch", intent.getBooleanExtra("touch", true)).apply();        // --ez touch false: no touch controls
         startQueue(which);
     }
 
@@ -230,6 +232,7 @@ public class LauncherActivity extends Activity {
             int frames = state.getInt("frames", -1);
             if (frames < 0) frames = defaultFrames(m);
             args.addAll(Arrays.asList("--android-env", "SS2PORT_WRITE_DIR=" + profile.getAbsolutePath()));
+            if (!state.getBoolean("touch", true)) args.addAll(Arrays.asList("--android-env", "SS2PORT_TOUCH=0"));   // no touch controls
             for (String e : state.getString("env", "").split("[ ,]")) if (e.contains("=")) args.addAll(Arrays.asList("--android-env", e));
             for (String e : state.getString("portargs", "").split(" ")) if (!e.isEmpty()) args.add(e);
             if (frames > 0) args.addAll(Arrays.asList("--frames", Integer.toString(frames)));
@@ -239,6 +242,7 @@ public class LauncherActivity extends Activity {
             .putExtra(NewDarkActivity.EXTRA_LIB, x[1])
             .putExtra(NewDarkActivity.EXTRA_TITLE, x[2])
             .putExtra(NewDarkActivity.EXTRA_OVERLAY, !m.equals("game"))      // the game's own picture needs no log on top
+            .putExtra(NewDarkActivity.EXTRA_TOUCH, m.equals("game") && state.getBoolean("touch", true))   // touch controls (libss2game)
             .putExtra(NewDarkActivity.EXTRA_ARGS, args.toArray(new String[0]));
         startActivity(i);
         refresh();

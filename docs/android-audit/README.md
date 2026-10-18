@@ -32,6 +32,7 @@ especially SCP.
 | [PHASE1C_RESULTS.md](PHASE1C_RESULTS.md) | Phase 1C: the recompiled NewDark 2.48 game running in the app, headless and with SDL2 + OpenGL ES; first frames on the S26 Ultra |
 | [PHASE1D_RESULTS.md](PHASE1D_RESULTS.md) | Phase 1D: gameplay on the S26 Ultra (Earth and MedSci: movement, mouse look, frob, inventory, PDA, melee, save/load), input, audio, performance, lifecycle, write-folder regression test |
 | [PHASE1E_RESULTS.md](PHASE1E_RESULTS.md) | Phase 1E: the Earth grav-shaft "defect" was a test error (only the low-gravity descent shaft was tried). The lift shaft works on Android and a Windows desktop build, with matching scripted position traces. |
+| [PHASE2A_RESULTS.md](PHASE2A_RESULTS.md) | Phase 2A: the Shockolate touch controls (7502370) in SS2 on Android: stick, look, fire, use, jump, crouch, weapons, menus, cursor mode with exact placement, inventory and PDA by touch; multitouch tested on device |
 
 ## Overall feasibility
 

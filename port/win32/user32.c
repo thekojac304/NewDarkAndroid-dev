@@ -205,10 +205,13 @@ static void on_event(const PlatEvent *e, void *user) {
     case PLAT_EV_MOUSE_MOVE: {
         int gx, gy; to_game_coords(e->x, e->y, &gx, &gy);
         if (captured) {           /* the real pointer stays put: raw motion moves the cursor the game reads (it recentres it with SetCursorPos) */
-            Wnd *cw = W(g_input.hwnd); vcur_x += e->dx; vcur_y += e->dy; vcur_clamp();
-            gx = vcur_x - (cw ? cw->x : 0); gy = vcur_y - (cw ? cw->y : 0);
+            Wnd *cw = W(g_input.hwnd);
+            if (e->abs) { vcur_x = gx + (cw ? cw->x : 0); vcur_y = gy + (cw ? cw->y : 0); }   /* placed (touch): no motion for DirectInput */
+            else { vcur_x += e->dx; vcur_y += e->dy; }
+            vcur_clamp(); gx = vcur_x - (cw ? cw->x : 0); gy = vcur_y - (cw ? cw->y : 0);
         }
-        g_input.mouse_x = gx; g_input.mouse_y = gy; g_input.mouse_dx += e->dx; g_input.mouse_dy += e->dy;
+        g_input.mouse_x = gx; g_input.mouse_y = gy;
+        if (!e->abs) { g_input.mouse_dx += e->dx; g_input.mouse_dy += e->dy; }
         if (h) post(h, 0x200, mk_flags(), ((uint32_t)(gy & 0xFFFF) << 16) | (uint32_t)(gx & 0xFFFF));
         break; }
     case PLAT_EV_MOUSE_BUTTON: {
@@ -237,6 +240,7 @@ static void on_event(const PlatEvent *e, void *user) {
  *                                             once: fine for text fields, too fast for key bindings
  *   <ms> char C                              only the character C (WM_CHAR); "char space" for a space
  *   <ms> move DX DY | btn N down|up | click N    relative mouse motion, mouse button (1 left, 2 right, 3 middle)
+ *   <ms> place X Y                           put the game's cursor at pixel X, Y of the drawing surface (touch placement)
  *   <ms> quit                                ends the process with exit code 0
  * '#' starts a comment. Each command is logged. */
 typedef struct { uint32_t ms; char cmd[8]; char arg[64]; int a, b; } ScriptLine;
@@ -292,6 +296,7 @@ static void script_run(const ScriptLine *s) {
         }
     } else if (!strcmp(s->cmd, "char")) { e.type = PLAT_EV_TEXT; e.text = !strcmp(k, "space") ? ' ' : (uint32_t)(unsigned char)k[0]; if (e.text) on_event(&e, NULL); }
     else if (!strcmp(s->cmd, "move")) { e.type = PLAT_EV_MOUSE_MOVE; e.dx = s->a; e.dy = s->b; on_event(&e, NULL); }
+    else if (!strcmp(s->cmd, "place")) { e.type = PLAT_EV_MOUSE_MOVE; e.abs = 1; e.x = s->a; e.y = s->b; on_event(&e, NULL); }
     else if (!strcmp(s->cmd, "btn") || !strcmp(s->cmd, "click")) {
         static const int map[4] = { 0, 0, 1, 2 }; e.type = PLAT_EV_MOUSE_BUTTON; e.button = s->a >= 1 && s->a <= 3 ? map[s->a] : 0;
         int click = !strcmp(s->cmd, "click");
@@ -397,7 +402,12 @@ SHIM(GetCursorPos) { input_pump();
     if (mouse_dbg()) { static int lx = -99999, ly; Wnd *w0 = W(g_input.hwnd); int x = captured ? vcur_x : g_input.mouse_x + (w0 ? w0->x : 0), y = captured ? vcur_y : g_input.mouse_y + (w0 ? w0->y : 0);
         if (x != lx || y != ly) { port_log("cursor: GetCursorPos -> %d,%d (from %08x)", x, y, RD32(c->esp)); lx = x; ly = y; } }
     if (captured) { WR32(A(0), (uint32_t)vcur_x); WR32(A(0) + 4, (uint32_t)vcur_y); RET(1); return; } Wnd *w = W(g_input.hwnd); WR32(A(0), (uint32_t)(g_input.mouse_x + (w ? w->x : 0))); WR32(A(0) + 4, (uint32_t)(g_input.mouse_y + (w ? w->y : 0))); RET(1); }
+/* When the game last moved the cursor itself. SS2 recentres it every frame in shoot (mouse look) mode and never in
+   interface mode or its menus, so this tells a backend which of the two the game is in (the Android touch controls). */
+static volatile uint64_t recentred_ns;
+uint64_t user32_cursor_recentred_ns(void) { return recentred_ns; }
 SHIM(SetCursorPos) {
+    recentred_ns = plat_time_ns();
     if (mouse_dbg()) port_log("cursor: SetCursorPos %d,%d (from %08x)%s", (int32_t)A(0), (int32_t)A(1), RD32(c->esp), captured ? " [captured]" : "");
     Wnd *w = W(g_input.hwnd);
     if (captured) { vcur_x = (int32_t)A(0); vcur_y = (int32_t)A(1); vcur_clamp(); g_input.mouse_x = vcur_x - (w ? w->x : 0); g_input.mouse_y = vcur_y - (w ? w->y : 0); RET(1); return; }   /* no real pointer move */

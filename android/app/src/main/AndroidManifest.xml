@@ -3,6 +3,8 @@
 
     <uses-feature android:glEsVersion="0x00020000" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <!-- optional touch-control haptics (off by default) -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:label="NewDark SS2"

@@ -39,6 +39,24 @@ adb shell "echo quit >> /data/local/tmp/uhid.cmd"        # removes the device ag
 | `btn N down`, `btn N up`, `click [N] [ms]` | Mouse button `N` (1 left, 2 right, 3 middle) |
 | `wheel N`, `sleep MS`, `release`, `quit` | `release` lets go of every key and button |
 
+**Touchscreen mode (`-t`).** `uhid_input -t FILE` creates a 5-contact HID multitouch touchscreen instead. Android
+classifies it as `TOUCH | TOUCH_MT | EXTERNAL`, source `TOUCHSCREEN`, and delivers its contacts through the normal input
+stack as several fingers at once, which `adb shell input` cannot do. It answers the kernel's contact-maximum feature
+request. Android maps an external touchscreen in the display's natural (portrait) orientation, so send `rotate 90` first
+to give coordinates in landscape screen pixels.
+
+| Command (`-t`) | Effect |
+| --- | --- |
+| `touch ID down X Y`, `touch ID move X Y`, `touch ID up` | Contact ID (0-4) at screen pixel X, Y |
+| `swipe ID X0 Y0 X1 Y1 [STEPS] [MS]` | Move a contact that is down; the other contacts stay put |
+| `screen W H`, `rotate 90` / `rotate 0` | Coordinate space (default 2340×1080); landscape mapping |
+
+```sh
+adb shell 'nohup /data/local/tmp/uhid_input -t /data/local/tmp/touch.cmd > /data/local/tmp/touch.log 2>&1 &'
+adb shell "printf '%s\n' 'rotate 90' 'touch 0 down 468 900' 'swipe 0 468 900 468 760 6 120' 'touch 1 down 1400 400' \
+  'swipe 1 1400 400 1600 400 10 400' 'touch 1 up' 'touch 0 up' >> /data/local/tmp/touch.cmd"
+```
+
 **Pointing at a menu item.** While the game holds the mouse in relative mode (it does in its menus too), the game moves its
 own cursor by the raw motion. `move -3000 -3000` therefore puts the cursor at the top left of the game picture, and a
 second `move X Y` puts it at game pixel (X, Y) of the 800×600 picture.

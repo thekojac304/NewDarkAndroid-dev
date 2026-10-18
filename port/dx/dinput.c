@@ -45,7 +45,7 @@ static void on_input(const PlatEvent *e) {
         uint32_t o;
         if (!d->mouse && e->type == PLAT_EV_KEY && !e->repeat && ofs_of(d, 0, e->key & 0xFF, &o)) push(d, o, e->down ? 0x80 : 0);
         if (d->mouse) {
-            if (e->type == PLAT_EV_MOUSE_MOVE) { d->dx += e->dx; d->dy += e->dy; if (e->dx && ofs_of(d, 1, 0, &o)) push(d, o, (uint32_t)e->dx); if (e->dy && ofs_of(d, 1, 1, &o)) push(d, o, (uint32_t)e->dy); }
+            if (e->type == PLAT_EV_MOUSE_MOVE && !e->abs) { d->dx += e->dx; d->dy += e->dy; if (e->dx && ofs_of(d, 1, 0, &o)) push(d, o, (uint32_t)e->dx); if (e->dy && ofs_of(d, 1, 1, &o)) push(d, o, (uint32_t)e->dy); }
             if (e->type == PLAT_EV_MOUSE_WHEEL) { d->dz += e->dy; if (ofs_of(d, 1, 2, &o)) push(d, o, (uint32_t)e->dy); }
             if (e->type == PLAT_EV_MOUSE_BUTTON && ofs_of(d, 0, e->button, &o)) push(d, o, e->down ? 0x80 : 0);
         }

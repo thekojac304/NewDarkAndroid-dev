@@ -15,6 +15,13 @@
  *   move DX DY [STEPS] [MS]                relative motion, split into STEPS reports over MS milliseconds
  *   btn N down|up | click [N] [ms]         mouse button N (1 left, 2 right, 3 middle)
  *   wheel N | sleep MS | release | quit    release lets go of every key and button
+ * With -t as the first argument it is a touchscreen instead: a 5-contact HID multitouch digitizer, which Android handles
+ * like any external touchscreen (several fingers at once, through the normal input stack):
+ *   touch ID down X Y | touch ID move X Y | touch ID up      contact ID (0-4) at screen pixel X, Y
+ *   swipe ID X0 Y0 X1 Y1 [STEPS] [MS]                      move a contact that is down, other contacts staying put
+ *   screen W H                                             the pixel size X and Y refer to (default 2340 1080)
+ *   rotate 90 | rotate 0                                   X, Y are landscape pixels of a portrait panel (Android maps an
+ *                                                          external touchscreen in the display's natural orientation)
  * Each command is logged to stdout with a monotonic timestamp in seconds. */
 #include <errno.h>
 #include <fcntl.h>
@@ -41,6 +48,19 @@ static const uint8_t rdesc[] = {
     0x09, 0x38, 0x15, 0x81, 0x25, 0x7F, 0x75, 0x08, 0x95, 0x01, 0x81, 0x06,                                       /* wheel */
     0xC0, 0xC0,
 };
+
+/* touchscreen (-t), report 3: 5 contacts of tip switch, contact id, 16-bit x and y; contact count; feature 4: maximum */
+#define TC 0x09, 0x22, 0xA1, 0x02, 0x09, 0x42, 0x15, 0x00, 0x25, 0x01, 0x75, 0x01, 0x95, 0x01, 0x81, 0x02,            0x75, 0x07, 0x95, 0x01, 0x81, 0x03, 0x09, 0x51, 0x25, 0x7F, 0x75, 0x08, 0x95, 0x01, 0x81, 0x02,            0x05, 0x01, 0x09, 0x30, 0x09, 0x31, 0x15, 0x00, 0x26, 0xFF, 0x7F, 0x75, 0x10, 0x95, 0x02, 0x81, 0x02,            0x05, 0x0D, 0xC0
+static const uint8_t rdesc_touch[] = {
+    0x05, 0x0D, 0x09, 0x04, 0xA1, 0x01, 0x85, 0x03,
+    TC, TC, TC, TC, TC,
+    0x09, 0x54, 0x15, 0x00, 0x25, 0x05, 0x75, 0x08, 0x95, 0x01, 0x81, 0x02,
+    0x85, 0x04, 0x09, 0x55, 0x25, 0x05, 0x75, 0x08, 0x95, 0x01, 0xB1, 0x02,
+    0xC0,
+};
+#define CONTACTS 5
+static struct { int down, x, y; } contact[CONTACTS];
+static int screen_w = 2340, screen_h = 1080, rotate90, touch_mode;
 
 static int fd;
 static uint8_t mods, keys[6], buttons;
@@ -91,14 +111,34 @@ static int key(const char *name, int down) {
     kb_report(); return 0;
 }
 
-static void drain(void) {          /* uhid's own events (start, open, close); nothing needs an answer */
+static void drain(void) {          /* uhid's own events (start, open, close); the touchscreen answers its feature request */
     struct pollfd p = { fd, POLLIN, 0 }; struct uhid_event e;
-    while (poll(&p, 1, 0) > 0 && (p.revents & POLLIN)) if (read(fd, &e, sizeof e) <= 0) break;
+    while (poll(&p, 1, 0) > 0 && (p.revents & POLLIN)) {
+        if (read(fd, &e, sizeof e) <= 0) break;
+        if (e.type == UHID_GET_REPORT) {
+            struct uhid_event r; memset(&r, 0, sizeof r); r.type = UHID_GET_REPORT_REPLY; r.u.get_report_reply.id = e.u.get_report.id;
+            if (touch_mode && e.u.get_report.rnum == 4) { r.u.get_report_reply.size = 2; r.u.get_report_reply.data[0] = 4; r.u.get_report_reply.data[1] = CONTACTS; }
+            else r.u.get_report_reply.err = EIO;
+            send_ev(&r);
+        }
+    }
+}
+/* one report with every contact that is down, plus the one just lifted (tip 0) */
+static void touch_report(int lifted) {
+    uint8_t r[2 + CONTACTS * 6]; memset(r, 0, sizeof r); r[0] = 3; int n = 0;
+    for (int i = 0; i < CONTACTS; i++) {
+        if (!contact[i].down && i != lifted) continue;
+        int x = (int)((long)contact[i].x * 32767 / (screen_w - 1)), y = (int)((long)contact[i].y * 32767 / (screen_h - 1));
+        if (rotate90) { int t = x; x = 32767 - y; y = t; }   /* the panel is portrait; X, Y are landscape screen pixels */
+        uint8_t *c = r + 1 + n * 6; c[0] = contact[i].down ? 1 : 0; c[1] = (uint8_t)i;
+        c[2] = (uint8_t)x; c[3] = (uint8_t)(x >> 8); c[4] = (uint8_t)y; c[5] = (uint8_t)(y >> 8); n++;
+    }
+    r[1 + CONTACTS * 6] = (uint8_t)n; input(r, sizeof r);
 }
 
 static int command(char *line) {
-    char *a[6] = { 0 }; int n = 0;
-    for (char *s = strtok(line, " \t\r\n"); s && n < 6; s = strtok(NULL, " \t\r\n")) a[n++] = s;
+    char *a[10] = { 0 }; int n = 0;
+    for (char *s = strtok(line, " \t\r\n"); s && n < 10; s = strtok(NULL, " \t\r\n")) a[n++] = s;
     if (!n || a[0][0] == '#') return 0;
     printf("%.3f %s%s%s%s%s\n", now() - t0, a[0], n > 1 ? " " : "", n > 1 ? a[1] : "", n > 2 ? " " : "", n > 2 ? a[2] : ""); fflush(stdout);
     if (!strcmp(a[0], "down") && n > 1) key(a[1], 1);
@@ -118,8 +158,21 @@ static int command(char *line) {
         buttons |= (uint8_t)(1u << (b - 1)); mouse_report(0, 0, 0); msleep(n > 2 ? atoi(a[2]) : 80);
         buttons &= (uint8_t)~(1u << (b - 1)); mouse_report(0, 0, 0);
     } else if (!strcmp(a[0], "wheel") && n > 1) mouse_report(0, 0, atoi(a[1]));
+    else if (!strcmp(a[0], "touch") && n > 2 && atoi(a[1]) >= 0 && atoi(a[1]) < CONTACTS) {
+        int i = atoi(a[1]);
+        if (!strcmp(a[2], "up")) { contact[i].down = 0; touch_report(i); }
+        else if (n > 4) { contact[i].down = 1; contact[i].x = atoi(a[3]); contact[i].y = atoi(a[4]); touch_report(-1); }
+    } else if (!strcmp(a[0], "swipe") && n > 5 && atoi(a[1]) >= 0 && atoi(a[1]) < CONTACTS) {
+        int i = atoi(a[1]), x0 = atoi(a[2]), y0 = atoi(a[3]), x1 = atoi(a[4]), y1 = atoi(a[5]), steps = n > 6 ? atoi(a[6]) : 10, ms = n > 7 ? atoi(a[7]) : 200;
+        if (steps < 1) steps = 1;
+        for (int k = 0; k <= steps; k++) { contact[i].down = 1; contact[i].x = x0 + (x1 - x0) * k / steps; contact[i].y = y0 + (y1 - y0) * k / steps; touch_report(-1); msleep(ms / steps); }
+    } else if (!strcmp(a[0], "screen") && n > 2) { screen_w = atoi(a[1]); screen_h = atoi(a[2]); }
+    else if (!strcmp(a[0], "rotate") && n > 1) rotate90 = atoi(a[1]) == 90;
     else if (!strcmp(a[0], "sleep") && n > 1) msleep(atoi(a[1]));
-    else if (!strcmp(a[0], "release")) { mods = 0; memset(keys, 0, sizeof keys); buttons = 0; kb_report(); mouse_report(0, 0, 0); }
+    else if (!strcmp(a[0], "release")) {
+        if (touch_mode) { for (int i = 0; i < CONTACTS; i++) if (contact[i].down) { contact[i].down = 0; touch_report(i); } }
+        else { mods = 0; memset(keys, 0, sizeof keys); buttons = 0; kb_report(); mouse_report(0, 0, 0); }
+    }
     else if (!strcmp(a[0], "quit")) return 1;
     else printf("unknown command %s\n", a[0]);
     drain(); return 0;
@@ -129,10 +182,12 @@ int main(int argc, char **argv) {
     setvbuf(stdout, NULL, _IOLBF, 0); t0 = now();
     fd = open("/dev/uhid", O_RDWR | O_CLOEXEC);
     if (fd < 0) { fprintf(stderr, "/dev/uhid: %s\n", strerror(errno)); return 1; }
+    if (argc > 1 && !strcmp(argv[1], "-t")) { touch_mode = 1; argv++; argc--; }
     struct uhid_event e; memset(&e, 0, sizeof e); e.type = UHID_CREATE2;
-    snprintf((char *)e.u.create2.name, sizeof e.u.create2.name, "NewDark test keyboard and mouse");
-    e.u.create2.rd_size = sizeof rdesc; memcpy(e.u.create2.rd_data, rdesc, sizeof rdesc);
-    e.u.create2.bus = 0x03; e.u.create2.vendor = 0x1209; e.u.create2.product = 0x0001; e.u.create2.version = 1;   /* BUS_USB; pid.codes test id */
+    snprintf((char *)e.u.create2.name, sizeof e.u.create2.name, touch_mode ? "NewDark test touchscreen" : "NewDark test keyboard and mouse");
+    if (touch_mode) { e.u.create2.rd_size = sizeof rdesc_touch; memcpy(e.u.create2.rd_data, rdesc_touch, sizeof rdesc_touch); }
+    else { e.u.create2.rd_size = sizeof rdesc; memcpy(e.u.create2.rd_data, rdesc, sizeof rdesc); }
+    e.u.create2.bus = 0x03; e.u.create2.vendor = 0x1209; e.u.create2.product = touch_mode ? 0x0002 : 0x0001; e.u.create2.version = 1;   /* BUS_USB; pid.codes test ids */
     if (send_ev(&e)) return 1;
     printf("device created; reading commands from %s\n", argc > 1 ? argv[1] : "stdin");
 
