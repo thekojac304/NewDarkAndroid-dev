@@ -1,0 +1,100 @@
+I/ss2port (18775): [touch] touch controls on; settings /data/data/local.newdarkandroid.ss2.legacytest/files/touch-settings.cfg (loaded); cursor relative, speed 1.00
+I/ss2port (18775): [touch] mode CURSOR (game interface/menu)
+I/ss2port (18775): [touch] game 2D picture 160,0 960x720 of 1280x720
+I/ss2port (18775): [touch] finger 32/0 down at 1170,540
+I/ss2port (18775): [touch] finger 32/0 move at 1180,540
+I/ss2port (18775): [touch] finger 32/0 move at 1190,540
+I/ss2port (18775): [touch] cursor at 18,0
+I/ss2port (18775): [touch] finger 32/0 move at 1200,540
+I/ss2port (18775): [touch] cursor at 27,0
+I/ss2port (18775): [touch] finger 32/0 up at 1200,540
+I/ss2port (18775): [touch] finger 32/0 down at 1170,500
+I/ss2port (18775): [touch] finger 32/0 move at 1221,545
+I/ss2port (18775): [touch] cursor at 72,30
+I/ss2port (18775): [touch] finger 32/0 move at 1273,591
+I/ss2port (18775): [touch] cursor at 118,60
+I/ss2port (18775): [touch] finger 32/0 move at 1325,636
+I/ss2port (18775): [touch] cursor at 164,90
+I/ss2port (18775): [touch] finger 32/0 move at 1377,681
+I/ss2port (18775): [touch] cursor at 210,120
+I/ss2port (18775): [touch] finger 32/0 move at 1429,726
+I/ss2port (18775): [touch] cursor at 256,150
+I/ss2port (18775): [touch] finger 32/0 move at 1481,771
+I/ss2port (18775): [touch] cursor at 302,180
+I/ss2port (18775): [touch] finger 32/0 move at 1532,816
+I/ss2port (18775): [touch] cursor at 348,210
+I/ss2port (18775): [touch] finger 32/0 move at 1584,861
+I/ss2port (18775): [touch] cursor at 394,240
+I/ss2port (18775): [touch] finger 32/0 move at 1636,906
+I/ss2port (18775): [touch] cursor at 440,270
+I/ss2port (18775): [touch] finger 32/0 move at 1687,951
+I/ss2port (18775): [touch] cursor at 486,300
+I/ss2port (18775): [touch] finger 32/0 move at 1739,996
+I/ss2port (18775): [touch] cursor at 532,330
+I/ss2port (18775): [touch] finger 32/0 move at 1791,1041
+I/ss2port (18775): [touch] cursor at 578,360
+I/ss2port (18775): [touch] finger 32/0 up at 1791,1041
+I/ss2port (18775): [touch] finger 32/0 down at 1170,701
+I/ss2port (18775): [touch] finger 32/0 move at 1180,701
+I/ss2port (18775): [touch] finger 32/0 move at 1190,701
+I/ss2port (18775): [touch] cursor at 866,495
+I/ss2port (18775): [touch] finger 32/0 move at 1200,701
+I/ss2port (18775): [touch] cursor at 875,495
+I/ss2port (18775): [touch] finger 32/0 up at 1200,701
+I/ss2port (18775): [touch] finger 32/0 down at 105,205
+I/ss2port (18775): [touch] finger 32/0 up at 105,205
+I/ss2port (18775): [touch] finger 32/0 down at 1709,94
+I/ss2port (18775): [touch] finger 32/0 up at 1709,94
+I/ss2port (18775): [touch] finger 32/0 down at 1170,208
+I/ss2port (18775): [touch] finger 32/0 up at 1170,208
+I/ss2port (18775): [touch] finger 32/0 down at 1522,981
+I/ss2port (18775): [touch] finger 32/0 up at 1522,981
+I/ss2port (18775): [touch] settings saved to /data/data/local.newdarkandroid.ss2.legacytest/files/touch-settings.cfg: ok; cursor direct, speed 1.00
+I/ss2port (18775): [touch] finger 32/0 down at 1551,284
+I/ss2port (18775): [touch] cursor at 978,189
+I/ss2port (18775): [touch] finger 32/0 up at 1551,284
+I/ss2port (18775): [touch] cursor at 978,189
+I/ss2port (18775): [touch] button 0 down
+I/ss2port (18775): [touch] button 0 up
+I/ss2port (18775): [touch] finger 32/0 down at 1208,136
+I/ss2port (18775): [touch] cursor at 674,90
+I/ss2port (18775): [touch] finger 32/0 up at 1208,136
+I/ss2port (18775): [touch] cursor at 674,90
+I/ss2port (18775): [touch] button 0 down
+I/ss2port (18775): [touch] button 0 up
+I/ss2port (18775): [touch] finger 32/0 down at 1741,434
+I/ss2port (18775): [touch] cursor at 1147,289
+I/ss2port (18775): [touch] finger 32/0 up at 1741,434
+I/ss2port (18775): [touch] cursor at 1147,289
+I/ss2port (18775): [touch] button 0 down
+I/ss2port (18775): [touch] button 0 up
+I/ss2port (18775): [touch] game 2D picture 0,0 1280x720 of 1280x720 (whole picture)
+I/ss2port (18775): [touch] mode LOOK (game shoot)
+I/ss2port (18775): [touch] finger 32/0 down at 2119,89
+I/ss2port (18775): [touch] key 0x0f down
+I/ss2port (18775): [touch] key 0x0f up
+I/ss2port (18775): [touch] finger 32/0 up at 2119,89
+I/ss2port (18775): [touch] finger 32/0 down at 1130,74
+I/ss2port (18775): [touch] cursor at 613,49
+I/ss2port (18775): [touch] finger 32/0 move at 1150,74
+I/ss2port (18775): [touch] cursor at 613,49
+I/ss2port (18775): [touch] button 0 down
+I/ss2port (18775): [touch] finger 32/0 move at 1170,74
+I/ss2port (18775): [touch] cursor at 626,49
+I/ss2port (18775): [touch] cursor at 640,49
+I/ss2port (18775): [touch] finger 32/0 move at 1190,74
+I/ss2port (18775): [touch] cursor at 653,49
+I/ss2port (18775): [touch] finger 32/0 move at 1210,74
+I/ss2port (18775): [touch] cursor at 666,49
+I/ss2port (18775): [touch] finger 32/0 move at 1230,74
+I/ss2port (18775): [touch] cursor at 680,49
+I/ss2port (18775): [touch] finger 32/0 move at 1250,74
+I/ss2port (18775): [touch] cursor at 693,49
+I/ss2port (18775): [touch] finger 32/0 move at 1270,74
+I/ss2port (18775): [touch] cursor at 706,49
+I/ss2port (18775): [touch] finger 32/0 move at 1290,74
+I/ss2port (18775): [touch] cursor at 720,49
+I/ss2port (18775): [touch] finger 32/0 up at 1290,74
+I/ss2port (18775): [touch] cursor at 720,49
+I/ss2port (18775): [touch] cursor at 720,49
+I/ss2port (18775): [touch] button 0 up

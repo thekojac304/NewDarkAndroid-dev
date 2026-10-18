@@ -138,7 +138,7 @@ static const char *ui_label(const TouchControls *t,int action) {
         "INVERT Y OFF","-","+","RESET TOUCH SETTINGS","CANCEL","SAVE / DONE",
         "<",">","SIZE -","SIZE +","SETTINGS","MOVE TOOLBAR","MORE >",
         "HAPTICS OFF","HAPTIC STRENGTH 1","WEAPON WHEEL OFF",
-        "CONSUMABLE WHEEL OFF","EXPLOSIVE WHEEL OFF"};
+        "CONSUMABLE WHEEL OFF","EXPLOSIVE WHEEL OFF","CURSOR DIRECT","-","+"};
     if (action>=TU_QA) return "";
     if (action==TU_INVERT && t->settings.invert_y) return "INVERT Y ON";
     if (action==TU_PAGE) return t->settings_page ? "< BACK" : "MORE >";
@@ -149,6 +149,7 @@ static const char *ui_label(const TouchControls *t,int action) {
     }
     if (action==TU_WHEEL_WEAPON) return t->settings.wheel_enabled[0] ? "WEAPON WHEEL ON" : "WEAPON WHEEL OFF";
     if (action==TU_WHEEL_CONSUMABLE) return t->settings.wheel_enabled[1] ? "CONSUMABLE WHEEL ON" : "CONSUMABLE WHEEL OFF";
+    if (action==TU_CURSOR_STYLE) return t->settings.cursor_relative ? "CURSOR RELATIVE - TRACKPAD" : "CURSOR DIRECT";
     if (action==TU_WHEEL_EXPLOSIVE) return t->settings.wheel_enabled[2] ? "EXPLOSIVE WHEEL ON" : "EXPLOSIVE WHEEL OFF";
     if (t->panel==TOUCH_UI_EDITOR) {
         if (action==TU_OPACITY_DOWN) return "OPACITY -";
@@ -173,6 +174,10 @@ static void panel(const TouchControls *t) {
             if (i==0) snprintf(value,sizeof(value),"%s %.0f%%",names[i],values[i]);
             else snprintf(value,sizeof(value),"%s %.2f",names[i],values[i]);
             text(value,w*.5f,h*rows[i],h/255,w*.33f);
+        }
+        if (t->settings_page) {             /* NewDarkAndroid: the relative cursor's speed, between its - and + */
+            snprintf(value,sizeof(value),"CURSOR SPEED %.2f",t->settings.cursor_speed);
+            text(value,w*.5f,h*.2775f,h/255,w*.33f);
         }
     } else if (t->panel==TOUCH_UI_EDITOR) {
         if (t->ui_drag) return; /* captured drag can cross either toolbar edge */

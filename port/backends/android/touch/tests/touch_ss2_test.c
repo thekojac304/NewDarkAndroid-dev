@@ -303,10 +303,305 @@ static void test_layout_upgrade(void) {
     remove(path);
 }
 
+/* ---------------------------------------------------------------- Phase 3D: the relative (trackpad) cursor style */
+static void rel_on(Ss2Touch *s, float speed) { s->t.settings.cursor_relative = true; s->t.settings.cursor_speed = speed; }
+static void menu_rel(Ss2Touch *s, float speed) { ss2t_init(s); now = 1000000000ull; frame(s, 0); rel_on(s, speed); }   /* a menu: cursor mode */
+static int abs_moves(int *x, int *y) {     /* cursor placements in this frame's output; the last one's position */
+    int n = 0; for (int i = 0; i < nout; i++) if (out[i].type == PLAT_EV_MOUSE_MOVE && out[i].abs) { n++; *x = out[i].x; *y = out[i].y; }
+    return n;
+}
+static int last_abs_index(void) { int m = -1; for (int i = 0; i < nout; i++) if (out[i].type == PLAT_EV_MOUSE_MOVE && out[i].abs) m = i; return m; }
+static int held0, downs0, ups0, bad0;      /* left-button edges counted over several frames: every down has its up, in order */
+static void tally_reset(void) { held0 = downs0 = ups0 = bad0 = 0; }
+static void tally(void) {
+    for (int i = 0; i < nout; i++) {
+        if (out[i].type != PLAT_EV_MOUSE_BUTTON || out[i].button != 0) continue;
+        if (out[i].down) { if (held0) bad0++; held0 = 1; downs0++; } else { if (!held0) bad0++; held0 = 0; ups0++; }
+    }
+}
+static void advance_tally(Ss2Touch *s, int frames, uint64_t ms) { for (int i = 0; i < frames; i++) { advance(s, ms, 0); tally(); } }
+static int fake_x, fake_y;                 /* the game's cursor as user32_cursor_pos would report it */
+static void fake_cursor(Ss2Touch *s, int *x, int *y) { (void)s; *x = fake_x; *y = fake_y; }
+static int haptics_seen;
+static void count_haptic(Ss2Touch *s, int level) { (void)s; (void)level; haptics_seen++; }
+
+static void test_rel_no_jump_and_motion(void) {
+    Ss2Touch s; menu_rel(&s, 1); CHECK(s.t.mode == TOUCH_CURSOR);
+    int x = -1, y = -1;
+    finger(&s, TOUCH_DOWN, 1, 1500, 700); advance(&s, 10, 0);
+    CHECK(nout == 0);                                        /* the touch moves nothing: no jump to the finger */
+    finger(&s, TOUCH_MOTION, 1, 1505, 700); advance(&s, 10, 0);
+    CHECK(nout == 0);                                        /* within the slop: still nothing */
+    finger(&s, TOUCH_MOTION, 1, 1644, 700); advance(&s, 10, 0);    /* 144 surface px = 80 game px, from the centre (400,300) */
+    CHECK(abs_moves(&x, &y) == 1 && x == 480 && y == 300);
+    CHECK(find(PLAT_EV_MOUSE_BUTTON, 0, 1) < 0);             /* moving presses no button */
+    finger(&s, TOUCH_MOTION, 1, 1644, 808); advance(&s, 10, 0);    /* 108 px down = 60 game px */
+    CHECK(abs_moves(&x, &y) == 1 && x == 480 && y == 360);
+    finger(&s, TOUCH_UP, 1, 1644, 808); advance(&s, 100, 0);
+    CHECK(nout == 0 && s.rel_state == SS2T_REL_IDLE);        /* lifting: no click, the cursor stays */
+    /* the next gesture goes on from the cursor, wherever the finger lands; fractions of a pixel add up */
+    finger(&s, TOUCH_DOWN, 2, 600, 200); advance(&s, 10, 0); CHECK(nout == 0);
+    finger(&s, TOUCH_MOTION, 2, 618, 200); advance(&s, 10, 0);     /* past the slop: 18 px = 10 game px */
+    CHECK(abs_moves(&x, &y) == 1 && x == 490 && y == 360);
+    for (int i = 1; i <= 9; i++) { finger(&s, TOUCH_MOTION, 2, 618.0f + i, 200); advance(&s, 10, 0); }   /* 9 x 1 px = 5 game px */
+    CHECK(s.rel_placed_x == 495);
+    finger(&s, TOUCH_UP, 2, 627, 200); advance(&s, 100, 0);
+    CHECK(s.touch_btn[0] == 0 && s.qn == 0);
+}
+
+static void test_rel_speed(void) {
+    Ss2Touch s; menu_rel(&s, 2); int x = -1, y = -1;
+    finger(&s, TOUCH_DOWN, 1, 1000, 500); finger(&s, TOUCH_MOTION, 1, 1072, 500); advance(&s, 10, 0);   /* 72 px = 40 game px, x2 */
+    CHECK(abs_moves(&x, &y) == 1 && x == 480 && y == 300);
+    finger(&s, TOUCH_UP, 1, 1072, 500); advance(&s, 100, 0);
+    s.t.settings.cursor_speed = .5f;
+    finger(&s, TOUCH_DOWN, 2, 1000, 500); finger(&s, TOUCH_MOTION, 2, 1144, 500); advance(&s, 10, 0);   /* 144 px = 80, x0.5 */
+    CHECK(abs_moves(&x, &y) == 1 && x == 520);
+    finger(&s, TOUCH_UP, 2, 1144, 500); advance(&s, 100, 0);
+    /* the cursor speed is its own: mouse look in shoot mode still turns 80 game px for 144 surface px */
+    enter_gameplay(&s);
+    finger(&s, TOUCH_DOWN, 3, 1300, 400); advance(&s, 10, shooting());
+    finger(&s, TOUCH_MOTION, 3, 1444, 400); advance(&s, 10, shooting());
+    int dx = 0, placed = 0; for (int i = 0; i < nout; i++) if (out[i].type == PLAT_EV_MOUSE_MOVE) { if (out[i].abs) placed = 1; else dx += out[i].dx; }
+    CHECK(dx >= 79 && dx <= 80 && !placed);
+    finger(&s, TOUCH_UP, 3, 1444, 400); advance(&s, 10, shooting());
+}
+
+static void test_rel_tap_and_double_tap(void) {
+    Ss2Touch s; menu_rel(&s, 1); int x = -1, y = -1;
+    finger(&s, TOUCH_DOWN, 1, 1500, 700); finger(&s, TOUCH_MOTION, 1, 1644, 700); finger(&s, TOUCH_UP, 1, 1644, 700);
+    advance(&s, 100, 0); advance(&s, 100, 0);                /* the cursor is at 480,300 */
+    finger(&s, TOUCH_DOWN, 1, 700, 900); now += 80000000ull; finger(&s, TOUCH_MOTION, 1, 704, 903); finger(&s, TOUCH_UP, 1, 704, 903);
+    frame(&s, 0);                                            /* a short tap far from the cursor, with a little jitter */
+    int d = find(PLAT_EV_MOUSE_BUTTON, 0, 1), m = last_abs_index();
+    CHECK(abs_moves(&x, &y) == 1 && x == 480 && y == 300);   /* the click is where the cursor is, not where the finger was */
+    CHECK(m >= 0 && d > m);                                  /* placed before the press */
+    CHECK(find(PLAT_EV_MOUSE_BUTTON, 0, 0) < 0);             /* released after the minimum hold */
+    advance(&s, 70, 0); CHECK(find(PLAT_EV_MOUSE_BUTTON, 0, 0) >= 0 && s.touch_btn[0] == 0);
+    /* a double tap: two ordinary clicks in order, nothing left held */
+    tally_reset();
+    finger(&s, TOUCH_DOWN, 2, 700, 900); now += 40000000ull; finger(&s, TOUCH_UP, 2, 700, 900); frame(&s, 0); tally();
+    now += 60000000ull; finger(&s, TOUCH_DOWN, 3, 702, 901); now += 40000000ull; finger(&s, TOUCH_UP, 3, 702, 901); frame(&s, 0); tally();
+    advance_tally(&s, 10, 30);
+    CHECK(downs0 == 2 && ups0 == 2 && !bad0 && !held0 && s.touch_btn[0] == 0 && s.qn == 0);
+    /* rapid taps: five clicks, none lost, none stuck */
+    tally_reset();
+    for (int i = 0; i < 5; i++) { finger(&s, TOUCH_DOWN, 10 + i, 800, 800); now += 20000000ull; finger(&s, TOUCH_UP, 10 + i, 800, 800); advance(&s, 10, 0); tally(); }
+    advance_tally(&s, 20, 30);
+    CHECK(downs0 == 5 && ups0 == 5 && !bad0 && !held0 && s.touch_btn[0] == 0 && s.qn == 0);
+    CHECK(s.rel_placed_x == 480 && s.rel_placed_y == 300);   /* taps never moved the cursor */
+    /* a slow tap (longer than a tap, shorter than a hold) does nothing and leaves nothing behind */
+    finger(&s, TOUCH_DOWN, 20, 800, 800); advance(&s, 200, 0); advance(&s, 200, 0); finger(&s, TOUCH_UP, 20, 800, 800); advance(&s, 100, 0);
+    CHECK(nout == 0 && s.rel_state == SS2T_REL_IDLE && s.touch_btn[0] == 0);
+}
+
+static void test_rel_hold_drag(void) {
+    Ss2Touch s; menu_rel(&s, 1); int x = -1, y = -1;
+    s.haptic = count_haptic; s.t.settings.haptics_enabled = true; haptics_seen = 0;
+    finger(&s, TOUCH_DOWN, 1, 1000, 500);
+    advance(&s, 200, 0); advance(&s, 200, 0); CHECK(nout == 0);   /* 400 ms: not yet a hold */
+    advance(&s, 110, 0);                                     /* held still for 510 ms: the left button goes down at the cursor */
+    int d = find(PLAT_EV_MOUSE_BUTTON, 0, 1), m = last_abs_index();
+    CHECK(abs_moves(&x, &y) == 1 && x == 400 && y == 300 && m >= 0 && d > m);
+    CHECK(s.rel_state == SS2T_REL_HELD && s.touch_btn[0] == 1 && haptics_seen == 1);
+    finger(&s, TOUCH_MOTION, 1, 1144, 500); advance(&s, 10, 0);   /* the drag: the press reaches the game before the cursor moves */
+    CHECK(abs_moves(&x, &y) == 0);
+    advance(&s, 60, 0); CHECK(abs_moves(&x, &y) == 1 && x == 480 && y == 300 && s.touch_btn[0] == 1);
+    finger(&s, TOUCH_UP, 1, 1144, 500); advance(&s, 10, 0);  /* lifting releases it where the cursor is; the cursor stays */
+    CHECK(find(PLAT_EV_MOUSE_BUTTON, 0, 0) >= 0 && abs_moves(&x, &y) == 0 && s.touch_btn[0] == 0 && s.rel_state == SS2T_REL_IDLE);
+    /* a hold lifted without moving: a press and a release at the cursor (a click), nothing held */
+    tally_reset();
+    finger(&s, TOUCH_DOWN, 2, 900, 600); advance_tally(&s, 6, 100);
+    CHECK(downs0 == 1 && held0);
+    finger(&s, TOUCH_UP, 2, 900, 600); advance_tally(&s, 3, 30);
+    CHECK(downs0 == 1 && ups0 == 1 && !bad0 && !held0 && s.rel_placed_x == 480);
+    /* no haptics when they are off */
+    s.t.settings.haptics_enabled = false; haptics_seen = 0;
+    finger(&s, TOUCH_DOWN, 3, 900, 600); advance_tally(&s, 6, 100); finger(&s, TOUCH_UP, 3, 900, 600); advance_tally(&s, 3, 30);
+    CHECK(haptics_seen == 0 && !held0);
+    /* moving first is a move, never a hold, however long the finger stays down afterwards */
+    tally_reset();
+    finger(&s, TOUCH_DOWN, 4, 900, 600); finger(&s, TOUCH_MOTION, 4, 950, 600); advance_tally(&s, 10, 100);
+    finger(&s, TOUCH_UP, 4, 950, 600); advance_tally(&s, 2, 30);
+    CHECK(downs0 == 0 && ups0 == 0);
+}
+
+static void test_rel_cancel(void) {
+    Ss2Touch s; menu_rel(&s, 1);
+    /* focus lost during a held drag: the button is released at once, and the stale finger does nothing afterwards */
+    finger(&s, TOUCH_DOWN, 1, 1000, 500); advance(&s, 300, 0); advance(&s, 300, 0);
+    finger(&s, TOUCH_MOTION, 1, 1100, 500); advance(&s, 100, 0);
+    CHECK(s.touch_btn[0] == 1 && s.rel_state == SS2T_REL_HELD);
+    ss2t_cancel(&s); nout = ss2t_flush(&s, out, 512);
+    CHECK(find(PLAT_EV_MOUSE_BUTTON, 0, 0) >= 0 && s.touch_btn[0] == 0 && s.rel_state == SS2T_REL_IDLE && s.qn == 0);
+    finger(&s, TOUCH_MOTION, 1, 1300, 500); finger(&s, TOUCH_UP, 1, 1300, 500); advance(&s, 100, 0);
+    CHECK(nout == 0);
+    /* focus lost while moving (no button): nothing to release, and the next touch still does not jump */
+    finger(&s, TOUCH_DOWN, 2, 1000, 500); finger(&s, TOUCH_MOTION, 2, 1100, 500); advance(&s, 10, 0);
+    int placed = s.rel_placed_x;
+    ss2t_cancel(&s); nout = ss2t_flush(&s, out, 512);
+    CHECK(find(PLAT_EV_MOUSE_BUTTON, 0, 0) < 0 && s.rel_state == SS2T_REL_IDLE);
+    finger(&s, TOUCH_DOWN, 3, 400, 900); advance(&s, 10, 0);
+    CHECK(nout == 0 && s.rel_placed_x == placed);
+    finger(&s, TOUCH_UP, 3, 400, 900); advance(&s, 10, 0);
+    /* the picture moved (rotation, resize): the same release */
+    finger(&s, TOUCH_DOWN, 4, 1000, 500); advance(&s, 300, 0); advance(&s, 300, 0); CHECK(s.touch_btn[0] == 1);
+    ss2t_frame(&s, now, W, H, true, 451, 0, 1440, 1080, 800, 600, 0); nout = ss2t_flush(&s, out, 512);
+    CHECK(find(PLAT_EV_MOUSE_BUTTON, 0, 0) >= 0 && s.touch_btn[0] == 0 && s.rel_state == SS2T_REL_IDLE);
+}
+
+static void test_rel_fingers_and_use(void) {
+    Ss2Touch s; menu_rel(&s, 1); int x = -1, y = -1;
+    finger(&s, TOUCH_DOWN, 1, 1000, 500); finger(&s, TOUCH_MOTION, 1, 1072, 500); advance(&s, 10, 0);   /* 40 game px */
+    CHECK(abs_moves(&x, &y) == 1 && x == 440);
+    finger(&s, TOUCH_DOWN, 2, 1400, 300); finger(&s, TOUCH_MOTION, 2, 1700, 300); advance(&s, 10, 0);   /* a second finger: not the cursor's */
+    CHECK(nout == 0);
+    TouchCircle u = ctl(&s, TC_AMMO);                        /* USE (right click) with a third finger, the cursor finger still down */
+    finger(&s, TOUCH_DOWN, 3, u.x, u.y); finger(&s, TOUCH_UP, 3, u.x, u.y); advance(&s, 10, 0);
+    CHECK(find(PLAT_EV_MOUSE_BUTTON, 1, 1) >= 0 && abs_moves(&x, &y) == 0);   /* where the cursor is: no placement */
+    advance(&s, 70, 0); CHECK(s.touch_btn[1] == 0);
+    finger(&s, TOUCH_MOTION, 1, 1144, 500); advance(&s, 10, 0);   /* the cursor finger goes on */
+    CHECK(abs_moves(&x, &y) == 1 && x == 480);
+    finger(&s, TOUCH_UP, 2, 1700, 300); finger(&s, TOUCH_UP, 1, 1144, 500); advance(&s, 100, 0);
+    CHECK(nout == 0 && s.touch_btn[0] == 0 && s.rel_state == SS2T_REL_IDLE);
+    /* lifted far outside where it started (in the letterbox bar): the cursor stops at the picture's edge, nothing is held */
+    finger(&s, TOUCH_DOWN, 4, 1800, 500); finger(&s, TOUCH_MOTION, 4, 100, 500); finger(&s, TOUCH_UP, 4, 100, 500); advance(&s, 100, 0);
+    CHECK(abs_moves(&x, &y) == 1 && x == 0 && s.touch_btn[0] == 0 && s.qn == 0);
+}
+
+static void test_rel_modes(void) {
+    Ss2Touch s; menu_rel(&s, 1); int x = -1, y = -1;
+    finger(&s, TOUCH_DOWN, 1, 1000, 500); advance(&s, 300, 0); advance(&s, 300, 0); CHECK(s.touch_btn[0] == 1);   /* a held drag */
+    enter_gameplay(&s);                                      /* the game switches to shoot mode: everything is released */
+    CHECK(s.touch_btn[0] == 0 && s.rel_state == SS2T_REL_IDLE && s.t.mode == TOUCH_GAMEPLAY);
+    finger(&s, TOUCH_UP, 1, 1000, 500); advance(&s, 10, shooting());
+    TouchRect m = touch_control_bounds(&s.t, TC_MODE);       /* MODE to the cursor, then the relative cursor at once */
+    finger(&s, TOUCH_DOWN, 2, m.x + m.w / 2, m.y + m.h / 2); finger(&s, TOUCH_UP, 2, m.x + m.w / 2, m.y + m.h / 2);
+    uint64_t last = now; advance(&s, 10, last);
+    CHECK(s.t.mode == TOUCH_CURSOR);
+    for (int i = 0; i < 70; i++) advance(&s, 10, last);      /* the game is in interface mode now */
+    finger(&s, TOUCH_DOWN, 3, 1500, 300); advance(&s, 10, last); CHECK(nout == 0);
+    finger(&s, TOUCH_MOTION, 3, 1572, 300); advance(&s, 10, last);
+    CHECK(abs_moves(&x, &y) == 1 && x == 440 && y == 300);   /* from where it was (no jump), 40 game px */
+    finger(&s, TOUCH_UP, 3, 1572, 300); advance(&s, 100, last);
+    CHECK(s.touch_btn[0] == 0);
+}
+
+static void test_rel_follows_game_cursor(void) {
+    Ss2Touch s; menu_rel(&s, 1); s.cursor_pos = fake_cursor; int x = -1, y = -1;
+    fake_x = 100; fake_y = 100;                              /* the game's cursor (a physical mouse put it there) */
+    finger(&s, TOUCH_DOWN, 1, 1000, 500); finger(&s, TOUCH_MOTION, 1, 1144, 500); advance(&s, 10, 0);
+    CHECK(abs_moves(&x, &y) == 1 && x == 180 && y == 100);
+    finger(&s, TOUCH_UP, 1, 1144, 500); advance(&s, 100, 0);
+    fake_x = 180;                                            /* the game reports where touch put it: go on from there */
+    finger(&s, TOUCH_DOWN, 2, 1000, 500); finger(&s, TOUCH_MOTION, 2, 1036, 500); advance(&s, 10, 0);
+    CHECK(abs_moves(&x, &y) == 1 && x == 200);
+    finger(&s, TOUCH_UP, 2, 1036, 500); advance(&s, 100, 0);
+    fake_x = 600; fake_y = 500;                              /* the mouse moved it again */
+    finger(&s, TOUCH_DOWN, 3, 1000, 500); finger(&s, TOUCH_MOTION, 3, 1036, 500); advance(&s, 10, 0);
+    CHECK(abs_moves(&x, &y) == 1 && x == 620 && y == 500);
+    finger(&s, TOUCH_UP, 3, 1036, 500); advance(&s, 100, 0);
+    PlatEvent b; memset(&b, 0, sizeof b); b.type = PLAT_EV_MOUSE_BUTTON; b.button = 0; b.down = 1;   /* a physical click still works */
+    CHECK(ss2t_physical(&s, &b)); b.down = 0; CHECK(ss2t_physical(&s, &b));
+}
+
+/* a 1280x720 game (1920x1080 at x = 210) on a 640x480 menu fitted into 160,0 960x720: the cursor still moves as far on screen
+   as the finger, continuously, and stops at the edges without a dead zone when it comes back */
+static void frame720(Ss2Touch *s, uint64_t ms) { now += ms * 1000000ull; ss2t_frame(s, now, W, H, true, 210, 0, 1920, 1080, 1280, 720, 0); nout = ss2t_flush(s, out, 512); }
+static void test_rel_menu_mapping(void) {
+    Ss2Touch s; ss2t_init(&s); now = 1000000000ull; frame720(&s, 0); rel_on(&s, 1);
+    ss2t_ui_rect(&s, 160, 0, 960, 720); int x = -1, y = -1;
+    finger(&s, TOUCH_DOWN, 1, 1000, 500); finger(&s, TOUCH_MOTION, 1, 1090, 500); frame720(&s, 10);
+    CHECK(abs_moves(&x, &y) == 1 && x == 720 && y == 360);   /* 90 surface px = 80 window px = 60 menu px = 90 screen px */
+    finger(&s, TOUCH_MOTION, 1, 1090, 590); frame720(&s, 10);
+    CHECK(abs_moves(&x, &y) == 1 && y == 420);                   /* the menu fills the height: 90 px = 60 window px = 90 screen px */
+    for (int i = 1; i <= 20; i++) { finger(&s, TOUCH_MOTION, 1, 1090.0f - 100 * i, 590); frame720(&s, 10); }   /* far past the left edge */
+    CHECK(s.rel_placed_x == 0);
+    finger(&s, TOUCH_MOTION, 1, -900, 590); frame720(&s, 10); /* back right by 10 px: moves at once */
+    CHECK(abs_moves(&x, &y) == 1 && x == 9);
+    finger(&s, TOUCH_UP, 1, -900, 590); frame720(&s, 100);
+    ss2t_ui_rect(&s, 0, 0, 1280, 720);                       /* in game (the HUD covers the picture): 90 px = 60 game px */
+    finger(&s, TOUCH_DOWN, 2, 1000, 500); finger(&s, TOUCH_MOTION, 2, 1090, 500); frame720(&s, 10);
+    CHECK(abs_moves(&x, &y) == 1 && x == 69);
+    finger(&s, TOUCH_UP, 2, 1090, 500); frame720(&s, 100);
+}
+
+/* settings: older files load as Direct at speed 1; the new keys round-trip; the panel switches style and speed; Reset is Direct */
+static const char *panel_path = "touch_cursor_panel_test.cfg";
+static void save_to_file(Ss2Touch *s) { s->t.save_failed = !touch_settings_save(&s->t.settings, panel_path); }
+static void ui_tap(Ss2Touch *s, TouchUiAction a) {
+    TouchRect r = touch_ui_bounds(&s->t, a); CHECK(r.w > 0);
+    finger(s, TOUCH_DOWN, 90, r.x + r.w / 2, r.y + r.h / 2); finger(s, TOUCH_UP, 90, r.x + r.w / 2, r.y + r.h / 2);
+}
+static void write_file(const char *path, const char *text) { FILE *f = fopen(path, "wb"); if (f) { fputs(text, f); fclose(f); } }
+static void test_cursor_settings(void) {
+    TouchSettings d; touch_settings_defaults(&d); CHECK(!d.cursor_relative && d.cursor_speed == 1 && d.version == 3);
+    const char *path = "touch_cursor_settings_test.cfg";
+    write_file(path, "version=3\nopacity=0.7\nfire.x=0.8\nsensitivity_x=1.5\nstick_size=1.3\n");   /* a file from before this setting */
+    TouchSettings l; CHECK(touch_settings_load(&l, path) == TOUCH_LOAD_OK);
+    CHECK(!l.cursor_relative && l.cursor_speed == 1);
+    CHECK(fabsf(l.opacity - .7f) < 1e-6f && fabsf(l.control[TC_FIRE].x - .8f) < 1e-6f && fabsf(l.sensitivity_x - 1.5f) < 1e-6f &&
+          fabsf(l.control[TC_STICK].scale - 1.3f) < 1e-6f);  /* everything else kept */
+    l.cursor_relative = true; l.cursor_speed = 2.5f; CHECK(touch_settings_save(&l, path));
+    TouchSettings r; CHECK(touch_settings_load(&r, path) == TOUCH_LOAD_OK);
+    CHECK(r.cursor_relative && r.cursor_speed == 2.5f && fabsf(r.opacity - .7f) < 1e-6f && fabsf(r.sensitivity_x - 1.5f) < 1e-6f);
+    write_file(path, "version=3\ncursor_relative=1\ncursor_speed=99\n");
+    CHECK(touch_settings_load(&r, path) == TOUCH_LOAD_OK && r.cursor_relative && r.cursor_speed == TOUCH_CURSOR_SPEED_MAX);
+    write_file(path, "version=3\ncursor_relative=7\ncursor_speed=nan\n");
+    CHECK(touch_settings_load(&r, path) == TOUCH_LOAD_OK && !r.cursor_relative && r.cursor_speed == 1);
+    write_file(path, "version=2\nopacity=0.5\n");
+    CHECK(touch_settings_load(&r, path) == TOUCH_LOAD_MIGRATED && !r.cursor_relative && r.cursor_speed == 1);
+    remove(path);
+
+    Ss2Touch s; ss2t_init(&s); s.save_settings = save_to_file; now = 1000000000ull; frame(&s, 0);
+    TouchSettings before = s.t.settings;
+    touch_ui_open(&s.t);
+    CHECK(touch_ui_bounds(&s.t, TU_CURSOR_STYLE).w == 0);    /* on the second page, not the first */
+    ui_tap(&s, TU_PAGE); CHECK(s.t.settings_page == 1);
+    static const TouchUiAction page2[] = { TU_PAGE, TU_CURSOR_STYLE, TU_CURSOR_SPEED_DOWN, TU_CURSOR_SPEED_UP, TU_HAPTICS, TU_HAPTIC_STRENGTH,
+                                           TU_WHEEL_WEAPON, TU_WHEEL_CONSUMABLE, TU_WHEEL_EXPLOSIVE, TU_RESET, TU_CANCEL, TU_SAVE };
+    int n2 = (int)(sizeof page2 / sizeof page2[0]);
+    for (int a = 0; a < n2; a++) { TouchRect ra = touch_ui_bounds(&s.t, page2[a]); CHECK(ra.w > 0 && ra.y >= 0 && ra.y + ra.h <= H);
+        for (int b = a + 1; b < n2; b++) { TouchRect rb = touch_ui_bounds(&s.t, page2[b]);
+            CHECK(ra.x + ra.w <= rb.x || rb.x + rb.w <= ra.x || ra.y + ra.h <= rb.y || rb.y + rb.h <= ra.y); } }
+    ui_tap(&s, TU_CURSOR_STYLE); CHECK(s.t.settings.cursor_relative);
+    for (int i = 0; i < 20; i++) touch_ui_action(&s.t, TU_CURSOR_SPEED_UP);
+    CHECK(s.t.settings.cursor_speed == TOUCH_CURSOR_SPEED_MAX);
+    for (int i = 0; i < 20; i++) touch_ui_action(&s.t, TU_CURSOR_SPEED_DOWN);
+    CHECK(s.t.settings.cursor_speed == TOUCH_CURSOR_SPEED_MIN);
+    ui_tap(&s, TU_CURSOR_SPEED_UP); ui_tap(&s, TU_CURSOR_SPEED_UP); ui_tap(&s, TU_CURSOR_SPEED_UP);
+    CHECK(s.t.settings.cursor_speed == 1);
+    ui_tap(&s, TU_CURSOR_SPEED_UP); CHECK(s.t.settings.cursor_speed == 1.25f);
+    CHECK(s.t.settings.opacity == before.opacity && s.t.settings.sensitivity_x == before.sensitivity_x &&
+          !memcmp(s.t.settings.control, before.control, sizeof before.control));   /* layout, opacity and look untouched */
+    ui_tap(&s, TU_SAVE); CHECK(s.t.panel == TOUCH_UI_CLOSED && !s.t.save_failed);
+    TouchSettings f; CHECK(touch_settings_load(&f, panel_path) == TOUCH_LOAD_OK && f.cursor_relative && f.cursor_speed == 1.25f);
+    /* the style applies to the next touch, without a restart */
+    finger(&s, TOUCH_DOWN, 1, 1500, 700); advance(&s, 10, 0); CHECK(nout == 0);
+    finger(&s, TOUCH_UP, 1, 1500, 700); advance(&s, 100, 0);
+    /* a restart: the stored style comes back */
+    Ss2Touch s2; ss2t_init(&s2); CHECK(touch_settings_load(&s2.t.settings, panel_path) == TOUCH_LOAD_OK); now += 1000000000ull; frame(&s2, 0);
+    finger(&s2, TOUCH_DOWN, 1, 1500, 700); advance(&s2, 10, 0); CHECK(nout == 0 && s2.rel_state == SS2T_REL_DOWN);
+    finger(&s2, TOUCH_UP, 1, 1500, 700); advance(&s2, 100, 0);
+    /* Reset goes back to Direct at speed 1; Cancel keeps what was saved */
+    touch_ui_open(&s.t); touch_ui_action(&s.t, TU_PAGE); touch_ui_action(&s.t, TU_RESET);
+    CHECK(!s.t.settings.cursor_relative && s.t.settings.cursor_speed == 1);
+    touch_ui_action(&s.t, TU_CANCEL); CHECK(s.t.settings.cursor_relative && s.t.settings.cursor_speed == 1.25f);
+    /* back to Direct through the panel: a tap places the cursor at the finger again */
+    touch_ui_open(&s.t); touch_ui_action(&s.t, TU_PAGE); touch_ui_action(&s.t, TU_CURSOR_STYLE); touch_ui_action(&s.t, TU_SAVE);
+    CHECK(!s.t.settings.cursor_relative);
+    finger(&s, TOUCH_DOWN, 2, 1170, 540); now += 50000000ull; finger(&s, TOUCH_UP, 2, 1170, 540); frame(&s, 0);
+    int x = -1, y = -1; CHECK(abs_moves(&x, &y) >= 1 && x == 400 && y == 300 && find(PLAT_EV_MOUSE_BUTTON, 0, 1) > last_abs_index());
+    advance(&s, 100, 0);
+    remove(panel_path);
+}
+
 int main(void) {
     test_tap_min_hold(); test_move_look_fire(); test_ownership_and_hysteresis(); test_modifier_spans_frames();
     test_cursor_mapping_and_click(); test_focus_cleanup(); test_mode_follow_and_toggle(); test_weapon_wheel_and_actions();
     test_physical_aggregation(); test_ui_rect_mapping(); test_keyboard_button(); test_default_layout(); test_layout_upgrade();
+    test_rel_no_jump_and_motion(); test_rel_speed(); test_rel_tap_and_double_tap(); test_rel_hold_drag(); test_rel_cancel();
+    test_rel_fingers_and_use(); test_rel_modes(); test_rel_follows_game_cursor(); test_rel_menu_mapping(); test_cursor_settings();
     printf("touch_ss2_test: %d of %d checks failed\n", fails, checks);
     return fails != 0;
 }

@@ -8,7 +8,9 @@
  *   - FIRE / USE  -> left button held / right click (+fire_weapon, frob_object);
  *   - actions     -> Space (jump), Shift (crouch), wheel up / down (next / previous weapon), R (reload), B (ammo), Esc;
  *     these are the bindings of the game's user.bnd (which replaces SHOCK.BND; Y is not bound there);
- *   - cursor mode -> the game's own cursor placed at the touched point (PlatEvent.abs), then left clicks or drags.
+ *   - cursor mode -> the game's own cursor placed at the touched point (PlatEvent.abs), then left clicks or drags;
+ *     or, with the relative cursor style (settings.cursor_relative), moved like a trackpad from where it is: a moving
+ *     finger moves it, a tap clicks where it is, a finger held still presses for a drag.
  * Every press is queued with a minimum hold, so a tap shorter than a game frame still reaches the game, and keys a
  * physical keyboard holds are never released by touch (or the other way round).
  *
@@ -18,6 +20,7 @@
  * Esc menu, the main menu).
  * SPDX-License-Identifier: GPL-3.0-or-later */
 #include "touch_ss2.h"
+#include <limits.h>
 #include <string.h>
 
 /* ---------------------------------------------------------------- the queue */
@@ -47,11 +50,71 @@ static void place(Ss2Touch *s, float x, float y) {          /* the game's cursor
     }
     PlatEvent e; memset(&e, 0, sizeof e); e.type = PLAT_EV_MOUSE_MOVE; e.abs = 1; e.x = (int)gx; e.y = (int)gy;
     push(s, s->now > s->move_hold_until ? s->now : s->move_hold_until, e);
+    s->rel_x = (float)e.x; s->rel_y = (float)e.y; s->rel_placed_x = e.x; s->rel_placed_y = e.y;   /* a later relative gesture goes on from here */
+}
+
+/* ---------------------------------------------------------------- relative (trackpad) cursor
+ * The cursor finger (cursor mode, touch_controls.c) reports a position on touch (POINTER_MOVE), then either a tap
+ * (POINTER_TAP: short, within the slop) or, past the slop, a drag (POINTER_DOWN, POINTER_MOVEs, POINTER_UP). With the
+ * relative style the touch moves nothing, a drag moves the cursor by the finger's motion with no button, a tap clicks
+ * where the cursor is, and a finger held still for SS2T_HOLD_MS presses the left button there; the drag that follows
+ * then carries it (inventory items) until the finger lifts. The press reaches the game a frame before the cursor moves
+ * on, as for a direct drag. */
+static void rel_scale(const Ss2Touch *s, float *kx, float *ky) {
+    /* game (window) pixels per surface pixel: at speed 1 the cursor moves as far on screen as the finger. In a 4:3 menu
+       fitted into a wider picture the engine scales the whole window onto the menu (ss2t_ui_rect): more window pixels */
+    float speed = s->t.settings.cursor_speed;
+    *kx = speed * (float)s->game_w / s->pic_w; *ky = speed * (float)s->game_h / s->pic_h;
+    if (s->ui_w > 0 && s->ui_h > 0) { *kx *= (float)s->game_w / (float)s->ui_w; *ky *= (float)s->game_h / (float)s->ui_h; }
+}
+static void rel_clamp(Ss2Touch *s) {
+    if (s->rel_x > (float)(s->game_w - 1)) s->rel_x = (float)(s->game_w - 1);
+    if (s->rel_x < 0) s->rel_x = 0;
+    if (s->rel_y > (float)(s->game_h - 1)) s->rel_y = (float)(s->game_h - 1);
+    if (s->rel_y < 0) s->rel_y = 0;
+}
+static int rel_px(float v) { return (int)(v + .5f); }    /* the nearest whole pixel (v >= 0 after rel_clamp) */
+static void rel_place(Ss2Touch *s) {
+    PlatEvent e; memset(&e, 0, sizeof e); e.type = PLAT_EV_MOUSE_MOVE; e.abs = 1; e.x = rel_px(s->rel_x); e.y = rel_px(s->rel_y);
+    s->rel_placed_x = e.x; s->rel_placed_y = e.y;
+    push(s, s->now > s->move_hold_until ? s->now : s->move_hold_until, e);
+}
+static void rel_begin(Ss2Touch *s, float x, float y) {      /* the cursor finger touched: the cursor stays where it is */
+    int cx, cy;
+    if (s->cursor_pos) {                    /* the game's cursor: moved by the game itself or by a physical mouse since? */
+        s->cursor_pos(s, &cx, &cy);
+        if (cx != s->rel_placed_x || cy != s->rel_placed_y) { s->rel_x = (float)cx; s->rel_y = (float)cy; }
+    } else if (s->rel_x < 0) { s->rel_x = (float)(s->game_w / 2); s->rel_y = (float)(s->game_h / 2); }
+    rel_clamp(s);
+    s->rel_last_x = x; s->rel_last_y = y; s->rel_state = SS2T_REL_DOWN;
+}
+static void rel_move(Ss2Touch *s, float x, float y) {
+    float kx, ky; rel_scale(s, &kx, &ky);
+    s->rel_x += (x - s->rel_last_x) * kx; s->rel_y += (y - s->rel_last_y) * ky; s->rel_last_x = x; s->rel_last_y = y;
+    rel_clamp(s);
+    if (rel_px(s->rel_x) != s->rel_placed_x || rel_px(s->rel_y) != s->rel_placed_y) rel_place(s);   /* whole pixels reach the game */
+}
+static void rel_click(Ss2Touch *s) {
+    s->move_hold_until = 0; rel_place(s); button(s, 0, 1, s->now); button(s, 0, 0, s->now);
+}
+static void rel_press(Ss2Touch *s) {        /* held still: the left button goes down where the cursor is */
+    s->rel_state = SS2T_REL_HELD;
+    s->move_hold_until = 0; rel_place(s); button(s, 0, 1, s->now); s->move_hold_until = s->now + SS2T_MIN_HOLD_NS;
+    if (s->haptic && s->t.settings.haptics_enabled) s->haptic(s, 2);
+}
+static void rel_end(Ss2Touch *s) {          /* the cursor finger lifted: the cursor stays; a held press is released */
+    if (s->rel_state == SS2T_REL_HELD) button(s, 0, 0, s->now);
+    s->rel_state = SS2T_REL_IDLE;
+}
+static void rel_tick(Ss2Touch *s, uint32_t now_ms) {
+    if (s->rel_state != SS2T_REL_DOWN || s->t.cursor_owner < 0) return;
+    const TouchFinger *f = &s->t.fingers[s->t.cursor_owner];
+    if (f->active && !f->dragging && (uint32_t)(now_ms - f->down_ms) >= SS2T_HOLD_MS) rel_press(s);
 }
 
 /* everything touch holds goes up now; pending presses are dropped */
 static void release_touch(Ss2Touch *s) {
-    s->qn = 0;
+    s->qn = 0; s->rel_state = SS2T_REL_IDLE;
     for (int k = 0; k < 256; k++) if (s->touch_key[k]) { s->touch_key[k] = 1; key(s, k, 0, 0); }
     for (int b = 0; b < 5; b++) if (s->touch_btn[b]) { s->touch_btn[b] = 1; button(s, b, 0, 0); }
     memset(s->stick_key, 0, sizeof s->stick_key);
@@ -82,11 +145,22 @@ static void output(void *user, TouchOutput o, float x, float y) {
     case TOUCH_FIRE_UP: button(s, 0, 0, s->now); break;
     case TOUCH_USE_PRESS: button(s, 1, 1, s->now); button(s, 1, 0, s->now); break;
     case TOUCH_ACTION_DOWN: case TOUCH_ACTION_UP: action(s, (TouchAction)(int)x, o == TOUCH_ACTION_DOWN); break;
-    case TOUCH_POINTER_MOVE: place(s, x, y); break;
+    case TOUCH_POINTER_MOVE:
+        if (s->rel_state == SS2T_REL_IDLE && s->t.settings.cursor_relative) rel_begin(s, x, y);   /* touched: no jump */
+        else if (s->rel_state != SS2T_REL_IDLE) rel_move(s, x, y);
+        else place(s, x, y);
+        break;
     case TOUCH_POINTER_DOWN:               /* a drag: press at the start point; the game picks up what is there before the cursor moves */
+        if (s->rel_state == SS2T_REL_DOWN) { s->rel_state = SS2T_REL_MOVING; break; }   /* relative: a move, no button */
+        if (s->rel_state != SS2T_REL_IDLE) break;                                       /* relative: pressed by the hold */
         s->move_hold_until = 0; place(s, x, y); button(s, 0, 1, s->now); s->move_hold_until = s->now + SS2T_MIN_HOLD_NS; break;
-    case TOUCH_POINTER_UP: place(s, x, y); button(s, 0, 0, s->now); break;
-    case TOUCH_POINTER_TAP: s->move_hold_until = 0; place(s, x, y); button(s, 0, 1, s->now); button(s, 0, 0, s->now); break;
+    case TOUCH_POINTER_UP:
+        if (s->rel_state != SS2T_REL_IDLE) { rel_end(s); break; }
+        place(s, x, y); button(s, 0, 0, s->now); break;
+    case TOUCH_POINTER_TAP:
+        if (s->rel_state == SS2T_REL_HELD) { rel_end(s); break; }
+        if (s->rel_state != SS2T_REL_IDLE) { s->rel_state = SS2T_REL_IDLE; rel_click(s); break; }   /* relative: where the cursor is */
+        s->move_hold_until = 0; place(s, x, y); button(s, 0, 1, s->now); button(s, 0, 0, s->now); break;
     case TOUCH_MODE_CHANGED:
         if (!s->syncing) { s->user_toggle_at = s->now; tap_key(s, SS2_DIK_TAB); }   /* toggle_mouse: shoot <-> interface */
         break;
@@ -102,6 +176,7 @@ static void output(void *user, TouchOutput o, float x, float y) {
 void ss2t_init(Ss2Touch *s) {
     memset(s, 0, sizeof *s);
     touch_init(&s->t, output, s);
+    s->rel_x = s->rel_y = -1; s->rel_placed_x = s->rel_placed_y = INT_MIN;     /* not known yet */
     s->t.radial_populate = NULL;           /* no item wheels yet: hold-to-wheel cancels, a tap still acts */
 }
 
@@ -124,6 +199,7 @@ void ss2t_frame(Ss2Touch *s, uint64_t now, float w, float h, bool enabled, float
         s->syncing = true; touch_set_mode(&s->t, want); s->syncing = false;
     }
     touch_tick(&s->t, (uint32_t)(now / 1000000u));
+    rel_tick(s, (uint32_t)(now / 1000000u));
 }
 
 void ss2t_ui_rect(Ss2Touch *s, int x, int y, int w, int h) {
@@ -137,7 +213,9 @@ void ss2t_finger(Ss2Touch *s, TouchPhase phase, int64_t device, int64_t finger, 
     if (s->typing && phase == TOUCH_DOWN && s->t.panel == TOUCH_UI_CLOSED && s->t.effective_mode == TOUCH_GAMEPLAY &&
         !touch_control_hit(&s->t, TC_PAUSE, x, y) && !touch_control_hit(&s->t, TC_TARGET, x, y) &&
         !touch_control_hit(&s->t, TC_MODE, x, y) && !touch_control_hit(&s->t, TC_SETTINGS, x, y)) return;
+    if (phase != TOUCH_DOWN) rel_tick(s, ms);           /* a hold that ends with this event still presses first */
     touch_finger(&s->t, phase, device, finger, x, y, ms);
+    if (s->rel_state != SS2T_REL_IDLE && s->t.cursor_owner < 0) rel_end(s);   /* lifted with neither a tap nor a drag */
 }
 
 void ss2t_cancel(Ss2Touch *s) {

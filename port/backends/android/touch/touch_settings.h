@@ -8,6 +8,10 @@
 #define TOUCH_OPACITY_MIN .25f
 #define TOUCH_SENS_MIN .25f
 #define TOUCH_SENS_MAX 3.0f
+/* NewDarkAndroid: relative (trackpad) cursor speed; 1 = the cursor moves as far on screen as the finger */
+#define TOUCH_CURSOR_SPEED_MIN .25f
+#define TOUCH_CURSOR_SPEED_MAX 4.0f
+#define TOUCH_CURSOR_SPEED_STEP .25f
 typedef enum {
     TC_FIRE, TC_USE, TC_JUMP, TC_CROUCH, TC_PREV, TC_NEXT, TC_CONSUMABLE,
     TC_EXPLOSIVE, TC_SPRINT, TC_TARGET, TC_PAUSE, TC_MODE, TC_SETTINGS,
@@ -21,6 +25,11 @@ typedef struct {
     bool haptics_enabled;
     unsigned haptic_strength; /* 1..3; default 1 (subtle) */
     bool wheel_enabled[3]; /* weapon, consumable, explosive */
+    /* NewDarkAndroid: cursor style in cursor mode. Direct (false, the default): the cursor goes to the finger. Relative
+       (true): a trackpad; the finger moves the cursor from where it is, a tap clicks there. New keys of the same file
+       version: older files load as Direct at speed 1, and older builds ignore the keys. */
+    bool cursor_relative;
+    float cursor_speed;
     /* TC_STICK.scale is the single stick-size value used by both UIs. */
     TouchPlacement control[TC_COUNT];
 } TouchSettings;

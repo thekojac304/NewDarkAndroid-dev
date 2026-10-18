@@ -49,6 +49,7 @@ static int di_acquired, di_exclusive, captured;   /* pointer capture: see apply_
 static int cursor_null;                            /* SetCursor(NULL) also hides the pointer */
 static int32_t clip_l, clip_t, clip_r, clip_b;     /* ClipCursor rectangle (screen coordinates, right/bottom exclusive) */
 static int32_t vcur_x, vcur_y;                     /* while captured: the cursor the game sees, in screen coordinates */
+static int abs_sx = -1, abs_sy, abs_gx, abs_gy;    /* the last placement (PlatEvent.abs, surface pixels) and where it put the cursor */
 static int mouse_dbg(void) { static int d = -1; if (d < 0) d = getenv("SS2PORT_MOUSE_DEBUG") != NULL; return d; }   /* in time order with the backend's motion lines */
 static void vcur_clamp(void) {      /* the clip rectangle, or the screen when there is none (Windows never lets the cursor leave it) */
     int32_t l = 0, t = 0, r, b; int dw, dh; plat_video_display_size(&dw, &dh); r = dw; b = dh;
@@ -211,6 +212,7 @@ static void on_event(const PlatEvent *e, void *user) {
             vcur_clamp(); gx = vcur_x - (cw ? cw->x : 0); gy = vcur_y - (cw ? cw->y : 0);
         }
         g_input.mouse_x = gx; g_input.mouse_y = gy;
+        if (e->abs) { abs_sx = e->x; abs_sy = e->y; abs_gx = gx; abs_gy = gy; }
         if (!e->abs) { g_input.mouse_dx += e->dx; g_input.mouse_dy += e->dy; }
         if (h) post(h, 0x200, mk_flags(), ((uint32_t)(gy & 0xFFFF) << 16) | (uint32_t)(gx & 0xFFFF));
         break; }
@@ -411,6 +413,16 @@ SHIM(GetCursorPos) { input_pump();
    interface mode or its menus, so this tells a backend which of the two the game is in (the Android touch controls). */
 static volatile uint64_t recentred_ns;
 uint64_t user32_cursor_recentred_ns(void) { return recentred_ns; }
+/* Where the cursor the game reads is, in the surface pixels of PlatEvent positions (the Android touch controls' relative
+   cursor starts there, so it goes on from where the game, a physical mouse or a direct touch left it). Unmoved since the
+   last placement: that placement exactly. Otherwise the window position mapped back, rounded up so that placing it there
+   gives the same window position (to_game_coords rounds down). Game thread only. */
+void user32_cursor_pos(int *x, int *y) {
+    if (abs_sx >= 0 && g_input.mouse_x == abs_gx && g_input.mouse_y == abs_gy) { *x = abs_sx; *y = abs_sy; return; }
+    Wnd *w = W(g_input.hwnd); int cw, ch; plat_video_window_size(&cw, &ch);
+    if (!w || w->w <= 0 || w->h <= 0 || cw <= 0 || ch <= 0) { *x = g_input.mouse_x; *y = g_input.mouse_y; return; }
+    *x = (int)(((int64_t)g_input.mouse_x * cw + w->w - 1) / w->w); *y = (int)(((int64_t)g_input.mouse_y * ch + w->h - 1) / w->h);
+}
 SHIM(SetCursorPos) {
     recentred_ns = plat_time_ns();
     if (mouse_dbg()) port_log("cursor: SetCursorPos %d,%d (from %08x)%s", (int32_t)A(0), (int32_t)A(1), RD32(c->esp), captured ? " [captured]" : "");

@@ -15,6 +15,7 @@
 #include <stdlib.h>
 
 uint64_t user32_cursor_recentred_ns(void) __attribute__((weak));
+void user32_cursor_pos(int *x, int *y) __attribute__((weak));
 int d3d9_ui_rect(int r[4], int *bb_w, int *bb_h) __attribute__((weak));
 int touch_draw_gles(const TouchControls *t, int w, int h, void *(*get_proc)(const char *));
 static void tlog(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
@@ -32,8 +33,10 @@ static int keyboard_changed;
 
 static void save_settings(Ss2Touch *s) {
     s->t.save_failed = future_settings || !settings_path[0] || !touch_settings_save(&s->t.settings, settings_path);
-    tlog("settings saved to %s: %s", settings_path, s->t.save_failed ? "FAILED" : "ok");
+    tlog("settings saved to %s: %s; cursor %s, speed %.2f", settings_path, s->t.save_failed ? "FAILED" : "ok",
+         s->t.settings.cursor_relative ? "relative" : "direct", s->t.settings.cursor_speed);
 }
+static void cursor_pos(Ss2Touch *s, int *x, int *y) { (void)s; user32_cursor_pos(x, y); }   /* the relative cursor's start */
 static void haptic(Ss2Touch *s, int level) {   /* NewDarkActivity.touchHaptic, as ShockolateActivity's */
     if (background || unfocused) return;
     JNIEnv *env = (JNIEnv *)SDL_AndroidGetJNIEnv(); jobject activity = (jobject)SDL_AndroidGetActivity();
@@ -76,6 +79,7 @@ void android_touch_init(void) {
     SDL_SetHintWithPriority(SDL_HINT_MOUSE_TOUCH_EVENTS, "0", SDL_HINT_OVERRIDE);
     ss2t_init(&touch);
     touch.save_settings = save_settings; touch.haptic = haptic; touch.keyboard = keyboard;
+    if (user32_cursor_pos) touch.cursor_pos = cursor_pos;
     debug = getenv("SS2PORT_TOUCH_DEBUG") != NULL;
     initialized = 1;
 }
@@ -89,9 +93,10 @@ static void late_init(void) {                /* once SDL runs: the event type an
         future_settings = r == TOUCH_LOAD_FUTURE;
         int upgraded = (r == TOUCH_LOAD_OK || r == TOUCH_LOAD_MIGRATED) && touch_settings_upgrade_layout(&touch.t.settings);
         touch.t.saved_settings = touch.t.settings; touch_layout_refresh(&touch.t);
-        tlog("touch controls on; settings %s (%s)%s", settings_path, r == TOUCH_LOAD_DEFAULTS ? "defaults" : r == TOUCH_LOAD_OK ? "loaded" :
+        tlog("touch controls on; settings %s (%s)%s; cursor %s, speed %.2f", settings_path, r == TOUCH_LOAD_DEFAULTS ? "defaults" : r == TOUCH_LOAD_OK ? "loaded" :
              r == TOUCH_LOAD_MIGRATED ? "migrated" : r == TOUCH_LOAD_FUTURE ? "newer version: defaults, not saved" : "invalid: defaults",
-             upgraded ? "; layout never moved: current default positions (file unchanged)" : "");
+             upgraded ? "; layout never moved: current default positions (file unchanged)" : "",
+             touch.t.settings.cursor_relative ? "relative" : "direct", touch.t.settings.cursor_speed);
     } else settings_path[0] = 0;
 }
 

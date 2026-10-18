@@ -20,6 +20,7 @@ enum {
 #define SS2T_FOLLOW_NS 600000000ull        /* after the player's own MODE toggle, wait this long before following the game */
 #define SS2T_STICK_ON .30f                 /* stick deflection that presses a movement key ... */
 #define SS2T_STICK_OFF .20f                /* ... and that releases it again (hysteresis) */
+#define SS2T_HOLD_MS 500u                  /* relative cursor: a finger held still this long presses the left button (a drag) */
 
 typedef struct { uint64_t due; PlatEvent ev; } Ss2Pending;
 typedef struct Ss2Touch {
@@ -39,10 +40,18 @@ typedef struct Ss2Touch {
     uint64_t move_hold_until;              /* a drag's press must reach the game a frame before the cursor moves on */
     bool game_shoot;
     bool typing;                           /* the Android keyboard is up: in look mode only II, KBD, MODE and SET take a touch */
+    /* relative (trackpad) cursor, settings.cursor_relative: the cursor finger moves the game's cursor from where it is */
+    enum { SS2T_REL_IDLE, SS2T_REL_DOWN, SS2T_REL_MOVING, SS2T_REL_HELD } rel_state;
+    float rel_x, rel_y;                    /* the game's cursor in game pixels (as placements); fractions add up over moves */
+    float rel_last_x, rel_last_y;          /* the finger's last surface position taken into account */
+    int rel_placed_x, rel_placed_y;        /* where the bridge last put the cursor: if the game reports another place, it moved */
     /* platform services (touch_ss2_android.c); may be NULL in tests */
     void (*save_settings)(struct Ss2Touch *s);
     void (*haptic)(struct Ss2Touch *s, int level);
     void (*keyboard)(struct Ss2Touch *s);  /* KBD: show or hide the Android keyboard */
+    /* where the game's cursor is now, in the pixels of the bridge's placements (user32_cursor_pos): a relative gesture
+       starts there, so it follows a physical mouse too. NULL: from where the bridge last put it (the picture centre at first) */
+    void (*cursor_pos)(struct Ss2Touch *s, int *x, int *y);
 } Ss2Touch;
 
 void ss2t_init(Ss2Touch *s);

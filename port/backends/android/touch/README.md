@@ -13,11 +13,12 @@ audit). It was taken with `git archive`; the working tree's uncommitted changes 
 
 | File | From 7502370 | Change |
 | --- | --- | --- |
-| `touch_controls.c/.h` | unchanged, except two lines | `in_circle` ignores radius-0 controls (hidden in the SS2 layout); KBD (the `target` action) takes a touch in cursor mode too, like AMMO (Phase 2B-2) |
-| `touch_editor.c`, `touch_radial.c/.h`, `touch_settings.h` | unchanged | |
-| `touch_settings.c` | defaults table, plus one function | SS2 labels: CONS → RELOAD, target → KBD; explosive and sprint hidden. Phase 2B-2 defaults: SET, AMMO/USE and KBD in the letterbox bars, MODE right of the EQUIP panel. `touch_settings_upgrade_layout` gives a stored layout that still has every control at the Phase 2A/2B-1 positions the new defaults (in memory). Keys and schema (v3) kept |
+| `touch_controls.c/.h` | unchanged, except two lines and three settings actions | `in_circle` ignores radius-0 controls (hidden in the SS2 layout); KBD (the `target` action) takes a touch in cursor mode too, like AMMO (Phase 2B-2); `TU_CURSOR_STYLE`, `TU_CURSOR_SPEED_DOWN/UP` (Phase 3D) |
+| `touch_radial.c/.h` | unchanged | |
+| `touch_editor.c` | the three cursor actions; the settings panel's second page has the cursor rows first and its five rows a little tighter (Phase 3D) | |
+| `touch_settings.c/.h` | defaults table, plus one function; `cursor_relative` and `cursor_speed` (Phase 3D) | SS2 labels: CONS → RELOAD, target → KBD; explosive and sprint hidden. Phase 2B-2 defaults: SET, AMMO/USE and KBD in the letterbox bars, MODE right of the EQUIP panel. `touch_settings_upgrade_layout` gives a stored layout that still has every control at the Phase 2A/2B-1 positions the new defaults (in memory). Keys and schema (v3) kept. Phase 3D adds two keys to the same version: `cursor_relative` (0 Direct, the default; 1 Relative) and `cursor_speed` (0.25-4, default 1). A file without them loads as Direct at speed 1, and an older build ignores them |
 | `touch_surface.c/.h` | JNI name only | `Java_local_newdarkandroid_ss2_TouchSurface_onNativeSurfaceTouch` |
-| `touch_render_gles.c` | from `touch_render.c` | the same drawing code, colours, layout and font; `SDL_Renderer` calls replaced by one batched GLES 2 triangle list; QA and visual-compare panels left out |
+| `touch_render_gles.c` | from `touch_render.c` | the same drawing code, colours, layout and font; `SDL_Renderer` calls replaced by one batched GLES 2 triangle list; QA and visual-compare panels left out; the cursor style and speed labels (Phase 3D) |
 | `android/.../TouchSurface.java` | from the `SDLSurface.java` patch | as a subclass (`NewDarkActivity.createSDLSurface`), so SDL's Java sources stay stock |
 | `touch_ss2.c/.h` | new | the SS2 bridge, replacing `touch_shock_bridge.c` (which is System Shock engine code) |
 | `touch_ss2_android.c` | new | SDL events, lifecycle, settings file, haptics (`NewDarkActivity.touchHaptic`, as `ShockolateActivity`'s), drawing |
@@ -60,7 +61,8 @@ The keys are the bindings of the game's `user.bnd`, which replaces `SHOCK.BND`.
 | II | Esc (`sim_menu`; also skips cutscenes) |
 | KBD | Shows or hides Android's keyboard (SDL text input), in look and cursor mode. What it types reaches the game as key presses and characters, as from a physical keyboard: save names, the console (`:`), Backspace, Enter. Android's Back closes it; Esc is II. While it is up in look mode, only II, KBD, MODE and SET take a new touch, so typing cannot walk, turn or fire. |
 | MODE (LOOK / CURSOR) | Tab (`toggle_mouse`): the game switches between shoot and interface mode |
-| Cursor mode | A tap places the game's cursor and clicks. A drag presses at the start point, moves and releases. |
+| Cursor mode, **Direct** (default) | A tap places the game's cursor and clicks. A drag presses at the start point, moves and releases. |
+| Cursor mode, **Relative** (trackpad; SET, MORE, CURSOR) | The touch moves nothing. A drag past the slop moves the cursor from where it is by the finger's motion times CURSOR SPEED (1 = as far on screen as the finger, also on 4:3 menus), with no button. A tap clicks where the cursor is. A finger held still for 0.5 s presses the left button there (a haptic if haptics are on); the drag that follows carries it, and lifting releases it. A gesture starts from the game's own cursor (`user32_cursor_pos`), so it goes on from where a mouse, the game or a direct tap left it. USE (right click) and mouse look are unchanged |
 
 - Every press lasts at least 60 ms, so a 100 fps game sees it.
 - A key or button a physical keyboard or mouse holds is never released by touch, and the other way round.
@@ -73,6 +75,6 @@ The keys are the bindings of the game's `user.bnd`, which replaces `SHOCK.BND`.
 `tests/run.sh` builds `tests/touch_ss2_test.c` with the bridge and the core and runs it on the PC, for example with
 `CC="python -m ziglang cc"`. It checks press/release order and minimum hold, several fingers, stick ownership and
 hysteresis, a modifier held across frames, relative look scaling, cursor placement before a click (corners, centre,
-bars), placement through a 4:3 menu in a 16:9 game, drags, focus-loss release, mode following, weapon wheel, physical/touch aggregation, the KBD button and its typing lock-out, the default positions at 16:9, and the layout upgrade. Shockolate's own core
+bars), placement through a 4:3 menu in a 16:9 game, drags, focus-loss release, mode following, weapon wheel, physical/touch aggregation, the KBD button and its typing lock-out, the default positions at 16:9, and the layout upgrade; and the relative cursor (Phase 3D): no jump on touch, delta accumulation and sub-pixel steps, speed, taps and double and rapid taps at the cursor, the hold press and its drag ordering, cancellation on focus loss and picture change, finger ownership with USE, LOOK/CURSOR changes, following the game's cursor, 4:3 menu mapping and edges, settings migration, persistence and the panel. Shockolate's own core
 suites (`touch_controls`, `alpha11`, `alpha2`, `alpha3`, `alpha4`, `ammo` from 7502370) also pass against this
 directory's core.

@@ -119,6 +119,9 @@ void touch_ui_action(TouchControls *t, TouchUiAction action) {
     case TU_WHEEL_WEAPON: t->settings.wheel_enabled[0]=!t->settings.wheel_enabled[0]; break;
     case TU_WHEEL_CONSUMABLE: t->settings.wheel_enabled[1]=!t->settings.wheel_enabled[1]; break;
     case TU_WHEEL_EXPLOSIVE: t->settings.wheel_enabled[2]=!t->settings.wheel_enabled[2]; break;
+    case TU_CURSOR_STYLE: t->settings.cursor_relative=!t->settings.cursor_relative; break;
+    case TU_CURSOR_SPEED_DOWN: t->settings.cursor_speed-=TOUCH_CURSOR_SPEED_STEP; break;
+    case TU_CURSOR_SPEED_UP: t->settings.cursor_speed+=TOUCH_CURSOR_SPEED_STEP; break;
     case TU_RESET: touch_settings_defaults(&t->settings); break;
     case TU_SAVE:
         touch_settings_validate(&t->settings);
@@ -141,13 +144,17 @@ TouchRect touch_ui_bounds(const TouchControls *t, TouchUiAction action) {
     if (t->panel==TOUCH_UI_SETTINGS) {
         float y=0;
         if (t->settings_page==1) {
+            /* NewDarkAndroid: the cursor rows first; the five Shockolate rows below them, a little tighter */
             switch (action) {
             case TU_PAGE: r=(TouchRect){.67f,.055f,.12f,.065f}; break;
-            case TU_HAPTICS: r=(TouchRect){.22f,.18f,.56f,.085f}; break;
-            case TU_HAPTIC_STRENGTH: r=(TouchRect){.22f,.285f,.56f,.085f}; break;
-            case TU_WHEEL_WEAPON: r=(TouchRect){.22f,.40f,.56f,.085f}; break;
-            case TU_WHEEL_CONSUMABLE: r=(TouchRect){.22f,.51f,.56f,.085f}; break;
-            case TU_WHEEL_EXPLOSIVE: r=(TouchRect){.22f,.62f,.56f,.085f}; break;
+            case TU_CURSOR_STYLE: r=(TouchRect){.22f,.155f,.56f,.075f}; break;
+            case TU_CURSOR_SPEED_DOWN: r=(TouchRect){.22f,.24f,.10f,.075f}; break;
+            case TU_CURSOR_SPEED_UP: r=(TouchRect){.68f,.24f,.10f,.075f}; break;
+            case TU_HAPTICS: r=(TouchRect){.22f,.325f,.56f,.075f}; break;
+            case TU_HAPTIC_STRENGTH: r=(TouchRect){.22f,.41f,.56f,.075f}; break;
+            case TU_WHEEL_WEAPON: r=(TouchRect){.22f,.495f,.56f,.075f}; break;
+            case TU_WHEEL_CONSUMABLE: r=(TouchRect){.22f,.58f,.56f,.075f}; break;
+            case TU_WHEEL_EXPLOSIVE: r=(TouchRect){.22f,.665f,.56f,.075f}; break;
             case TU_RESET: r=(TouchRect){.22f,.77f,.56f,.065f}; break;
             case TU_CANCEL: r=(TouchRect){.22f,.87f,.26f,.075f}; break;
             case TU_SAVE: r=(TouchRect){.52f,.87f,.26f,.075f}; break;

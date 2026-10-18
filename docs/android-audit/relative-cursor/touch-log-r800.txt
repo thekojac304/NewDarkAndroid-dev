@@ -1,0 +1,163 @@
+I/ss2port (16379): [touch] touch controls on; settings /data/data/local.newdarkandroid.ss2.legacytest/files/touch-settings.cfg (loaded); cursor relative, speed 1.00
+I/ss2port (16379): [touch] mode CURSOR (game interface/menu)
+I/ss2port (16379): [touch] finger 32/0 down at 1170,540
+I/ss2port (16379): [touch] finger 32/0 move at 1180,540
+I/ss2port (16379): [touch] finger 32/0 move at 1190,540
+I/ss2port (16379): [touch] cursor at 11,0
+I/ss2port (16379): [touch] finger 32/0 move at 1200,540
+I/ss2port (16379): [touch] cursor at 17,0
+I/ss2port (16379): [touch] finger 32/0 up at 1200,540
+I/ss2port (16379): [touch] finger 32/0 down at 1170,540
+I/ss2port (16379): [touch] finger 32/0 move at 1259,564
+I/ss2port (16379): [touch] cursor at 66,13
+I/ss2port (16379): [touch] finger 32/0 move at 1349,587
+I/ss2port (16379): [touch] cursor at 116,26
+I/ss2port (16379): [touch] finger 32/0 move at 1438,612
+I/ss2port (16379): [touch] cursor at 165,39
+I/ss2port (16379): [touch] finger 32/0 move at 1527,635
+I/ss2port (16379): [touch] cursor at 215,52
+I/ss2port (16379): [touch] finger 32/0 move at 1616,659
+I/ss2port (16379): [touch] cursor at 264,66
+I/ss2port (16379): [touch] finger 32/0 move at 1705,683
+I/ss2port (16379): [touch] cursor at 313,79
+I/ss2port (16379): [touch] finger 32/0 move at 1794,706
+I/ss2port (16379): [touch] cursor at 363,92
+I/ss2port (16379): [touch] finger 32/0 move at 1883,730
+I/ss2port (16379): [touch] cursor at 412,105
+I/ss2port (16379): [touch] finger 32/0 move at 1972,754
+I/ss2port (16379): [touch] cursor at 462,118
+I/ss2port (16379): [touch] finger 32/0 move at 2061,777
+I/ss2port (16379): [touch] cursor at 511,131
+I/ss2port (16379): [touch] finger 32/0 move at 2150,801
+I/ss2port (16379): [touch] cursor at 561,145
+I/ss2port (16379): [touch] finger 32/0 move at 2240,825
+I/ss2port (16379): [touch] cursor at 611,158
+I/ss2port (16379): [touch] finger 32/0 up at 2240,825
+I/ss2port (16379): [touch] finger 32/0 down at 600,901
+I/ss2port (16379): [touch] finger 32/0 up at 600,901
+I/ss2port (16379): [touch] cursor at 611,158
+I/ss2port (16379): [touch] button 0 down
+I/ss2port (16379): [touch] button 0 up
+I/ss2port (16379): [touch] finger 32/0 down at 1170,540
+I/ss2port (16379): [touch] finger 32/0 move at 1142,528
+I/ss2port (16379): [touch] cursor at 594,150
+I/ss2port (16379): [touch] finger 32/0 move at 1113,516
+I/ss2port (16379): [touch] cursor at 578,144
+I/ss2port (16379): [touch] finger 32/0 move at 1085,503
+I/ss2port (16379): [touch] cursor at 563,136
+I/ss2port (16379): [touch] finger 32/0 move at 1056,491
+I/ss2port (16379): [touch] cursor at 547,130
+I/ss2port (16379): [touch] finger 32/0 move at 1028,479
+I/ss2port (16379): [touch] cursor at 531,123
+I/ss2port (16379): [touch] finger 32/0 move at 999,466
+I/ss2port (16379): [touch] cursor at 515,116
+I/ss2port (16379): [touch] finger 32/0 move at 971,454
+I/ss2port (16379): [touch] cursor at 499,109
+I/ss2port (16379): [touch] finger 32/0 move at 942,442
+I/ss2port (16379): [touch] cursor at 483,103
+I/ss2port (16379): [touch] finger 32/0 move at 914,429
+I/ss2port (16379): [touch] cursor at 468,95
+I/ss2port (16379): [touch] finger 32/0 move at 885,417
+I/ss2port (16379): [touch] cursor at 452,89
+I/ss2port (16379): [touch] finger 32/0 move at 857,405
+I/ss2port (16379): [touch] cursor at 436,82
+I/ss2port (16379): [touch] finger 32/0 move at 828,392
+I/ss2port (16379): [touch] cursor at 420,75
+I/ss2port (16379): [touch] finger 32/0 up at 828,392
+I/ss2port (16379): [touch] finger 32/0 down at 600,901
+I/ss2port (16379): [touch] finger 32/0 up at 600,901
+I/ss2port (16379): [touch] cursor at 420,75
+I/ss2port (16379): [touch] button 0 down
+I/ss2port (16379): [touch] button 0 up
+I/ss2port (16379): [touch] finger 32/0 down at 1170,540
+I/ss2port (16379): [touch] finger 32/0 move at 1214,564
+I/ss2port (16379): [touch] cursor at 444,88
+I/ss2port (16379): [touch] finger 32/0 move at 1259,590
+I/ss2port (16379): [touch] cursor at 469,102
+I/ss2port (16379): [touch] finger 32/0 move at 1303,615
+I/ss2port (16379): [touch] cursor at 494,116
+I/ss2port (16379): [touch] finger 32/0 move at 1349,640
+I/ss2port (16379): [touch] cursor at 519,130
+I/ss2port (16379): [touch] finger 32/0 move at 1393,665
+I/ss2port (16379): [touch] cursor at 543,144
+I/ss2port (16379): [touch] finger 32/0 move at 1438,690
+I/ss2port (16379): [touch] cursor at 568,158
+I/ss2port (16379): [touch] finger 32/0 move at 1482,715
+I/ss2port (16379): [touch] cursor at 593,171
+I/ss2port (16379): [touch] finger 32/0 move at 1527,740
+I/ss2port (16379): [touch] cursor at 618,185
+I/ss2port (16379): [touch] finger 32/0 move at 1571,765
+I/ss2port (16379): [touch] cursor at 642,199
+I/ss2port (16379): [touch] finger 32/0 move at 1616,790
+I/ss2port (16379): [touch] cursor at 667,213
+I/ss2port (16379): [touch] finger 32/0 move at 1660,815
+I/ss2port (16379): [touch] cursor at 692,227
+I/ss2port (16379): [touch] finger 32/0 move at 1705,840
+I/ss2port (16379): [touch] cursor at 717,241
+I/ss2port (16379): [touch] finger 32/0 up at 1705,840
+I/ss2port (16379): [touch] finger 32/0 down at 600,901
+I/ss2port (16379): [touch] finger 32/0 up at 600,901
+I/ss2port (16379): [touch] cursor at 717,241
+I/ss2port (16379): [touch] button 0 down
+I/ss2port (16379): [touch] button 0 up
+I/ss2port (16379): [touch] mode LOOK (game shoot)
+I/ss2port (16379): [touch] mode CURSOR (game interface/menu)
+I/ss2port (16379): [touch] mode LOOK (game shoot)
+I/ss2port (16379): [touch] finger 32/0 down at 2119,89
+I/ss2port (16379): [touch] key 0x0f down
+I/ss2port (16379): [touch] key 0x0f up
+I/ss2port (16379): [touch] finger 32/0 up at 2119,89
+I/ss2port (16379): [touch] finger 32/0 down at 1170,540
+I/ss2port (16379): [touch] finger 32/0 move at 1180,540
+I/ss2port (16379): [touch] finger 32/0 move at 1190,540
+I/ss2port (16379): [touch] cursor at 411,300
+I/ss2port (16379): [touch] finger 32/0 move at 1200,540
+I/ss2port (16379): [touch] cursor at 417,300
+I/ss2port (16379): [touch] finger 32/0 up at 1200,540
+I/ss2port (16379): [touch] finger 32/0 down at 1170,540
+I/ss2port (16379): [touch] finger 32/0 move at 1165,502
+I/ss2port (16379): [touch] cursor at 414,279
+I/ss2port (16379): [touch] finger 32/0 move at 1159,463
+I/ss2port (16379): [touch] cursor at 411,257
+I/ss2port (16379): [touch] finger 32/0 move at 1153,424
+I/ss2port (16379): [touch] cursor at 407,236
+I/ss2port (16379): [touch] finger 32/0 move at 1147,385
+I/ss2port (16379): [touch] cursor at 404,214
+I/ss2port (16379): [touch] finger 32/0 move at 1141,347
+I/ss2port (16379): [touch] cursor at 401,193
+I/ss2port (16379): [touch] finger 32/0 move at 1135,308
+I/ss2port (16379): [touch] cursor at 397,171
+I/ss2port (16379): [touch] finger 32/0 move at 1129,269
+I/ss2port (16379): [touch] cursor at 394,149
+I/ss2port (16379): [touch] finger 32/0 move at 1123,230
+I/ss2port (16379): [touch] cursor at 391,128
+I/ss2port (16379): [touch] finger 32/0 move at 1117,192
+I/ss2port (16379): [touch] cursor at 387,106
+I/ss2port (16379): [touch] finger 32/0 move at 1111,153
+I/ss2port (16379): [touch] cursor at 384,85
+I/ss2port (16379): [touch] finger 32/0 move at 1105,114
+I/ss2port (16379): [touch] cursor at 381,63
+I/ss2port (16379): [touch] finger 32/0 move at 1099,75
+I/ss2port (16379): [touch] cursor at 377,41
+I/ss2port (16379): [touch] finger 32/0 up at 1099,75
+I/ss2port (16379): [touch] finger 32/0 down at 1000,701
+I/ss2port (16379): [touch] cursor at 377,41
+I/ss2port (16379): [touch] button 0 down
+I/ss2port (16379): [touch] finger 32/0 move at 1020,701
+I/ss2port (16379): [touch] cursor at 388,41
+I/ss2port (16379): [touch] finger 32/0 move at 1040,701
+I/ss2port (16379): [touch] cursor at 399,41
+I/ss2port (16379): [touch] finger 32/0 move at 1060,701
+I/ss2port (16379): [touch] cursor at 411,41
+I/ss2port (16379): [touch] finger 32/0 move at 1080,701
+I/ss2port (16379): [touch] cursor at 422,41
+I/ss2port (16379): [touch] finger 32/0 move at 1100,701
+I/ss2port (16379): [touch] cursor at 433,41
+I/ss2port (16379): [touch] finger 32/0 move at 1120,701
+I/ss2port (16379): [touch] cursor at 444,41
+I/ss2port (16379): [touch] finger 32/0 move at 1140,701
+I/ss2port (16379): [touch] cursor at 455,41
+I/ss2port (16379): [touch] finger 32/0 move at 1160,701
+I/ss2port (16379): [touch] cursor at 466,41
+I/ss2port (16379): [touch] finger 32/0 up at 1160,701
+I/ss2port (16379): [touch] button 0 up
