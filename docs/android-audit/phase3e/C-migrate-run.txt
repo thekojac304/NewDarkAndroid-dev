@@ -1,0 +1,18 @@
+phone storage free: 18,593 MB
+1. backups
+  backup of local.newdarkandroid.ss2.legacytest internal data: C:\Dev\NewDarkAndroid\build\android\phase3e-preserve\data\local.newdarkandroid.ss2.legacytest.internal.tar (kept)
+  backup of local.newdarkandroid.ss2.legacytest installed APK: C:\Dev\NewDarkAndroid\build\android\phase3e-preserve\apk\local.newdarkandroid.ss2.legacytest.installed.apk (kept)
+  backup of local.newdarkandroid.ss2 internal data: C:\Dev\NewDarkAndroid\build\android\phase3e-preserve\data\local.newdarkandroid.ss2.internal.tar (kept)
+  backup of local.newdarkandroid.ss2 installed APK: C:\Dev\NewDarkAndroid\build\android\phase3e-preserve\apk\local.newdarkandroid.ss2.installed.apk (kept)
+2. game folder
+  games/scp4: present, 6448 of 6448 files equal (verified)
+3. profile (saves and configuration)
+  profiles/scp4: present; its 160 save files equal the legacy app's (verified); other files: 1 differ (logs and configuration the game rewrites)
+4. touch settings
+  touch settings: the regular app's file holds no choice of the player; the legacy app's has: cursor_relative=1
+  touch settings: now the legacy app's (verified); the old one is files/touch-settings.cfg.before-3e
+5. labels
+  label scp4: System Shock 2 — SCP Beta 4 (Legacy)
+  label ss2scp: System Shock 2 — SCP Beta 8
+  label ss2: System Shock 2 (no mods)
+done

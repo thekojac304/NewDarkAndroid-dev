@@ -47,6 +47,9 @@ especially SCP.
 | [LEGACY_AUDIO_RESULTS.md](LEGACY_AUDIO_RESULTS.md) | Phase 3D-A: the legacy app was silent because the PC's `cam.cfg` selects OpenAL (`sfx_device 4`), which the port does not have; the launcher now switches that one line to DirectSound. PCM, Android player and lifecycle verified; listening is the user's |
 | [RELATIVE_CURSOR_RESULTS.md](RELATIVE_CURSOR_RESULTS.md) | Phase 3D-B: an optional relative (trackpad) cursor style next to the default direct one (SET, MORE, CURSOR; speed 0.25-4); hold to drag. Verified on the phone through the real touchscreen path at three resolutions; comfort is the user's |
 | [AUDIO_CURSOR_INTEGRATION_RESULTS.md](AUDIO_CURSOR_INTEGRATION_RESULTS.md) | Phase 3D integration: audio root cause and fix, both cursor styles, conformance 0/511, 0/511 (ABI), 0/113, touch 345/345, core suites, final run on the real profile, APK identities, the player's checklist |
+| [PHASE3E_UNIFIED_APK_RESULTS.md](PHASE3E_UNIFIED_APK_RESULTS.md) | Phase 3E: one APK (`local.newdarkandroid.ss2`) for SCP Beta 4 (legacy) and SCP Beta 8; NVScript chosen by the file's identity; CROUCH fixed for the legacy bindings; legacy game and saves migrated with every file verified; APK hashes and the player's checklist |
+| [PHASE3E_CROUCH_FIX.md](PHASE3E_CROUCH_FIX.md) | Phase 3E-A: why CROUCH only made the legacy player creep (Shift is `+creepon` in that `user.bnd`), and the bind-aware fix |
+| [PHASE3E_MODULE_SELECTION.md](PHASE3E_MODULE_SELECTION.md) | Phase 3E-B: several NVScript versions in one build (`port/nvscript_versions.json`), selection by size, base, entry point and code CRC, refusal cases |
 
 ## Overall feasibility
 
