@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -211,24 +212,36 @@ final class GameImport {
     }
 
     /** Copies of the recompiled modules (allobjs.osm, Squirrel.osm, lgvid.dll, NVScript.osm) in another version are not
-     *  loaded by the game (modules.c): warn, by comparing SizeOfImage and ImageBase in the PE header. */
+     *  loaded by the game (modules.c): warn, by comparing SizeOfImage and ImageBase in the PE header. A build may hold
+     *  several versions of one module (two NVScript.osm): a copy is fine when it has the header of any of them. */
     private void checkModules() {
         if (BuildConfig.GAME_MODULES.isEmpty()) return;
+        Map<String, List<long[]>> versions = new LinkedHashMap<>();       // lower-case name -> {SizeOfImage, ImageBase} of each version
+        Map<String, String> names = new HashMap<>();
         for (String m : BuildConfig.GAME_MODULES.split(",")) {
             String[] p = m.split(":");
             if (p.length != 3) continue;
-            long size = Long.parseLong(p[1], 16), base = Long.parseLong(p[2], 16);
             String lower = p[0].toLowerCase(Locale.ROOT);
+            versions.computeIfAbsent(lower, k -> new ArrayList<>()).add(new long[] { Long.parseLong(p[1], 16), Long.parseLong(p[2], 16) });
+            names.put(lower, p[0]);
+        }
+        for (Map.Entry<String, List<long[]>> v : versions.entrySet()) {
+            String lower = v.getKey();
             List<String> other = new ArrayList<>();
             for (Entry e : plan.game) {
                 String r = e.rel.toLowerCase(Locale.ROOT);
                 if (e.dir || !(r.equals(lower) || r.endsWith("/" + lower))) continue;
                 long[] pe = peHeader(e);
-                if (pe != null && (pe[0] != size || pe[1] != base)) other.add(e.rel);
+                if (pe == null) continue;
+                boolean known = false;
+                for (long[] k : v.getValue()) known |= pe[0] == k[0] && pe[1] == k[1];
+                if (!known) other.add(e.rel);
             }
             if (other.isEmpty()) continue;                                     // one note per module, naming a few of the copies
             String where = String.join(", ", other.subList(0, Math.min(3, other.size()))) + (other.size() > 3 ? " and " + (other.size() - 3) + " more" : "");
-            plan.moduleWarnings.add(p[0] + " (" + where + ") is another version than the one recompiled into this app, so the game will not load it"
+            String name = names.get(lower);
+            plan.moduleWarnings.add(name + " (" + where + ") is " + (v.getValue().size() > 1 ? "none of the " + v.getValue().size() + " versions" : "another version than the one")
+                + " recompiled into this app, so the game will not load it"
                 + (lower.equals("nvscript.osm") ? "; mods that need NVScript, such as SCP, will not work" : lower.equals("squirrel.osm") ? "; Squirrel scripts will not run" : ""));
         }
     }

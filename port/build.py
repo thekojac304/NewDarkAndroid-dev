@@ -37,12 +37,42 @@ MODULES_LOW = [("allobjs.osm", "Data", "ao", 0x00E00000), ("Squirrel.osm", "osm"
 # --nvscript FILE: Nameless Voice's NVScript.osm, which the System Shock 2 Community Patch (SCP) needs. It is not part of the
 # game, so its path is given (a mod folder's copy, e.g. DMM/SCP_beta8/NVScript.osm); the engine finds it by name in the mod
 # paths, and the host loads it only when the file there is byte-identical to the one lifted (as for the other modules).
+# Several NVScript versions can be built in at once (one game build for an SCP Beta 4 and an SCP Beta 8 installation):
+# --nvscript is repeatable, and port/nvscript_versions.json fixes each known file's prefix and lift address by its sha256.
+# The host then loads whichever version the file on disk is (modules.c), and refuses any other.
 NVSCRIPT_BASE, NVSCRIPT_BASE_LOW = 0x30400000, 0x01140000
+NVSCRIPT_VERSIONS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "nvscript_versions.json")
+def nvscript_versions():
+    import json
+    return json.load(open(NVSCRIPT_VERSIONS, encoding="utf-8"))["versions"]
+def nvscript_plan(files, low=False):
+    """[(path, prefix, base, label)] for the --nvscript files. One file not in nvscript_versions.json keeps the old
+    behaviour (prefix nv at NVSCRIPT_BASE); with several, each must be a known version (distinct prefixes and ranges)."""
+    if not files: return []
+    if isinstance(files, str): files = [files]
+    known = {v["sha256"]: v for v in nvscript_versions()}
+    plan = []
+    for f in files:
+        f = os.path.abspath(f)
+        if not os.path.isfile(f): sys.exit(f"--nvscript: {f} not found")
+        if os.path.basename(f).lower() != "nvscript.osm": sys.exit(f"--nvscript: {f}: the file must be called NVScript.osm (the engine loads it by that name)")
+        h = hashlib.sha256(open(f, "rb").read()).hexdigest(); v = known.get(h)
+        if v is None:
+            if len(files) > 1: sys.exit(f"--nvscript: {f} (sha256 {h}) is not in {NVSCRIPT_VERSIONS}; several versions need known prefixes and addresses")
+            plan.append((f, "nv", NVSCRIPT_BASE_LOW if low else NVSCRIPT_BASE, "unlisted NVScript.osm " + h[:12])); continue
+        if low and len(files) > 1: sys.exit("--low-dll-bases takes one --nvscript (no low addresses are assigned for several versions)")
+        plan.append((f, v["prefix"], NVSCRIPT_BASE_LOW if low else int(v["base"], 16), v["label"]))
+    if len({p for _, p, _, _ in plan}) != len(plan): sys.exit("--nvscript: the same NVScript version was given twice")
+    return plan
 def modules(nvscript=None, low=False):
     """(file name, folder (None: fname is a full path), prefix, rebase) of every module to lift"""
     m = list(MODULES_LOW if low else MODULES)
-    if nvscript: m.append((os.path.abspath(nvscript), None, "nv", NVSCRIPT_BASE_LOW if low else NVSCRIPT_BASE))
+    for path, pfx, base, _ in nvscript_plan(nvscript, low): m.append((path, None, pfx, base))
     return m
+def drop_stale_nvscript(gen, mods):
+    """an earlier --nvscript lift that is not built in this time"""
+    for d in os.listdir(gen) if os.path.isdir(gen) else []:
+        if d.startswith("nv") and d not in mods and os.path.isdir(os.path.join(gen, d)): shutil.rmtree(os.path.join(gen, d), ignore_errors=True)
 LIFT_SOURCES = ("lift.py", "lift_preserve.py", "lift_x87.py", "lift_sse.py")   # the lifter: any change relifts
 
 def run(cmd, what):
@@ -73,7 +103,7 @@ def main():
     ap.add_argument("--abi-check", action="store_true", help="with --cache-regs: check at run time that indirect calls and imports keep EBX/EBP/ESI/EDI, log and correct violations (slower; for test sessions)")
     ap.add_argument("--symbols", action="store_true", help="embed a function-name table (tools/annotate.py + symbols/manual.sym) so crash reports show names instead of addresses; adds a few hundred KB, so it is off by default")
     ap.add_argument("--low-dll-bases", action="store_true", help="lift the game's DLLs for load addresses below 32 MB (hosts with a small guest space, e.g. the PS Vita backend)")
-    ap.add_argument("--nvscript", metavar="FILE", help="also recompile this NVScript.osm (needed by SCP; e.g. the copy in its mod folder)")
+    ap.add_argument("--nvscript", metavar="FILE", action="append", help="also recompile this NVScript.osm (needed by SCP; e.g. the copy in its mod folder); repeat for several versions listed in port/nvscript_versions.json")
     a = ap.parse_args(); exe = os.path.abspath(a.ss2exe)
     win = a.target == "windows"
     if a.abi_check and not a.cache_regs: sys.exit("--abi-check checks code lifted with --cache-regs: add --cache-regs")
@@ -116,7 +146,6 @@ def main():
         run([PY, os.path.join("host", "gen_symtab.py"), "--functions", os.path.join(nd, "nd_meta.json"), exe, symc, auto, os.path.join(ROOT, "symbols", "manual.sym")], "symbol table")
     elif os.path.exists(symc): os.remove(symc)
     mods = []
-    if a.nvscript and not os.path.isfile(a.nvscript): sys.exit(f"--nvscript: {a.nvscript} not found")
     for fname, sub, pfx, rebase in modules(a.nvscript, a.low_dll_bases):
         src = fname if sub is None else find_ci(os.path.dirname(exe), sub, fname); md = os.path.join(OUT, pfx)
         if not os.path.isfile(src): print(f"  warning: {src} not found; the game will not run without it"); shutil.rmtree(md, ignore_errors=True); continue
@@ -127,7 +156,7 @@ def main():
         else: print(f"  {os.path.basename(fname)}: already lifted")
         run([PY, os.path.join("host", "gen_moddata.py"), src, pfx, os.path.join(md, f"{pfx}_moddata.c")] + (["--rebase", hex(rebase)] if rebase else []), f"{fname} data")
         mods.append(pfx)
-    if not a.nvscript: shutil.rmtree(os.path.join(OUT, "nv"), ignore_errors=True)      # an earlier --nvscript lift: not built in
+    drop_stale_nvscript(OUT, mods)
     md = os.path.join(OUT, "mods"); os.makedirs(md, exist_ok=True)
     with open(os.path.join(md, "mods.c"), "w") as f:
         f.write('#include "recomp_mod.h"\n' + "".join(f"extern const RecompModDesc {p}_desc;\n" for p in mods) + "const RecompModDesc *const recomp_mods[] = { " + "".join(f"&{p}_desc, " for p in mods) + "0 };\n")

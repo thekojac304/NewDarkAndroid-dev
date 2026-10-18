@@ -1,0 +1,27 @@
+{
+  "about": [
+    "NVScript.osm builds this port knows how to recompile side by side (port/build.py and android/build_native.py --nvscript, repeatable).",
+    "A file given with --nvscript is identified by its sha256 here; that fixes its generated-code prefix and the guest address it is",
+    "lifted at, so several versions coexist in one build without symbol or address clashes. At run time the loader still picks",
+    "the version by the identity of the file on disk (size, ImageBase, entry point, code CRC: port/core/modules.c), never by label.",
+    "Labels are for people. The files themselves are not part of this repository: bring your own legally obtained copies."
+  ],
+  "versions": [
+    {
+      "label": "NVScript of System Shock 2 Community Patch (SCP) Beta 8",
+      "sha256": "f15fc91b276e73ad52d5026a86a7d51b83e5644a20c3e58a53a10a4b52d4f11a",
+      "bytes": 704512,
+      "source": "SCP_beta8.7z: DMM/SCP_beta8/NVScript.osm",
+      "prefix": "nv",
+      "base": "0x30400000"
+    },
+    {
+      "label": "NVScript 1.2.4 (2017), used by SCP Beta 4",
+      "sha256": "abed4ee229dda567553b7d805f219008b6390c2d2da37459629eb28ac9ee6a9a",
+      "bytes": 662016,
+      "source": "an SCP Beta 4 installation: osm/NVScript.osm or DMM/SCP_beta4/NVScript.osm (identical)",
+      "prefix": "nv124",
+      "base": "0x30500000"
+    }
+  ]
+}

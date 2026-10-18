@@ -52,7 +52,7 @@ def lift_game(exe, gen, nvscript=None):
         lift(src, pfx, md, [sys.executable, "lift.py", "--iat-indirect"] + reb + [src, pfx, md], str(rebase))
         pb.run([sys.executable, os.path.join("host", "gen_moddata.py"), src, pfx, os.path.join(md, f"{pfx}_moddata.c")] + reb, f"{os.path.basename(fname)} data")
         mods.append(pfx)
-    if not nvscript: shutil.rmtree(os.path.join(gen, "nv"), ignore_errors=True)     # an earlier --nvscript lift: not built in
+    pb.drop_stale_nvscript(gen, mods)                       # an earlier --nvscript lift that is not built in now
     md = os.path.join(gen, "mods"); os.makedirs(md, exist_ok=True)
     with open(os.path.join(md, "mods.c"), "w") as f:
         f.write('#include "recomp_mod.h"\n' + "".join(f"extern const RecompModDesc {p}_desc;\n" for p in mods) + "const RecompModDesc *const recomp_mods[] = { " + "".join(f"&{p}_desc, " for p in mods) + "0 };\n")
@@ -63,6 +63,8 @@ def build_game(a, libs):
     exe = os.path.abspath(a.game); game = os.path.join(a.build, "game"); gen = os.path.join(game, "gen")
     if not os.path.isfile(exe): sys.exit(f"SS2.exe not found: {exe}")
     print(f"lift {exe} (default lift) ...", flush=True)
+    sys.path.insert(0, PORT); import build as pb
+    for path, pfx, base, label in pb.nvscript_plan(a.nvscript): print(f"  NVScript: {label} -> prefix {pfx}, lifted at {base:#x} ({path})")
     for pfx, s in lift_game(exe, gen, a.nvscript).items(): print(f"  {pfx}: lifted in {s:.0f} s")
     for name, backend in (("ss2null", "null"), ("ss2game", "sdl2")):
         if a.game_backend not in ("all", backend): continue
@@ -85,7 +87,7 @@ def main():
     ap.add_argument("--no-rebuild-guest", action="store_true", help="reuse the conformance program and its lifted C if present")
     ap.add_argument("--game", metavar="SS2.EXE", help="also lift your own NewDark 2.48 SS2.exe (with its allobjs.osm, Squirrel.osm, lgvid.dll) and build the game libraries; read only, nothing is written next to it")
     ap.add_argument("--game-only", action="store_true", help="with --game: rebuild only the game libraries, keep SDL2 and the conformance libraries already staged")
-    ap.add_argument("--nvscript", metavar="FILE", help="with --game: also recompile this NVScript.osm (SCP needs it; e.g. its mod folder's copy). Without it, an earlier lift of it is dropped")
+    ap.add_argument("--nvscript", metavar="FILE", action="append", help="with --game: also recompile this NVScript.osm (SCP needs it; e.g. its mod folder's copy). Repeat it for several versions in one build (each must be listed in port/nvscript_versions.json); the game then loads whichever one an installation has. Without it, earlier lifts of it are dropped")
     ap.add_argument("--game-backend", default="all", choices=["all", "null", "sdl2"], help="with --game: which game libraries to build")
     a = ap.parse_args(); a.build = os.path.abspath(a.build)
     if not os.path.isfile(os.path.join(a.sdl2, "CMakeLists.txt")): sys.exit(f"no SDL 2 source in {a.sdl2} (--sdl2)")

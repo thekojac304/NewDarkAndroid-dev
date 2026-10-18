@@ -30,6 +30,6 @@ L = ['#include "recomp_mod.h"',
      f'static const uint32_t code_hi[] = {{ {", ".join(f"0x{base + y:08x}u" for _, y in code)} }};',
      f'const RecompModDesc {p}_desc = {{ "{name}", 0x{base:08x}u, 0x{pe.OPTIONAL_HEADER.SizeOfImage:x}u, '
      f'0x{base + pe.OPTIONAL_HEADER.AddressOfEntryPoint:08x}u, 0x{file_base:08x}u, 0x{crc & 0xffffffff:08x}u, {int(manual)}, '
-     f'{len(code)}, code_lo, code_hi, {p}_table, &{p}_table_n, {p}_lookup }};']
+     f'{len(code)}, code_lo, code_hi, {p}_table, &{p}_table_n, {p}_lookup, "{p}" }};']
 open(a.out, 'w').write('\n'.join(L) + '\n')
 print(f'{name}: base {base:#x}{" (rebased from %#x)" % file_base if manual else ""}, {len(code)} code ranges, crc {crc & 0xffffffff:08x}')

@@ -31,11 +31,19 @@ git clone -b release-2.32.10 https://github.com/libsdl-org/SDL build/deps/SDL2
 python android/build_native.py          # about 1.5 min: SDL2, conformance.exe, two lifts, two libraries
 python android/build_native.py --no-rebuild-guest --game "/path/to/SS2.exe"   # + the game: ~8 min the first time (lifts), then seconds
 python android/build_native.py --no-rebuild-guest --game "/path/to/SS2.exe" --nvscript "/path/to/DMM/SCP_beta8/NVScript.osm"   # + NVScript, for SCP
+python android/build_native.py --game-only --game "/path/to/SS2.exe" --nvscript "<SCP Beta 8 NVScript.osm>" --nvscript "<NVScript 1.2.4 (SCP Beta 4)>"   # both, in one APK
 cd android && ./gradlew assembleDevDebug    # app/build/outputs/apk/dev/debug/app-dev-debug.apk: everything (diagnostics, tests)
 cd android && ./gradlew assemblePlayDebug   # app/build/outputs/apk/play/debug/app-play-debug.apk: the game only, about half the size
 ```
 
-**Side-by-side build** (for example a legacy SCP Beta 4 setup with NVScript 1.2.4, docs/android-audit/LEGACY_SCP4_RUNTIME_RESULTS.md).
+**Several NVScript versions in one app** (Phase 3E, docs/android-audit/PHASE3E_UNIFIED_APK_RESULTS.md). `--nvscript` is
+repeatable. Each file must be one of the versions listed by sha256 in `port/nvscript_versions.json`, which fixes its
+generated-code prefix and guest address (Beta 8: `nv` at `0x30400000`; 1.2.4: `nv124` at `0x30500000`), so the versions
+coexist. At run time the host loads whichever version the installation's file is, by its identity (size, ImageBase,
+entry point, code CRC), and refuses a file that is none of them. One game folder per installation then works in the
+same app: `games/ss2scp` (SCP Beta 8) and `games/scp4` (SCP Beta 4), each with its own `profiles/NAME`.
+
+**Side-by-side build** (no longer needed for SCP Beta 4; kept for experiments: for example a legacy SCP Beta 4 setup with NVScript 1.2.4, docs/android-audit/LEGACY_SCP4_RUNTIME_RESULTS.md).
 `-Pside=NAME` gives the app the ID `local.newdarkandroid.ss2.NAME`, the launcher name `SS2 <label>` and the version suffix
 `-NAME`, so it installs next to the regular app with its own games, profiles and settings. Build its native libraries into
 their own folder and point Gradle at it (an absolute path):

@@ -1,0 +1,118 @@
+# Phase 3E-B module selection evidence (log excerpts). Paths shortened only where noted.
+
+## Desktop (Windows null host build/desktop-win-null-3e, same generated code as the APK)
+### leg
+[port] C:\osm\nvscript.osm (./osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30500000 (78 imports bound), DllMain -> 1
+### b8
+[port] NVScript.osm: loaded the recompiled module at 30400000 (77 imports bound), DllMain -> 1
+### refusal: wrongcrc (overlay osm/NVScript.osm in the scratch write folder)
+[port] C:\osm\nvscript.osm (<scratch>/modsel/neg-wrongcrc\write/osm/NVScript.osm): SizeOfImage 0xa8000, ImageBase 10000000, entry +0x5f1e9. It is none of the 2 recompiled versions of NVScript.osm, so it is refused; no other version is used in its place:
+[port]   version nv: SizeOfImage 0xb2000, ImageBase 10000000, entry +0x5d989, code CRC 7426e52a at 30400000
+[port]   version nv124: SizeOfImage 0xa8000, ImageBase 10000000, entry +0x5f1e9, code CRC 273bab35 at 30500000; this file's code CRC there: e297f9b9
+[port] C:\osm\nvscript.osm is a different version than the one that was recompiled (code checksum differs; a mod's copy?)
+: Failed to load script module "nvscript.osm" (error code 126)
+### refusal: wrongsize (overlay osm/NVScript.osm in the scratch write folder)
+[port] C:\osm\nvscript.osm (<scratch>/modsel/neg-wrongsize\write/osm/NVScript.osm): SizeOfImage 0xa9000, ImageBase 10000000, entry +0x5f1e9. It is none of the 2 recompiled versions of NVScript.osm, so it is refused; no other version is used in its place:
+[port]   version nv: SizeOfImage 0xb2000, ImageBase 10000000, entry +0x5d989, code CRC 7426e52a at 30400000
+[port]   version nv124: SizeOfImage 0xa8000, ImageBase 10000000, entry +0x5f1e9, code CRC 273bab35 at 30500000
+[port] C:\osm\nvscript.osm is a different version than the one that was recompiled (its size, base or entry point differs; a mod's copy?)
+: Failed to load script module "nvscript.osm" (error code 126)
+### refusal: foreign (overlay osm/NVScript.osm in the scratch write folder)
+[port] C:\osm\nvscript.osm (<scratch>/modsel/neg-foreign\write/osm/NVScript.osm): SizeOfImage 0x29f000, ImageBase 10000000, entry +0x2086f9. It is none of the 2 recompiled versions of NVScript.osm, so it is refused; no other version is used in its place:
+[port]   version nv: SizeOfImage 0xb2000, ImageBase 10000000, entry +0x5d989, code CRC 7426e52a at 30400000
+[port]   version nv124: SizeOfImage 0xa8000, ImageBase 10000000, entry +0x5f1e9, code CRC 273bab35 at 30500000
+[port] C:\osm\nvscript.osm is a different version than the one that was recompiled (its size, base or entry point differs; a mod's copy?)
+: Failed to load script module "nvscript.osm" (error code 126)
+### refusal: notpe (overlay osm/NVScript.osm in the scratch write folder)
+[port] C:\osm\nvscript.osm (<scratch>/modsel/neg-notpe\write/osm/NVScript.osm) is not a Windows module (14 bytes); refused
+: Failed to load script module "nvscript.osm" (error code 126)
+### missing (hard-linked game copy without NVScript.osm)
+[port] C:\nvscript.osm: could not be opened (./nvscript.osm)
+: Failed to load script module "nvscript.osm" (error code 126)
+### reload in one process (quicksave, quickload x2)
+[port] C:\osm\nvscript.osm (./osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30500000 (78 imports bound), DllMain -> 1
+[port] C:\osm\nvscript.osm (./osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30500000 (78 imports bound), DllMain -> 1
+[port] C:\osm\nvscript.osm (./osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30500000 (78 imports bound), DllMain -> 1
+: OSM: SQUIRREL> Quest Note Notifier initialized
+: OSM: SQUIRREL> Quest Note Notifier initialized
+: OSM: SQUIRREL> Quest Note Notifier initialized
+
+## Phone (0.9.0-modsel-play, regular app)
+### b4-slot0
+[port] C:\osm\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/scp4/osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30500000 (78 imports bound), DllMain -> 1
+[touch] CROUCH key from /data/user/0/local.newdarkandroid.ss2/files/profiles/scp4/user.bnd: 'c' (crouch, toggle), DIK 0x2e
+: OSM: SQUIRREL> Quest Note Notifier initialized
+: PLAYER POS: -92.0434 -169.932 7.00275
+: PLAYER POS: -68.3502 -169.585 6.00385
+2026-10-18 19:01:35 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=12446 seconds=53.617
+### b4-slot3
+[port] C:\osm\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/scp4/osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30500000 (78 imports bound), DllMain -> 1
+[touch] CROUCH key from /data/user/0/local.newdarkandroid.ss2/files/profiles/scp4/user.bnd: 'c' (crouch, toggle), DIK 0x2e
+: OSM: SQUIRREL> Quest Note Notifier initialized
+: PLAYER POS: -171.694 202.152 -24.9884
+2026-10-18 19:13:03 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=20586 seconds=47.967
+### b4-slot8
+[port] C:\osm\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/scp4/osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30500000 (78 imports bound), DllMain -> 1
+[touch] CROUCH key from /data/user/0/local.newdarkandroid.ss2/files/profiles/scp4/user.bnd: 'c' (crouch, toggle), DIK 0x2e
+: OSM: SQUIRREL> Quest Note Notifier initialized
+: PLAYER POS: -10.798 -432.995 -3.98919
+2026-10-18 19:13:56 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=21101 seconds=47.959
+### b4-slot13
+[port] C:\osm\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/scp4/osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30500000 (78 imports bound), DllMain -> 1
+[touch] CROUCH key from /data/user/0/local.newdarkandroid.ss2/files/profiles/scp4/user.bnd: 'c' (crouch, toggle), DIK 0x2e
+: OSM: SQUIRREL> Quest Note Notifier initialized
+: PLAYER POS: -176.045 289.703 -36.9926
+2026-10-18 19:14:50 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=21573 seconds=47.976
+### b4-slot14
+[port] C:\osm\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/scp4/osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30500000 (78 imports bound), DllMain -> 1
+[touch] CROUCH key from /data/user/0/local.newdarkandroid.ss2/files/profiles/scp4/user.bnd: 'c' (crouch, toggle), DIK 0x2e
+: OSM: SQUIRREL> Quest Note Notifier initialized
+: PLAYER POS: 14.75 -322.75 -9.99208
+2026-10-18 19:15:44 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=21881 seconds=47.965
+### b4-load15
+[port] C:\osm\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/scp4/osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30500000 (78 imports bound), DllMain -> 1
+[touch] CROUCH key from /data/user/0/local.newdarkandroid.ss2/files/profiles/scp4/user.bnd: 'c' (crouch, toggle), DIK 0x2e
+: OSM: SQUIRREL> Quest Note Notifier initialized
+: PLAYER POS: -66.9667 -169.566 6.00385
+2026-10-18 19:09:53 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=18668 seconds=48.365
+### b8-load15
+[port] C:\DMM\SCP_beta8\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2scp/DMM/SCP_beta8/NVScript.osm): identified as recompiled version nv (SizeOfImage 0xb2000, ImageBase 10000000, code CRC 7426e52a at 30400000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30400000 (77 imports bound), DllMain -> 1
+[touch] CROUCH key from /storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2scp/user.bnd: 'shift' (crouch, toggle), DIK 0x2a
+: PLAYER POS: 103.005 42.6953 -11.9984
+2026-10-18 19:12:02 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=19867 seconds=48.338
+### b8-gravshaft
+[port] C:\DMM\SCP_beta8\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2scp/DMM/SCP_beta8/NVScript.osm): identified as recompiled version nv (SizeOfImage 0xb2000, ImageBase 10000000, code CRC 7426e52a at 30400000), one of 2 built in
+[port] NVScript.osm: loaded the recompiled module at 30400000 (77 imports bound), DllMain -> 1
+[touch] CROUCH key from /storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2scp/user.bnd: 'shift' (crouch, toggle), DIK 0x2a
+: PLAYER POS: -27 -28.2592 4.30556
+: PLAYER POS: -27 20.549 5.00157
+: PLAYER POS: -27 18.0931 5.00157
+: PLAYER POS: -25.5471 18.0931 5.00157
+: PLAYER POS: -25.5471 28.5569 5.00157
+: PLAYER POS: -25.5471 28.564 5.00157
+: PLAYER POS: -25.5471 28.564 5.00157
+: PLAYER POS: -25.5471 28.564 5.00157
+: PLAYER POS: -25.5471 28.564 5.00157
+: PLAYER POS: -25.5471 28.564 5.00157
+: PLAYER POS: -25.5471 28.564 5.00157
+: PLAYER POS: -25.5471 28.564 5.00157
+: PLAYER POS: -24.6724 36.7962 5.75763
+: PLAYER POS: -24.6532 36.7962 18.0646
+: PLAYER POS: -24.6368 36.7962 40.1053
+: PLAYER POS: -24.6296 36.7962 52.8706
+: PLAYER POS: -24.6296 36.7962 52.8706
+: PLAYER POS: -24.6296 36.7962 52.8706
+: PLAYER POS: -24.6296 36.7962 52.8706
+: PLAYER POS: -24.6296 36.7962 52.8706
+2026-10-18 19:07:43 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=16843 seconds=79.803

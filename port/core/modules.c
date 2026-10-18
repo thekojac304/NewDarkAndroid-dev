@@ -5,6 +5,11 @@
  * lifted, its imports are bound to host functions, and its recompiled entry points are found through the module's
  * lookup table. A module whose bytes differ (a mod's copy, another version) is refused, as on the Windows host.
  *
+ * Several versions of one module can be built in (two NVScript.osm, for two SCP installations): each has its own
+ * descriptor, prefix and guest range. LoadLibrary picks the one whose identity the file on disk has (SizeOfImage,
+ * ImageBase, entry point, and the CRC of its code mapped at that descriptor's base), never by a label or by order; a
+ * file that matches none is refused, never replaced by another version.
+ *
  * The address each module was lifted at is fixed in the generated code, so the host reserves those ranges up front. On
  * hosts with a small guest address space, lift the modules at low bases (build_win.py's MODULES table) to keep the
  * space compact. */
@@ -17,11 +22,14 @@
 typedef struct { int refs, reserved, unloading; } ModSt;
 static ModSt st[16];
 static int ieq(const char *a, const char *b) { while (*a && tolower((unsigned char)*a) == tolower((unsigned char)*b)) a++, b++; return !*a && !*b; }
-static int find_by_name(const char *n) {
-    const char *b = strrchr(n, '\\'), *b2 = strrchr(n, '/'); if (b2 > b) b = b2; b = b ? b + 1 : n;
-    for (int i = 0; recomp_mods[i] && i < 16; i++) if (ieq(b, recomp_mods[i]->name)) return i;
-    return -1;
+static const char *base_name(const char *n) { const char *b = strrchr(n, '\\'), *b2 = strrchr(n, '/'); if (b2 > b) b = b2; return b ? b + 1 : n; }
+static int is_named(int i, const char *n) { return ieq(base_name(n), recomp_mods[i]->name); }
+static int find_by_name(const char *n) {        /* the loaded version of this module if one is, else the first built in */
+    int first = -1;
+    for (int i = 0; recomp_mods[i] && i < 16; i++) if (is_named(i, n)) { if (st[i].refs) return i; if (first < 0) first = i; }
+    return first;
 }
+static const char *variant(const RecompModDesc *d) { return d->variant ? d->variant : "?"; }
 static int find_by_handle(uint32_t h) { for (int i = 0; recomp_mods[i] && i < 16; i++) if (st[i].refs && recomp_mods[i]->base == h) return i; return -1; }
 uint32_t mod_handle_of(const char *n) { int k = find_by_name(n); return k >= 0 && st[k].refs ? recomp_mods[k]->base : 0; }
 uint32_t mod_highest_end(void) { uint32_t e = 0; for (int i = 0; recomp_mods[i] && i < 16; i++) if (recomp_mods[i]->base + recomp_mods[i]->size > e) e = recomp_mods[i]->base + recomp_mods[i]->size; return e; }
@@ -89,25 +97,19 @@ static uint8_t *slurp(const char *host, long *n) {
     if (got != (int64_t)s.size) { free(d); return NULL; }
     *n = (long)s.size; return d;
 }
-uint32_t mod_load(CPU *c, const char *name) {
-    int k = find_by_name(name); if (k < 0) return 0;
-    const RecompModDesc *d = recomp_mods[k];
-    if (ieq(d->name, "fmsel.dll")) { port_log("%s (the fan-mission selector, a GDI/shell user interface) is not loaded by the portable host", name); return 0; }
-    if (!st[k].reserved) return 0;
-    if (st[k].refs) { st[k].refs++; port_debug("%s: LoadLibrary again (references %d, thread %u%s)", d->name, st[k].refs, cur_thread_id(), st[k].unloading ? ", during its unload" : ""); return d->base; }
-    char hp[1200]; vfs_map(name, hp, sizeof hp); long n; uint8_t *file = slurp(hp, &n);
-    if (!file) { port_log("%s: could not be opened (%s)", name, hp); return 0; }
-    uint32_t lf = *(uint32_t *)(file + 0x3c); const uint8_t *nt = file + lf;
-    uint32_t image_base = *(const uint32_t *)(nt + 24 + 28), size_of_image = *(const uint32_t *)(nt + 24 + 56), hdrs = *(const uint32_t *)(nt + 24 + 60);
+/* Maps the file's image at d's base, applies its relocations and returns the CRC of its code as mapped there (the
+ * identity gen_moddata.py recorded). The image stays mapped; the caller clears it when the CRC is not d's. */
+static uint32_t map_image(const RecompModDesc *d, const uint8_t *file, long n) {
+    uint32_t lf = *(const uint32_t *)(file + 0x3c); const uint8_t *nt = file + lf;
+    uint32_t hdrs = *(const uint32_t *)(nt + 24 + 60);
     unsigned nsec = *(const uint16_t *)(nt + 6), optsz = *(const uint16_t *)(nt + 20); const uint8_t *sec = nt + 24 + optsz;
-    if (size_of_image != d->size || image_base != d->file_base) { port_log("%s is a different version than the one that was recompiled (a mod's copy?)", name); free(file); return 0; }
+    if (hdrs > d->size) hdrs = d->size; if (hdrs > (uint32_t)n) hdrs = (uint32_t)n;
     memset(GP(d->base), 0, d->size); memcpy(GP(d->base), file, hdrs);
     for (unsigned i = 0; i < nsec; i++) {
         const uint8_t *s = sec + 40 * i; uint32_t vsz = *(const uint32_t *)(s + 8), va = *(const uint32_t *)(s + 12), rsz = *(const uint32_t *)(s + 16), raw = *(const uint32_t *)(s + 20);
         uint32_t cp = rsz < vsz || !vsz ? rsz : vsz; if ((uint64_t)raw + cp > (uint64_t)n) cp = raw < (uint32_t)n ? (uint32_t)n - raw : 0; if (va > d->size || cp > d->size - va) continue;   /* truncated file: no wrap-around */
         memcpy(GP(d->base + va), file + raw, cp);
     }
-    free(file);
     uint32_t delta = d->base - d->file_base, ntg = d->base + RD32(d->base + 0x3c), dir = ntg + 24 + 96;      /* data directories */
     uint32_t reloc_rva = RD32(dir + 8 * 5), reloc_sz = RD32(dir + 8 * 5 + 4);
     if (delta && reloc_rva) {
@@ -117,7 +119,51 @@ uint32_t mod_load(CPU *c, const char *name) {
             p += blk;
         }
     }
-    if (code_crc(d) != d->crc) { port_log("%s is a different version than the one that was recompiled (code checksum differs; a mod's copy?)", name); memset(GP(d->base), 0, d->size); return 0; }
+    return code_crc(d);
+}
+uint32_t mod_load(CPU *c, const char *name) {
+    int k = find_by_name(name); if (k < 0) return 0;
+    const RecompModDesc *d = recomp_mods[k];
+    if (ieq(d->name, "fmsel.dll")) { port_log("%s (the fan-mission selector, a GDI/shell user interface) is not loaded by the portable host", name); return 0; }
+    if (st[k].refs) { st[k].refs++; port_debug("%s: LoadLibrary again (references %d, thread %u%s)", d->name, st[k].refs, cur_thread_id(), st[k].unloading ? ", during its unload" : ""); return d->base; }
+    char hp[1200]; vfs_map(name, hp, sizeof hp); long n; uint8_t *file = slurp(hp, &n);
+    if (!file) { port_log("%s: could not be opened (%s)", name, hp); return 0; }
+    uint32_t lf = n >= 0x40 ? *(uint32_t *)(file + 0x3c) : 0;
+    if (n < 0x40 || (uint64_t)lf + 24 + 0x60 + 8 * 16 > (uint64_t)n || memcmp(file + lf, "PE\0\0", 4)) {
+        port_log("%s (%s) is not a Windows module (%ld bytes); refused", name, hp, n); free(file); return 0;
+    }
+    const uint8_t *nt = file + lf;
+    uint32_t image_base = *(const uint32_t *)(nt + 24 + 28), size_of_image = *(const uint32_t *)(nt + 24 + 56), entry_rva = *(const uint32_t *)(nt + 24 + 16);
+    /* every version of this module built in whose header identity the file has; then its code CRC at that version's base */
+    int nver = 0, header_match = 0, ntried = 0, tried[16]; uint32_t crcs[16]; k = -1;
+    for (int i = 0; recomp_mods[i] && i < 16; i++) nver += is_named(i, name);
+    for (int i = 0; recomp_mods[i] && i < 16; i++) {
+        if (!is_named(i, name)) continue;
+        const RecompModDesc *v = recomp_mods[i];
+        if (size_of_image != v->size || image_base != v->file_base || entry_rva != v->entry - v->base) continue;
+        header_match++;
+        if (!st[i].reserved) { port_log("%s: version %s has this header, but its range %08x-%08x could not be reserved", name, variant(v), v->base, v->base + v->size); continue; }
+        uint32_t crc = map_image(v, file, n); tried[ntried] = i; crcs[ntried++] = crc;
+        if (crc == v->crc) { k = i; break; }
+        memset(GP(v->base), 0, v->size);
+    }
+    free(file);
+    if (k < 0) {
+        port_log("%s (%s): SizeOfImage 0x%x, ImageBase %08x, entry +0x%x. It is none of the %d recompiled version%s of %s, so it is refused; "
+                 "no other version is used in its place:", name, hp, size_of_image, image_base, entry_rva, nver, nver == 1 ? "" : "s", recomp_mods[find_by_name(name)]->name);
+        for (int i = 0; recomp_mods[i] && i < 16; i++) {
+            if (!is_named(i, name)) continue;
+            const RecompModDesc *v = recomp_mods[i]; char got[64] = "";
+            for (int t = 0; t < ntried; t++) if (tried[t] == i) snprintf(got, sizeof got, "; this file's code CRC there: %08x", crcs[t]);
+            port_log("  version %s: SizeOfImage 0x%x, ImageBase %08x, entry +0x%x, code CRC %08x at %08x%s", variant(v), v->size, v->file_base, v->entry - v->base, v->crc, v->base, got);
+        }
+        port_log("%s is a different version than the one that was recompiled (%s; a mod's copy?)", name, header_match ? "code checksum differs" : "its size, base or entry point differs");
+        return 0;
+    }
+    d = recomp_mods[k];
+    uint32_t ntg = d->base + RD32(d->base + 0x3c), dir = ntg + 24 + 96;
+    if (nver > 1) port_log("%s (%s): identified as recompiled version %s (SizeOfImage 0x%x, ImageBase %08x, code CRC %08x at %08x), one of %d built in",
+                           name, hp, variant(d), d->size, d->file_base, d->crc, d->base, nver);
     uint32_t irva = RD32(dir + 8), nb = 0;
     if (irva) for (uint32_t p = d->base + irva; RD32(p + 12); p += 20) {
         const char *dll = (const char *)GP(d->base + RD32(p + 12)); uint32_t ot = RD32(p) ? RD32(p) : RD32(p + 16), ft = RD32(p + 16);

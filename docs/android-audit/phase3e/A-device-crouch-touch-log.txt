@@ -1,0 +1,34 @@
+## b4 (regular app, 0.9.0-modsel-play, HID touchscreen; disposable write folder)
+[touch] mode CURSOR (game interface/menu)
+[touch] CROUCH key from /data/user/0/local.newdarkandroid.ss2/files/crouchtest/b4/user.bnd: 'c' (crouch, toggle), DIK 0x2e
+[touch] mode LOOK (game shoot)
+[touch] finger 35/0 down at 1850,584
+[touch] key 0x2e down
+[touch] finger 35/0 up at 1850,584
+[touch] key 0x2e up
+[touch] finger 35/0 down at 1850,584
+[touch] key 0x2e down
+[touch] finger 35/0 up at 1850,584
+[touch] key 0x2e up
+[touch] finger 35/0 down at 420,851
+[touch] key 0x11 down
+[touch] finger 35/1 down at 1300,400
+[touch] finger 35/2 down at 1851,584
+[touch] key 0x2e down
+[touch] finger 35/2 up at 1851,584
+[touch] key 0x2e up
+[touch] finger 35/1 up at 1300,400
+[touch] finger 35/0 up at 420,701
+[touch] key 0x11 up
+## b8 (regular app, 0.9.0-modsel-play, HID touchscreen; disposable write folder)
+[touch] mode CURSOR (game interface/menu)
+[touch] CROUCH key from /storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2scp/user.bnd: 'shift' (crouch, toggle), DIK 0x2a
+[touch] mode LOOK (game shoot)
+[touch] finger 36/0 down at 1850,584
+[touch] key 0x2a down
+[touch] finger 36/0 up at 1850,584
+[touch] key 0x2a up
+[touch] finger 36/0 down at 1850,584
+[touch] key 0x2a down
+[touch] finger 36/0 up at 1850,584
+[touch] key 0x2a up
