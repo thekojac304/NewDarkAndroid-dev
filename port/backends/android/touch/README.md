@@ -13,9 +13,9 @@ audit). It was taken with `git archive`; the working tree's uncommitted changes 
 
 | File | From 7502370 | Change |
 | --- | --- | --- |
-| `touch_controls.c/.h` | unchanged, except one line | `in_circle` ignores radius-0 controls (hidden in the SS2 layout) |
+| `touch_controls.c/.h` | unchanged, except two lines | `in_circle` ignores radius-0 controls (hidden in the SS2 layout); KBD (the `target` action) takes a touch in cursor mode too, like AMMO (Phase 2B-2) |
 | `touch_editor.c`, `touch_radial.c/.h`, `touch_settings.h` | unchanged | |
-| `touch_settings.c` | defaults table only | SS2 labels: CONS → RELOAD; explosive, sprint and target hidden; AMMO moved into the left letterbox bar. Keys, schema (v3) and positions otherwise kept |
+| `touch_settings.c` | defaults table, plus one function | SS2 labels: CONS → RELOAD, target → KBD; explosive and sprint hidden. Phase 2B-2 defaults: SET, AMMO/USE and KBD in the letterbox bars, MODE right of the EQUIP panel. `touch_settings_upgrade_layout` gives a stored layout that still has every control at the Phase 2A/2B-1 positions the new defaults (in memory). Keys and schema (v3) kept |
 | `touch_surface.c/.h` | JNI name only | `Java_local_newdarkandroid_ss2_TouchSurface_onNativeSurfaceTouch` |
 | `touch_render_gles.c` | from `touch_render.c` | the same drawing code, colours, layout and font; `SDL_Renderer` calls replaced by one batched GLES 2 triangle list; QA and visual-compare panels left out |
 | `android/.../TouchSurface.java` | from the `SDLSurface.java` patch | as a subclass (`NewDarkActivity.createSDLSurface`), so SDL's Java sources stay stock |
@@ -58,6 +58,7 @@ The keys are the bindings of the game's `user.bnd`, which replaces `SHOCK.BND`.
 | `<` / `>` | Mouse wheel down / up (`cycle_weapon -1` / `1`) |
 | RELOAD / AMMO | R (`reload_gun`) / B (`cycle_ammo`). In cursor mode the AMMO button is a right click at the cursor, labelled USE. |
 | II | Esc (`sim_menu`; also skips cutscenes) |
+| KBD | Shows or hides Android's keyboard (SDL text input), in look and cursor mode. What it types reaches the game as key presses and characters, as from a physical keyboard: save names, the console (`:`), Backspace, Enter. Android's Back closes it; Esc is II. While it is up in look mode, only II, KBD, MODE and SET take a new touch, so typing cannot walk, turn or fire. |
 | MODE (LOOK / CURSOR) | Tab (`toggle_mouse`): the game switches between shoot and interface mode |
 | Cursor mode | A tap places the game's cursor and clicks. A drag presses at the start point, moves and releases. |
 
@@ -72,6 +73,6 @@ The keys are the bindings of the game's `user.bnd`, which replaces `SHOCK.BND`.
 `tests/run.sh` builds `tests/touch_ss2_test.c` with the bridge and the core and runs it on the PC, for example with
 `CC="python -m ziglang cc"`. It checks press/release order and minimum hold, several fingers, stick ownership and
 hysteresis, a modifier held across frames, relative look scaling, cursor placement before a click (corners, centre,
-bars), placement through a 4:3 menu in a 16:9 game, drags, focus-loss release, mode following, weapon wheel and physical/touch aggregation. Shockolate's own core
+bars), placement through a 4:3 menu in a 16:9 game, drags, focus-loss release, mode following, weapon wheel, physical/touch aggregation, the KBD button and its typing lock-out, the default positions at 16:9, and the layout upgrade. Shockolate's own core
 suites (`touch_controls`, `alpha11`, `alpha2`, `alpha3`, `alpha4`, `ammo` from 7502370) also pass against this
 directory's core.

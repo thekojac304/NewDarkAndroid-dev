@@ -38,9 +38,11 @@ typedef struct Ss2Touch {
     uint64_t recent[3];                    /* the last three distinct recentring times the bridge saw */
     uint64_t move_hold_until;              /* a drag's press must reach the game a frame before the cursor moves on */
     bool game_shoot;
+    bool typing;                           /* the Android keyboard is up: in look mode only II, KBD, MODE and SET take a touch */
     /* platform services (touch_ss2_android.c); may be NULL in tests */
     void (*save_settings)(struct Ss2Touch *s);
     void (*haptic)(struct Ss2Touch *s, int level);
+    void (*keyboard)(struct Ss2Touch *s);  /* KBD: show or hide the Android keyboard */
 } Ss2Touch;
 
 void ss2t_init(Ss2Touch *s);

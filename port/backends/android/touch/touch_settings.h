@@ -35,4 +35,8 @@ void touch_settings_defaults(TouchSettings *s);
 void touch_settings_validate(TouchSettings *s);
 TouchLoadResult touch_settings_load(TouchSettings *s, const char *path);
 bool touch_settings_save(const TouchSettings *s, const char *path);
+/* NewDarkAndroid: a loaded layout whose controls are all still at the previous release's default positions gets the
+   current defaults (in memory; the file changes only when the player saves). Stick size, opacity and look speed are
+   kept. Returns true when it did. A layout with any control moved or resized is left alone. */
+bool touch_settings_upgrade_layout(TouchSettings *s);
 #endif

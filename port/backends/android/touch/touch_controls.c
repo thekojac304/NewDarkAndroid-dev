@@ -205,7 +205,8 @@ void touch_finger(TouchControls *t, TouchPhase phase, int64_t device, int64_t id
             touch_set_mode(t, t->mode == TOUCH_GAMEPLAY ? TOUCH_CURSOR : TOUCH_GAMEPLAY);
             role = TOUCH_MODE_TOGGLE;
         } else if (!t->controller && t->gameplay_available &&
-                   in_circle(x,y,t->layout.action[TOUCH_AMMO])) {
+                   (in_circle(x,y,t->layout.action[TOUCH_AMMO]) ||
+                    in_circle(x,y,t->layout.action[TOUCH_TARGET_ID]))) {   /* NewDarkAndroid: KBD in both modes */
             role = TOUCH_ACTION;
         } else if (t->effective_mode == TOUCH_CURSOR) {
             if (!t->radial.open && t->cursor_owner < 0) role = TOUCH_CURSOR_OWNER;

@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+extern int touch_keyboard_shown;         /* touch_ss2_android.c: the Android keyboard is up (KBD is drawn pressed) */
+
 /* ---------------------------------------------------------------- the GLES 2 primitive layer */
 typedef struct { float x, y; uint8_t r, g, b, a; } V;
 static V *vb; static int vn, vcap;
@@ -101,13 +103,13 @@ static void controls(const TouchControls *t) {
         if (!preview) {
             if (id==TC_PAUSE && !t->pause_available) continue;
             if (id!=TC_PAUSE && id!=TC_SETTINGS && !t->gameplay_available) continue;
-            if (id!=TC_PAUSE && id!=TC_SETTINGS && id!=TC_MODE && id!=TC_AMMO &&
+            if (id!=TC_PAUSE && id!=TC_SETTINGS && id!=TC_MODE && id!=TC_AMMO && id!=TC_TARGET &&
                 t->effective_mode!=TOUCH_GAMEPLAY) continue;
         }
         TouchRect b=touch_control_bounds(t,id);
         bool selected=t->panel==TOUCH_UI_EDITOR && t->selected==id;
         float opacity=selected ? fmaxf(.85f,t->settings.opacity) : t->settings.opacity;
-        bool down=!preview && held(t,id);
+        bool down=!preview && (held(t,id) || (id==TC_TARGET && touch_keyboard_shown));   /* lit while the keyboard is up */
         const char *name=touch_defaults[id].label;
         if (id==TC_MODE) {
             color(t->mode==TOUCH_GAMEPLAY ? 15 : 59, t->mode==TOUCH_GAMEPLAY ? 58 : 59,

@@ -220,10 +220,93 @@ static void test_physical_aggregation(void) {
     k.down = 0; CHECK(ss2t_physical(&s, &k));              /* the keyboard's release does reach the game */
 }
 
+/* Phase 2B-2: KBD shows the Android keyboard in look and cursor mode; while it is up, look mode takes no walk, turn or fire */
+static int kb_calls;
+static void kb_toggle(Ss2Touch *s) { kb_calls++; s->typing = !s->typing; }
+static void test_keyboard_button(void) {
+    Ss2Touch s; ss2t_init(&s); s.keyboard = kb_toggle; kb_calls = 0; now = 1000000000ull; enter_gameplay(&s);
+    TouchCircle k = ctl(&s, TC_TARGET), f = ctl(&s, TC_FIRE);
+    CHECK(k.radius > 0);
+    finger(&s, TOUCH_DOWN, 1, k.x, k.y); finger(&s, TOUCH_UP, 1, k.x, k.y); advance(&s, 10, shooting());
+    CHECK(kb_calls == 1 && s.typing);
+    CHECK(nout == 0);                                      /* KBD itself sends nothing to the game */
+    float r = s.t.layout.move_radius;
+    finger(&s, TOUCH_DOWN, 2, 400, 900); finger(&s, TOUCH_MOTION, 2, 400, 900 - r);     /* stick: ignored */
+    finger(&s, TOUCH_DOWN, 3, 1300, 400); finger(&s, TOUCH_MOTION, 3, 1500, 400);        /* look: ignored */
+    finger(&s, TOUCH_DOWN, 4, f.x, f.y);                                                  /* fire: ignored */
+    advance(&s, 10, shooting());
+    CHECK(find(PLAT_EV_KEY, SS2_DIK_W, 1) < 0 && find(PLAT_EV_MOUSE_BUTTON, 0, 1) < 0);
+    int moved = 0; for (int i = 0; i < nout; i++) if (out[i].type == PLAT_EV_MOUSE_MOVE) moved = 1;
+    CHECK(!moved);
+    finger(&s, TOUCH_UP, 2, 400, 900 - r); finger(&s, TOUCH_UP, 3, 1500, 400); finger(&s, TOUCH_UP, 4, f.x, f.y);
+    TouchCircle p = ctl(&s, TC_PAUSE);                     /* II (Esc) still works while typing */
+    finger(&s, TOUCH_DOWN, 5, p.x, p.y); finger(&s, TOUCH_UP, 5, p.x, p.y); advance(&s, 10, shooting());
+    CHECK(find(PLAT_EV_KEY, SS2_DIK_ESC, 1) >= 0);
+    advance(&s, 100, shooting());
+    finger(&s, TOUCH_DOWN, 6, k.x, k.y); finger(&s, TOUCH_UP, 6, k.x, k.y); advance(&s, 10, shooting());
+    CHECK(kb_calls == 2 && !s.typing);                     /* KBD again: hidden, the stick works again */
+    finger(&s, TOUCH_DOWN, 7, 400, 900); finger(&s, TOUCH_MOTION, 7, 400, 900 - r); advance(&s, 10, shooting());
+    CHECK(find(PLAT_EV_KEY, SS2_DIK_W, 1) >= 0);
+    finger(&s, TOUCH_UP, 7, 400, 900 - r); advance(&s, 100, shooting());
+    /* cursor mode (a menu: no recentring): KBD works, and taps still reach the game while typing */
+    for (int i = 0; i < 70; i++) advance(&s, 10, 0);
+    CHECK(s.t.mode == TOUCH_CURSOR);
+    finger(&s, TOUCH_DOWN, 8, k.x, k.y); finger(&s, TOUCH_UP, 8, k.x, k.y); advance(&s, 10, 0);
+    CHECK(kb_calls == 3 && s.typing);
+    finger(&s, TOUCH_DOWN, 9, 1170, 540); finger(&s, TOUCH_UP, 9, 1170, 540); advance(&s, 10, 0);
+    CHECK(find(PLAT_EV_MOUSE_BUTTON, 0, 1) >= 0);          /* a tap on the save screen still clicks */
+}
+
+/* the defaults keep SET, AMMO/USE and KBD in the letterbox bars and MODE right of EQUIP, at 16:9 (1920x1080 at x = 210) */
+static void test_default_layout(void) {
+    Ss2Touch s; ss2t_init(&s); now = 1000000000ull;
+    ss2t_frame(&s, now, W, H, true, 210, 0, 1920, 1080, 1280, 720, 0);
+    for (int id = 0; id < TC_COUNT; id++) {
+        if (id != TC_SETTINGS && id != TC_AMMO && id != TC_TARGET && id != TC_PAUSE) continue;
+        TouchRect b = touch_control_bounds(&s.t, id);
+        CHECK(b.x >= 0 && (b.x + b.w <= 210 || b.x >= 2130) && b.x + b.w <= W);
+    }
+    TouchRect m = touch_control_bounds(&s.t, TC_MODE);
+    CHECK(m.x >= 1900 && m.x + m.w <= W);                  /* EQUIP's right edge is at about x = 1884 with the largest interface */
+    for (int a = 0; a < TC_COUNT; a++) for (int b = a + 1; b < TC_COUNT; b++) {   /* no two bar buttons overlap */
+        if (touch_defaults[a].radius <= 0 || touch_defaults[b].radius <= 0 || a == TC_STICK || b == TC_STICK || a == TC_MODE || b == TC_MODE) continue;
+        TouchRect ra = touch_control_bounds(&s.t, a), rb = touch_control_bounds(&s.t, b);
+        CHECK(ra.x + ra.w <= rb.x || rb.x + rb.w <= ra.x || ra.y + ra.h <= rb.y || rb.y + rb.h <= ra.y);
+    }
+}
+
+/* a stored layout the player never moved gets the new positions; one with any control moved is kept as it is */
+static void test_layout_upgrade(void) {
+    static const float old[TC_COUNT][2] = { {.86f,.73f}, {.69f,.85f}, {.95f,.52f}, {.79f,.54f}, {.55f,.78f}, {.55f,.90f}, {.52f,.10f},
+        {.63f,.10f}, {.22f,.54f}, {.73f,.10f}, {.05f,.06f}, {.88f,.0825f}, {.16f,.06f}, {.20f,.77f}, {.09f,.30f} };
+    TouchSettings t; touch_settings_defaults(&t);
+    for (int i = 0; i < TC_COUNT; i++) { t.control[i].x = old[i][0]; t.control[i].y = old[i][1]; }
+    t.control[TC_STICK].scale = 1.3f; t.sensitivity_x = 1.4f;
+    TouchSettings moved = t;
+    CHECK(touch_settings_upgrade_layout(&t));
+    CHECK(t.control[TC_SETTINGS].x == touch_defaults[TC_SETTINGS].x && t.control[TC_MODE].x == touch_defaults[TC_MODE].x);
+    CHECK(t.control[TC_STICK].scale == 1.3f && t.sensitivity_x == 1.4f);   /* stick size and look speed kept */
+    moved.control[TC_JUMP].x = .91f;                       /* the player moved one button */
+    TouchSettings before = moved;
+    CHECK(!touch_settings_upgrade_layout(&moved));
+    CHECK(!memcmp(&before, &moved, sizeof moved));
+    TouchSettings resized = t; resized.control[TC_FIRE].scale = 1.2f;   /* already current: nothing to do */
+    CHECK(!touch_settings_upgrade_layout(&resized));
+    /* the same through the file: a Phase 2A file round-trips unchanged when loaded, and only memory is upgraded */
+    const char *path = "touch_layout_upgrade_test.cfg";
+    TouchSettings f; touch_settings_defaults(&f);
+    for (int i = 0; i < TC_COUNT; i++) { f.control[i].x = old[i][0]; f.control[i].y = old[i][1]; }
+    CHECK(touch_settings_save(&f, path));
+    TouchSettings l; CHECK(touch_settings_load(&l, path) == TOUCH_LOAD_OK);
+    CHECK(l.control[TC_SETTINGS].x == old[TC_SETTINGS][0]);
+    CHECK(touch_settings_upgrade_layout(&l) && l.control[TC_SETTINGS].x == touch_defaults[TC_SETTINGS].x);
+    remove(path);
+}
+
 int main(void) {
     test_tap_min_hold(); test_move_look_fire(); test_ownership_and_hysteresis(); test_modifier_spans_frames();
     test_cursor_mapping_and_click(); test_focus_cleanup(); test_mode_follow_and_toggle(); test_weapon_wheel_and_actions();
-    test_physical_aggregation(); test_ui_rect_mapping();
+    test_physical_aggregation(); test_ui_rect_mapping(); test_keyboard_button(); test_default_layout(); test_layout_upgrade();
     printf("touch_ss2_test: %d of %d checks failed\n", fails, checks);
     return fails != 0;
 }

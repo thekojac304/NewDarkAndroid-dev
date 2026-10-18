@@ -27,6 +27,8 @@ static Ss2Touch touch;
 static int initialized, background, unfocused, debug;
 static int surf_w, surf_h;                  /* the touch surface (= drawable) size */
 static char settings_path[1024]; static int future_settings;
+int touch_keyboard_shown;                   /* touch_render_gles.c draws KBD pressed while it is up */
+static int keyboard_changed;
 
 static void save_settings(Ss2Touch *s) {
     s->t.save_failed = future_settings || !settings_path[0] || !touch_settings_save(&s->t.settings, settings_path);
@@ -45,6 +47,26 @@ static void haptic(Ss2Touch *s, int level) {   /* NewDarkActivity.touchHaptic, a
     }
     (*env)->DeleteLocalRef(env, activity);
 }
+/* KBD: SDL's Android text input. Its keyboard sends each typed character as a key press and its text (SDL generates the
+   scan codes), so the game sees what a physical keyboard sends. SDL keeps text events on from the start without a
+   keyboard, so whether it is up is tracked here. Android's Back closes it: SDL then stops text input (keyboard_poll). */
+static void text_events_on(void) {          /* as SDL starts: text from a physical keyboard, no on-screen keyboard */
+    SDL_EventState(SDL_TEXTINPUT, SDL_ENABLE); SDL_EventState(SDL_TEXTEDITING, SDL_ENABLE);
+}
+static void keyboard(Ss2Touch *s) {
+    if (touch_keyboard_shown) { SDL_StopTextInput(); text_events_on(); touch_keyboard_shown = 0; }
+    else { SDL_Rect r = { 0, 0, 1, 1 }; SDL_SetTextInputRect(&r); SDL_StartTextInput(); touch_keyboard_shown = 1; }
+    s->typing = touch_keyboard_shown != 0;
+    keyboard_changed = 1;                   /* called from inside the touch core: release held controls in the next poll */
+    tlog("keyboard %s", touch_keyboard_shown ? "shown" : "hidden");
+}
+static void keyboard_poll(void) {
+    if (touch_keyboard_shown && !SDL_IsTextInputActive()) {    /* Back (or the keyboard's hide key) closed it */
+        text_events_on(); touch_keyboard_shown = 0; touch.typing = false; keyboard_changed = 1;
+        tlog("keyboard hidden by Android");
+    }
+    if (keyboard_changed) { keyboard_changed = 0; ss2t_cancel(&touch); }   /* nothing touch holds (a walk, a turn) stays held */
+}
 
 /* Before SDL_Init: touches must never become SDL mouse events (they would enter the relative-motion accumulator) */
 void android_touch_init(void) {
@@ -53,7 +75,7 @@ void android_touch_init(void) {
     SDL_SetHintWithPriority(SDL_HINT_TOUCH_MOUSE_EVENTS, "0", SDL_HINT_OVERRIDE);
     SDL_SetHintWithPriority(SDL_HINT_MOUSE_TOUCH_EVENTS, "0", SDL_HINT_OVERRIDE);
     ss2t_init(&touch);
-    touch.save_settings = save_settings; touch.haptic = haptic;
+    touch.save_settings = save_settings; touch.haptic = haptic; touch.keyboard = keyboard;
     debug = getenv("SS2PORT_TOUCH_DEBUG") != NULL;
     initialized = 1;
 }
@@ -65,9 +87,11 @@ static void late_init(void) {                /* once SDL runs: the event type an
     if (dir && snprintf(settings_path, sizeof settings_path, "%s/touch-settings.cfg", dir) < (int)sizeof settings_path) {
         TouchLoadResult r = touch_settings_load(&touch.t.settings, settings_path);
         future_settings = r == TOUCH_LOAD_FUTURE;
+        int upgraded = (r == TOUCH_LOAD_OK || r == TOUCH_LOAD_MIGRATED) && touch_settings_upgrade_layout(&touch.t.settings);
         touch.t.saved_settings = touch.t.settings; touch_layout_refresh(&touch.t);
-        tlog("touch controls on; settings %s (%s)", settings_path, r == TOUCH_LOAD_DEFAULTS ? "defaults" : r == TOUCH_LOAD_OK ? "loaded" :
-             r == TOUCH_LOAD_MIGRATED ? "migrated" : r == TOUCH_LOAD_FUTURE ? "newer version: defaults, not saved" : "invalid: defaults");
+        tlog("touch controls on; settings %s (%s)%s", settings_path, r == TOUCH_LOAD_DEFAULTS ? "defaults" : r == TOUCH_LOAD_OK ? "loaded" :
+             r == TOUCH_LOAD_MIGRATED ? "migrated" : r == TOUCH_LOAD_FUTURE ? "newer version: defaults, not saved" : "invalid: defaults",
+             upgraded ? "; layout never moved: current default positions (file unchanged)" : "");
     } else settings_path[0] = 0;
 }
 
@@ -117,6 +141,7 @@ void android_touch_poll(void (*sink)(const PlatEvent *, void *), void *user, int
     if (!initialized) return;
     late_init();
     surf_w = dw; surf_h = dh;
+    keyboard_poll();
     TouchMode before = touch.t.mode;
     ss2t_frame(&touch, now_ns(), (float)dw, (float)dh, focused && !background && !unfocused, (float)bx, (float)by, (float)bw, (float)bh,
                game_w, game_h, user32_cursor_recentred_ns ? user32_cursor_recentred_ns() : 0);

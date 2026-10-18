@@ -241,6 +241,7 @@ static void on_event(const PlatEvent *e, void *user) {
  *   <ms> char C                              only the character C (WM_CHAR); "char space" for a space
  *   <ms> move DX DY | btn N down|up | click N    relative mouse motion, mouse button (1 left, 2 right, 3 middle)
  *   <ms> place X Y                           put the game's cursor at pixel X, Y of the drawing surface (touch placement)
+ *   <ms> shot                                frame capture (SS2PORT_SHOT_DIR, backends/sdl2/plat_sdl2.c), taken within 15 frames
  *   <ms> quit                                ends the process with exit code 0
  * '#' starts a comment. Each command is logged. */
 typedef struct { uint32_t ms; char cmd[8]; char arg[64]; int a, b; } ScriptLine;
@@ -302,6 +303,10 @@ static void script_run(const ScriptLine *s) {
         int click = !strcmp(s->cmd, "click");
         if (click || strstr(s->arg, "down")) { e.down = 1; on_event(&e, NULL); }
         if (click || strstr(s->arg, "up")) { e.down = 0; on_event(&e, NULL); }
+    } else if (!strcmp(s->cmd, "shot")) {
+        const char *d = getenv("SS2PORT_SHOT_DIR"); char p[1100]; FILE *f;
+        if (!d) port_warn("input script: shot needs SS2PORT_SHOT_DIR");
+        else { snprintf(p, sizeof p, "%s/shot.req", d); if ((f = fopen(p, "wb"))) fclose(f); }
     } else if (!strcmp(s->cmd, "quit")) port_exit(0);
     else port_warn("input script: unknown command %s", s->cmd);
 }

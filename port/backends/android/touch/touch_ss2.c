@@ -71,6 +71,7 @@ static void action(Ss2Touch *s, TouchAction a, bool down) {
         if (s->t.effective_mode == TOUCH_CURSOR) { button(s, 1, 1, s->now); button(s, 1, 0, s->now); }
         else tap_key(s, SS2_DIK_B);
         break;
+    case TOUCH_TARGET_ID: if (down && s->keyboard) s->keyboard(s); break;   /* KBD: the Android keyboard (text arrives as keys) */
     default: break;                                                       /* hidden in this layout */
     }
 }
@@ -131,6 +132,11 @@ void ss2t_ui_rect(Ss2Touch *s, int x, int y, int w, int h) {
 }
 
 void ss2t_finger(Ss2Touch *s, TouchPhase phase, int64_t device, int64_t finger, float x, float y, uint32_t ms) {
+    /* While typing in look mode (the console), a new finger must not walk, turn, fire or use: only II, KBD, MODE and SET
+       take it. Cursor mode (menus, the save screen) is unchanged, so the game's own buttons can still be tapped. */
+    if (s->typing && phase == TOUCH_DOWN && s->t.panel == TOUCH_UI_CLOSED && s->t.effective_mode == TOUCH_GAMEPLAY &&
+        !touch_control_hit(&s->t, TC_PAUSE, x, y) && !touch_control_hit(&s->t, TC_TARGET, x, y) &&
+        !touch_control_hit(&s->t, TC_MODE, x, y) && !touch_control_hit(&s->t, TC_SETTINGS, x, y)) return;
     touch_finger(&s->t, phase, device, finger, x, y, ms);
 }
 

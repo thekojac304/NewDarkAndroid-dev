@@ -12,20 +12,35 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* NewDarkAndroid: System Shock 2 labels; the keys (the settings file format) and the System Shock positions are kept.
-   CONS is RELOAD, AMMO cycles ammunition (or right-clicks in cursor mode, so it moved into the left letterbox bar, off
-   the game's interface), and the actions System Shock 2 has no equivalent for (explosive, sprint, target) have radius 0,
-   which hides them. */
+/* NewDarkAndroid: System Shock 2 labels; the keys (the settings file format) are kept.
+   CONS is RELOAD, AMMO cycles ammunition (or right-clicks in cursor mode), "target" is KBD (the Android keyboard, for
+   save names and the console), and the actions System Shock 2 has no equivalent for (explosive, sprint) have radius 0,
+   which hides them. Phase 2B-2: SET, AMMO and KBD sit in the letterbox bars and MODE right of the game's EQUIP panel,
+   off the 640x480 interface at 16:9 (Phase 2B-1 found SET over the PDA, AMMO/USE beside its arrow, MODE over EQUIP). */
 const TouchDefault touch_defaults[TC_COUNT] = {
     {"fire", "FIRE", .86f,.73f,.095f}, {"use", "USE", .69f,.85f,.065f},
     {"jump", "JUMP", .95f,.52f,.05f}, {"crouch", "CROUCH", .79f,.54f,.05f},
     {"previous", "<", .55f,.78f,.045f}, {"next", ">", .55f,.90f,.045f},
     {"consumable", "RELOAD", .52f,.10f,.045f}, {"explosive", "", .63f,.10f,0},
-    {"sprint", "", .22f,.54f,0}, {"target", "", .73f,.10f,0},
-    {"pause", "II", .05f,.06f,.045f}, {"mode", "MODE", .88f,.0825f,0},
-    {"settings", "SET", .16f,.06f,.035f}, {"stick", "MOVE", .20f,.77f,.11f},
-    {"ammo", "AMMO", .09f,.30f,.045f}
+    {"sprint", "", .22f,.54f,0}, {"target", "KBD", .955f,.25f,.04f},
+    {"pause", "II", .05f,.06f,.045f}, {"mode", "MODE", .905f,.0825f,0},
+    {"settings", "SET", .045f,.19f,.035f}, {"stick", "MOVE", .20f,.77f,.11f},
+    {"ammo", "AMMO", .045f,.33f,.045f}
 };
+/* The Phase 2A/2B-1 default positions. A stored layout that still has every control exactly there was never moved. */
+static const float previous_defaults[TC_COUNT][2] = {
+    {.86f,.73f}, {.69f,.85f}, {.95f,.52f}, {.79f,.54f}, {.55f,.78f}, {.55f,.90f}, {.52f,.10f}, {.63f,.10f},
+    {.22f,.54f}, {.73f,.10f}, {.05f,.06f}, {.88f,.0825f}, {.16f,.06f}, {.20f,.77f}, {.09f,.30f}
+};
+bool touch_settings_upgrade_layout(TouchSettings *s) {
+    for (int i=0; i<TC_COUNT; ++i) {
+        const TouchPlacement *p=&s->control[i];
+        if (fabsf(p->x-previous_defaults[i][0])>1e-5f || fabsf(p->y-previous_defaults[i][1])>1e-5f ||
+            (i!=TC_STICK && fabsf(p->scale-1)>1e-5f)) return false;    /* moved or resized: the player's layout */
+    }
+    for (int i=0; i<TC_COUNT; ++i) { s->control[i].x=touch_defaults[i].x; s->control[i].y=touch_defaults[i].y; }
+    return true;
+}
 static float bounded(float v, float low, float high, float fallback) {
     return !isfinite(v) ? fallback : fmaxf(low, fminf(high, v));
 }

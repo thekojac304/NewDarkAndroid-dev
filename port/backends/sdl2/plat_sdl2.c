@@ -68,10 +68,37 @@ static void prof_frame(uint64_t t_before, uint64_t t_after) {
                   au_calls, au_gap_us / 1000.0, au_peak, au_silent);
     t0 = t_after; n = 0; swap_ns = 0; au_calls = au_silent = au_peak = au_gap_us = 0;
 }
+/* SS2PORT_SHOT_DIR=<folder>: frame capture for tests and bug reports, of the picture as shown (bars and touch controls
+   included). Whenever <folder>/shot.req exists (looked for every 15 frames), the frame is written to
+   <folder>/shot_NNN.bmp at half size and shot.req is removed. It reads the GL back buffer, so it works whatever covers
+   the window (another app's overlay, a locked desktop). */
+static void shot_maybe(void) {
+    static const char *dir; static int init, n; static unsigned frame;
+    if (!init) { init = 1; dir = getenv("SS2PORT_SHOT_DIR"); }
+    if (!dir || ++frame % 15) return;
+    char path[1200]; snprintf(path, sizeof path, "%s/shot.req", dir);
+    FILE *f = fopen(path, "rb"); if (!f) return; fclose(f); remove(path);
+    typedef void (*ReadPixels)(int, int, int, int, unsigned, unsigned, void *);
+    ReadPixels rp = (ReadPixels)SDL_GL_GetProcAddress("glReadPixels");
+    int w, h; SDL_GL_GetDrawableSize(win, &w, &h);
+    uint8_t *px = rp && w > 1 && h > 1 ? malloc((size_t)w * h * 4) : NULL; if (!px) return;
+    rp(0, 0, w, h, 0x1908 /* GL_RGBA */, 0x1401 /* GL_UNSIGNED_BYTE */, px);
+    int ow = w / 2, oh = h / 2, stride = (ow * 3 + 3) & ~3; uint32_t size = 54u + (uint32_t)stride * oh;
+    uint8_t hd[54] = { 'B', 'M' }; memcpy(hd + 2, &size, 4); hd[10] = 54; hd[14] = 40; memcpy(hd + 18, &ow, 4); memcpy(hd + 22, &oh, 4);
+    hd[26] = 1; hd[28] = 24;
+    snprintf(path, sizeof path, "%s/shot_%03d.bmp", dir, n++);
+    if ((f = fopen(path, "wb"))) {             /* GL rows start at the bottom, as BMP rows do */
+        uint8_t *row = calloc(1, (size_t)stride); fwrite(hd, 1, 54, f);
+        for (int y = 0; y < oh; y++) { const uint8_t *s = px + (size_t)(2 * y) * w * 4; for (int x = 0; x < ow; x++) { row[3 * x] = s[8 * x + 2]; row[3 * x + 1] = s[8 * x + 1]; row[3 * x + 2] = s[8 * x]; } fwrite(row, 1, (size_t)stride, f); }
+        free(row); fclose(f); port_log_plat("frame capture: %s (%dx%d)", path, ow, oh);
+    }
+    free(px);
+}
 void gl_swap(void) {
 #ifdef __ANDROID__
     if (android_touch_draw) { int dw, dh; SDL_GL_GetDrawableSize(win, &dw, &dh); android_touch_draw(dw, dh); }   /* over the picture and bars */
 #endif
+    shot_maybe();
     uint64_t t = plat_time_ns(); SDL_GL_SwapWindow(win); prof_frame(t, plat_time_ns());
 }
 int gl_thread_spawn(void (*fn)(void *), void *arg) { return plat_thread_start(fn, arg, "render"); }

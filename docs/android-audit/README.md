@@ -35,6 +35,7 @@ especially SCP.
 | [PHASE2A_RESULTS.md](PHASE2A_RESULTS.md) | Phase 2A: the Shockolate touch controls (7502370) in SS2 on Android: stick, look, fire, use, jump, crouch, weapons, menus, cursor mode with exact placement, inventory and PDA by touch; multitouch tested on device |
 | [PHASE2A_FRAME_LIMIT_FIX.md](PHASE2A_FRAME_LIMIT_FIX.md) | Phase 2A fix: play from the launcher button ended after ~40 s at the launcher's default 3600-frame limit (a clean exit, not a crash). The windowed game now has no default limit; tests pass `--ei frames N`. |
 | [PHASE2B_UI_SCALING.md](PHASE2B_UI_SCALING.md) | Phase 2B-1: the HUD, inventory, PDA and text up to 1.5x larger at 1280x720 (2.25 screen px per interface px) with NewDark's own `d3d_disp_scaled_2d_overlay`, chosen in the launcher; touch placement fixed for 4:3 menus at wide resolutions |
+| [PHASE2B2_RESULTS.md](PHASE2B2_RESULTS.md) | Phase 2B-2 (Milestone A, PARTIAL): KBD button for Android's keyboard, default buttons moved off the 640x480 interface into the bars, layout upgrade only for never-moved layouts; device checks by frame capture (a third-party overlay blocked touch input) |
 
 ## Overall feasibility
 
