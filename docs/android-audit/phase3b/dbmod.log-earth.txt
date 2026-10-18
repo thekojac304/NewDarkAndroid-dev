@@ -1,0 +1,12 @@
+
+INFO: found file 'gamesys.dml' in path 'patch_ext\', loading... (40200)
+INFO: patch queued
+
+INFO: found file 'gamesys.dml' in path 'patch_ext\', loading... (40200)
+INFO: patch done
+
+INFO: found file 'earth.mis.dml' in path '.\misdml\', loading... (31900)
+INFO: patch done
+
+INFO: found file 'earth.mis.dml' in path '.\misdml\', loading... (31900)
+INFO: patch rejected by fingerprint identification

@@ -1,0 +1,12 @@
+: Loaded script module "allobjs.osm" []
+: Loaded script module "nvscript.osm" []
+: Loaded script module "squirrel.osm" []
+: PLAYER POS: -27 -28.2592 4.30482
+: PLAYER POS: -24.6414 36.793 52.7482
+: PLAYER POS: -24.6414 50.8084 52.502
+: PLAYER POS: -24.6414 64.7913 52.502
+: PLAYER POS: -24.6414 78.6762 54.02
+: PLAYER POS: -24.6414 92.5251 59.02
+: PLAYER POS: -24.6414 93.7962 59.02
+: PLAYER POS: -24.6414 93.7962 59.02
+: PLAYER POS: -24.6414 93.7962 59.02

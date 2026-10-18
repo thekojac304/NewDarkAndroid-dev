@@ -1,0 +1,35 @@
+8000 tap esc
+10000 tap esc
+12000 tap esc
+14550 place 989 75
+14750 btn 1 down
+14850 btn 1 up
+17750 place 752 444
+17950 btn 1 down
+18050 btn 1 up
+18400 shot
+20900 shot
+23400 shot
+25900 shot
+28400 tap esc
+28900 shot
+32900 shot
+36900 shot
+40900 shot
+44900 shot
+48900 shot
+52900 shot
+56900 shot
+60900 shot
+64900 shot
+68900 shot
+72900 shot
+76900 shot
+80900 shot
+84900 shot
+88900 shot
+92900 shot
+96900 shot
+100900 shot
+104900 shot
+108900 quit

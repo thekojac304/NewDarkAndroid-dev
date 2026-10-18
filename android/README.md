@@ -28,6 +28,7 @@ Requirements:
 git clone -b release-2.32.10 https://github.com/libsdl-org/SDL build/deps/SDL2
 python android/build_native.py          # about 1.5 min: SDL2, conformance.exe, two lifts, two libraries
 python android/build_native.py --no-rebuild-guest --game "/path/to/SS2.exe"   # + the game: ~8 min the first time (lifts), then seconds
+python android/build_native.py --no-rebuild-guest --game "/path/to/SS2.exe" --nvscript "/path/to/DMM/SCP_beta8/NVScript.osm"   # + NVScript, for SCP
 cd android && ./gradlew assembleDebug   # app/build/outputs/apk/debug/app-debug.apk
 ```
 
@@ -55,6 +56,9 @@ adb shell am start -n local.newdarkandroid.ss2/.LauncherActivity --es autorun ga
 #   --es env SS2PORT_PROFILE=1,SS2PORT_INPUT_DEBUG=1   extra settings for the game process (comma or space separated)
 #   --es portargs "--trace-only GetKeyState"           extra port arguments, before the executable
 #   --es uisize 640x480|720x540|800x600|game          Interface size (kept for later starts, like the launcher button)
+#   --es game NAME                                    the game folder games/NAME (kept), with its own profile profiles/NAME
+#   --es env SS2PORT_INPUT_SCRIPT=FILE,SS2PORT_SHOT_DIR=DIR   scripted input and frame captures (tests; work under overlays)
+#   --es env SS2PORT_MODSTATS=1                       log how often the engine calls into each recompiled module
 ```
 
 **Interface size** (launcher button, Phase 2B-1): the size of the game's HUD, inventory, PDA and in-game text. It sets

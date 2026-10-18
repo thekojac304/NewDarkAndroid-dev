@@ -37,6 +37,7 @@ especially SCP.
 | [PHASE2B_UI_SCALING.md](PHASE2B_UI_SCALING.md) | Phase 2B-1: the HUD, inventory, PDA and text up to 1.5x larger at 1280x720 (2.25 screen px per interface px) with NewDark's own `d3d_disp_scaled_2d_overlay`, chosen in the launcher; touch placement fixed for 4:3 menus at wide resolutions |
 | [PHASE2B2_RESULTS.md](PHASE2B2_RESULTS.md) | Phase 2B-2 (Milestone A, PARTIAL): KBD button for Android's keyboard, default buttons moved off the 640x480 interface into the bars, layout upgrade only for never-moved layouts; device checks by frame capture (a third-party overlay blocked touch input) |
 | [PHASE3A_NVSCRIPT_RESULTS.md](PHASE3A_NVSCRIPT_RESULTS.md) | Phase 3A (Milestone B, PASS): SCP Beta 8's NVScript.osm (MSVC 2017) recompiled: SSE/SSE2 in the lifter (differentially tested against the CPU), static TLS and newer-CRT shims in the host; loads and runs on Android and Windows; SCP's module gate opens only with it |
+| [PHASE3B_SCP_RESULTS.md](PHASE3B_SCP_RESULTS.md) | Phase 3B (Milestone C, PARTIAL): SCP Beta 8 on the S26 Ultra from a DMM-style copy: missions, gamesys, assets, Squirrel and NVScript scripts, the module gate, both Earth grav shafts, SCP's UNN changes, quicksave/quickload; level transition and item use not reached |
 
 ## Overall feasibility
 

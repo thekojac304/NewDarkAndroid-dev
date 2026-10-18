@@ -1,0 +1,130 @@
+8000 tap esc
+10000 tap esc
+12000 tap esc
+14550 place 989 75
+14750 btn 1 down
+14850 btn 1 up
+17750 place 752 444
+17950 btn 1 down
+18050 btn 1 up
+26400 tap esc
+38900 down lshift
+38930 down semicolon
+38930 char :
+38970 up semicolon
+38990 up lshift
+39010 down b
+39010 char b
+39050 up b
+39090 down i
+39090 char i
+39130 up i
+39170 down n
+39170 char n
+39210 up n
+39250 down d
+39250 char d
+39290 up d
+39330 down space
+39330 char space
+39370 up space
+39410 down k
+39410 char k
+39450 up k
+39490 down space
+39490 char space
+39530 up space
+39570 down l
+39570 char l
+39610 up l
+39650 down o
+39650 char o
+39690 up o
+39730 down g
+39730 char g
+39770 up g
+39810 down lshift
+39840 down minus
+39840 char _
+39880 up minus
+39900 up lshift
+39920 down p
+39920 char p
+39960 up p
+40000 down l
+40000 char l
+40040 up l
+40080 down a
+40080 char a
+40120 up a
+40160 down y
+40160 char y
+40200 up y
+40240 down e
+40240 char e
+40280 up e
+40320 down r
+40320 char r
+40360 up r
+40400 down lshift
+40430 down minus
+40430 char _
+40470 up minus
+40490 up lshift
+40510 down p
+40510 char p
+40550 up p
+40590 down o
+40590 char o
+40630 up o
+40670 down s
+40670 char s
+40710 up s
+40850 tap enter
+41450 down k
+41490 up k
+41600 down w
+48600 up w
+48800 down k
+48840 up k
+48950 down s
+49850 up s
+50050 down k
+50090 up k
+50200 down d
+50550 up d
+50750 down k
+50790 up k
+50900 shot
+51300 down w
+52800 up w
+53000 down k
+53040 up k
+53150 shot
+53550 down k
+53590 up k
+54500 down k
+54540 up k
+55450 down k
+55490 up k
+55600 shot
+56800 down k
+56840 up k
+57750 down k
+57790 up k
+57900 shot
+59800 down k
+59840 up k
+59950 shot
+61850 down k
+61890 up k
+62000 shot
+62400 down w
+63900 up w
+64100 down k
+64140 up k
+64250 shot
+66650 down k
+66690 up k
+66800 shot
+67200 quit

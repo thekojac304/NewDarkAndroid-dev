@@ -51,7 +51,10 @@ public class LauncherActivity extends Activity {
         { "game-null", "ss2null", "game, headless (null backend)", "" },
         { "game", "ss2game", "game, SDL2 + OpenGL ES", "" },
     };
-    static final String GAME = "ss2";                       // games/<GAME>/SS2.exe, profiles/<GAME>/
+    // The game folder: games/<name>/SS2.exe, with its own write folder profiles/<name>/ (saves, configuration), so a modded
+    // installation (e.g. games/ss2scp, SCP) never shares saves with the vanilla one (games/ss2, the default). Chosen with
+    // the Game folder button or --es game NAME (kept).
+    static final String DEFAULT_GAME = "ss2";
     static boolean isGame(String m) { return m.startsWith("game"); }
     // Frame limit when none is given (0: none). The windowed game is played, so it runs until the player quits; only the
     // headless mode, which nobody can quit, stops by itself. Bounded windowed runs pass --ei frames N.
@@ -135,6 +138,16 @@ public class LauncherActivity extends Activity {
         addButton(col, "Run both", "all");
         addButton(col, "Game: headless, 600 frames", "game-null");
         addButton(col, "Game: SDL2 window (play, no frame limit)", "game");
+        Button folder = new Button(this);
+        folder.setAllCaps(false);
+        folder.setText(gameLabel());
+        folder.setOnClickListener(v -> {                                      // cycles through the folders that have SS2.exe
+            List<String> g = installedGames(); if (g.isEmpty()) return;
+            int i = g.indexOf(game());
+            state.edit().putString("game", g.get((i + 1) % g.size())).apply();
+            folder.setText(gameLabel());
+        });
+        col.addView(folder);
         Button size = new Button(this);
         size.setAllCaps(false);
         size.setText("Interface size: " + uiSize()[2]);
@@ -176,6 +189,16 @@ public class LauncherActivity extends Activity {
         return d;
     }
 
+    private String game() { return state.getString("game", DEFAULT_GAME); }
+    private String gameLabel() { return "Game folder: " + game() + (new File(new File(gamesDir(), game()), "SS2.exe").isFile() ? "" : " (no SS2.exe there)"); }
+    private List<String> installedGames() {
+        List<String> g = new ArrayList<>();
+        File[] d = gamesDir().listFiles();
+        if (d != null) for (File f : d) if (new File(f, "SS2.exe").isFile()) g.add(f.getName());
+        java.util.Collections.sort(g);
+        return g;
+    }
+
     private String versionName() {
         try { return getPackageManager().getPackageInfo(getPackageName(), 0).versionName; } catch (Exception e) { return "?"; }
     }
@@ -211,6 +234,8 @@ public class LauncherActivity extends Activity {
         state.edit().putInt("frames", intent.getIntExtra("frames", -1))                // -1: each game mode's default
             .putString("env", env != null ? env.trim() : "").putString("portargs", pa != null ? pa.trim() : "")
             .putBoolean("touch", intent.getBooleanExtra("touch", true)).apply();        // --ez touch false: no touch controls
+        String g = intent.getStringExtra("game");                                       // --es game NAME: games/NAME (kept)
+        if (g != null && g.matches("[A-Za-z0-9._-]+")) state.edit().putString("game", g).apply();
         String size = intent.getStringExtra("uisize");                                  // --es uisize 640x480|720x540|800x600|game (kept)
         if (size != null) for (String[] u : UI_SIZES) if (u[1].equals(size)) state.edit().putString("ui_size", u[1]).apply();
         startQueue(which);
@@ -236,7 +261,7 @@ public class LauncherActivity extends Activity {
         int comma = q.indexOf(',');
         String m = comma < 0 ? q : q.substring(0, comma), rest = comma < 0 ? "" : q.substring(comma + 1);
         String[] x = mode(m);
-        File dir = runDir(m), exe = new File(new File(gamesDir(), GAME), "SS2.exe"), profile = new File(getFilesDir(), "profiles/" + GAME);
+        File dir = runDir(m), exe = new File(new File(gamesDir(), game()), "SS2.exe"), profile = new File(getFilesDir(), "profiles/" + game());
         try {
             Files.deleteTree(dir);
             if (!dir.mkdirs()) throw new IOException("cannot create " + dir);
@@ -253,7 +278,7 @@ public class LauncherActivity extends Activity {
         state.edit().putString("queue", rest).putString("pending", m).putString("last", m).putLong("launched", System.currentTimeMillis()).apply();
         int frames = state.getInt("frames", -1);
         if (frames < 0) frames = defaultFrames(m);
-        Log.i(TAG, "starting " + m + ": lib" + x[1] + ".so in " + dir + (isGame(m) ? ", frame limit " + (frames > 0 ? frames : "none") : ""));
+        Log.i(TAG, "starting " + m + ": lib" + x[1] + ".so in " + dir + (isGame(m) ? ", game folder " + game() + ", frame limit " + (frames > 0 ? frames : "none") : ""));
         List<String> args = new ArrayList<>(Arrays.asList(dir.getAbsolutePath(), "--verbose"));
         if (isGame(m)) {
             args.addAll(Arrays.asList("--android-env", "SS2PORT_WRITE_DIR=" + profile.getAbsolutePath()));
