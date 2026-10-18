@@ -41,6 +41,8 @@ especially SCP.
 | [PHASE4_ANDROID_POLISH_RESULTS.md](PHASE4_ANDROID_POLISH_RESULTS.md) | Phase 4 (Milestone D, PARTIAL): Play button and game folders, folder import (not device-tested), lifecycle and soak tests, dev/play builds (play: 43.7 MB) |
 | [OVERNIGHT_INTEGRATION_REPORT.md](OVERNIGHT_INTEGRATION_REPORT.md) | The overnight session (Phase 2B-2 to Phase 4): milestone labels, commits, APK hashes, tests, open items |
 | [GAME_IMPORT_FIX.md](GAME_IMPORT_FIX.md) | Import fix: `games/` belongs to the adb shell, so imports go to the app-owned `imported/`; scan-then-confirm import with saves into the new game's own profile, crash recovery, `SS2.exe` version check (the user's install is NewDark 2.47); validated on the S26 Ultra |
+| [LEGACY_SAVE_COMPATIBILITY.md](LEGACY_SAVE_COMPATIBILITY.md) | The user's 15 NewDark 2.47 / SCP Beta 4 saves under the port's SCP Beta 8 setup: they load and play in short tests, with SCP's "mid-game activation" warning, one reused archetype ID in Operations and two missing models |
+| [LEGACY_SCP4_FEASIBILITY.md](LEGACY_SCP4_FEASIBILITY.md) | Audit: running the original SCP Beta 4 mod set on the 2.48 port. Every save dependency resolves in the original set; the blocker is recompiling NVScript 1.2.4; recommends a side-by-side build and a PC-referenced validation |
 
 ## Overall feasibility
 

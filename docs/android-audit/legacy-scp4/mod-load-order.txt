@@ -1,0 +1,45 @@
+# Blue's Mod Manager 1.15 log (ss2bmm.log, created 2026-10-18 11:06) and the resulting cam_mod.ini / ss2.log lines
+Mods Setup Log - SS2 Blue Mod Manager 1.15
+Created: 18 October 2026, 11:06:02
+
+ss2.exe version: 2.47
+Mods folder path: E:\Launchbox\Games\PC Games\System Shock 2\DMM\
+
+ #  Name                            Status    Type              Warning
+--  ------------------------------  --------  ----------------  ----------------------
+ 1  SCP_beta4                       Active    Gamesys
+ 2  SS2_Rebirth_v05a                Active    Replacement, DML
+ 3  SHTUP-ND_beta1                  Active    Replacement
+ 4  thelovebat-SS2-altMusic         Active    Replacement
+ 5  Vurt_Env_map_for_SS2_water      Active    Replacement
+ 6  Vurt-Goo-(GrubPodVanilla-1.04)  Active    Replacement
+ 7  Vurt's SS2 Water v5.1           Active    Replacement
+ 8  Vurt's SS2 Flora Overhaul 1.0k  Active    Replacement, DML
+ 9  Vurt's Pool Water (Resource)    Active    Replacement
+10  Vurt's Hi-Res Space v1.1        Active    Replacement
+11  SS2_Vaxquis_VintageSongRemake   Active    Replacement
+12  ss2_quest_note_notifier         Active    DML
+13  SS2 Black Egg 1.02              Active    Replacement
+14  obj_fixes_v12                   Active    Replacement, DML
+15  Kolya-Crosshair-Hazard-Amber    Active    Replacement
+16  Tacticool_complete_v1.05        Active    Replacement
+17  AccFam_20                       Active    Replacement
+    NoGunDegrading                  Inactive  Unrecognized      Unrecognized mod type.
+
+mod_path .\DMM\SCP_beta4+.\DMM\SS2_Rebirth_v05a+.\DMM\SHTUP-ND_beta1+.\DMM\thelovebat-SS2-altMusic+.\DMM\Vurt_Env_map_for_SS2_water+.\DMM\Vurt-Goo-(GrubPodVanilla-1.04)+.\DMM\Vurt's SS2 Water v5.1+.\DMM\Vurt's SS2 Flora Overhaul 1.0k+.\DMM\Vurt's Pool Water (Resource)+.\DMM\Vurt's Hi-Res Space v1.1+.\DMM\SS2_Vaxquis_VintageSongRemake+.\DMM\ss2_quest_note_notifier+.\DMM\SS2 Black Egg 1.02+.\DMM\obj_fixes_v12+.\DMM\Kolya-Crosshair-Hazard-Amber+.\DMM\Tacticool_complete_v1.05+.\DMM\AccFam_20+.\patch_ext
+
+movie_path .\cutscenes+.\Data\cutscenes
+
+uber_mod_path osm+ubermod
+mod_path .\DMM\SCP_beta4+.\DMM\SS2_Rebirth_v05a+.\DMM\SHTUP-ND_beta1+.\DMM\thelovebat-SS2-altMusic+.\DMM\Vurt_Env_map_for_SS2_water+.\DMM\Vurt-Goo-(GrubPodVanilla-1.04)+.\DMM\Vurt's SS2 Water v5.1+.\DMM\Vurt's SS2 Flora Overhaul 1.0k+.\DMM\Vurt's Pool Water (Resource)+.\DMM\Vurt's Hi-Res Space v1.1+.\DMM\SS2_Vaxquis_VintageSongRemake+.\DMM\ss2_quest_note_notifier+.\DMM\SS2 Black Egg 1.02+.\DMM\obj_fixes_v12+.\DMM\Kolya-Crosshair-Hazard-Amber+.\DMM\Tacticool_complete_v1.05+.\DMM\AccFam_20+.\patch_ext
+
+: App Version: System Shock 2 Patch Final 2.47
+: resname_base .\+.\Data+.\Data\res
+: load_path .\+.\misdml+.\Data
+: script_module_path .\+.\Data
+: mod_path .\DMM\SCP_beta4+.\DMM\SS2_Rebirth_v05a+.\DMM\SHTUP-ND_beta1+.\DMM\thelovebat-SS2-altMusic+.\DMM\Vurt_Env_map_for_SS2_water+.\DMM\Vurt-Goo-(GrubPodVanilla-1.04)+.\DMM\Vurt's SS2 Water v5.1+.\DMM\Vurt's SS2 Flora Overhaul 1.0k+.\DMM\Vurt's Pool Water (Resource)+.\DMM\Vurt's Hi-Res Space v1.1+.\DMM\SS2_Vaxquis_VintageSongRemake+.\DMM\ss2_quest_note_notifier+.\DMM\SS2 Black Egg 1.02+.\DMM\obj_fixes_v12+.\DMM\Kolya-Crosshair-Hazard-Amber+.\DMM\Tacticool_complete_v1.05+.\DMM\AccFam_20+.\patch_ext
+: uber_mod_path osm+ubermod
+: Loaded script module "nvscript.osm" [FileVer=1.2.4.0 ; ProductVer=1.2.4.0 ; FileModDate=2017-Sep-12]
+: Loaded script module "allobjs.osm" [FileModDate=1999-Sep-09]
+: Loaded script module "squirrel.osm" [FileVer=1.0.1.0 ; ProductVer=1.0.1.0 ; FileModDate=2018-Apr-06]
+: OSM: SQUIRREL> Quest Note Notifier initialized

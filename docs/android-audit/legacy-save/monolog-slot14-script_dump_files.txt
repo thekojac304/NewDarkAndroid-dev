@@ -1,0 +1,4 @@
+Script modules in mission:
+'nvscript'
+'allobjs'
+'squirrel'

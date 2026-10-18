@@ -1,0 +1,115 @@
+# Original installation (phone: Download/System Shock 2; PC: E:\Launchbox\Games\PC Games\System Shock 2; identical, 6,624 files)
+# Critical files only. sha256  path
+a7b1c52262165ee880c31a2297a8dbd237304501e251c2cffc57b3a9dea66255  ./DMM/Kolya-Crosshair-Hazard-Amber/mod.ini
+f5343f584d9472c277e12ab4b600240d8d55dda7f85f8e77d5721f509d0cfad1  ./DMM/NoGunDegrading/mod.ini
+ccc551d7e7e10f02b21385bd3efb191c6b38048b3e8b5a2d6fec855350516483  ./DMM/SCP_beta4/HYDRO2.DIF
+abed4ee229dda567553b7d805f219008b6390c2d2da37459629eb28ac9ee6a9a  ./DMM/SCP_beta4/NVScript.osm
+ccc551d7e7e10f02b21385bd3efb191c6b38048b3e8b5a2d6fec855350516483  ./DMM/SCP_beta4/SHODAN.DIF
+a420920196a769a4ce894045c9941b1dce5332f3ba96b390933d109c96ec9ff8  ./DMM/SCP_beta4/command1.mis
+1e2954f322be4129e6683a1c5177d0261d2d0c6c500e2d768803b210660f24bc  ./DMM/SCP_beta4/command2.mis
+ab68b5e41d41f43487ce4ccd96f5f60f497632c8f3616517d48eba8946301974  ./DMM/SCP_beta4/earth.mis
+e0b82acedd1b9853191be0970da7e2d1152a20b8a13ef50b1685b1785ea7dc23  ./DMM/SCP_beta4/eng1.mis
+d536767b18c32ad676484d115f33fcf7536acaccfb0be131e308edcb9628c72d  ./DMM/SCP_beta4/eng2.mis
+46adff707829102db40ca18a597b2f87c27012f2d614ff27d017b0767a2a5846  ./DMM/SCP_beta4/hydro1.mis
+b5fe080934581bf2105523609bfc1a1862526854ad4daf3ea61501b0f6446b9d  ./DMM/SCP_beta4/hydro2.mis
+6d27c7a4904dd1f2b96932713f808645cbd2d4fd5de84247e042efd92f5fb9b9  ./DMM/SCP_beta4/hydro3.mis
+a3c41a51c5dd5fac1834d9c79d19d21fd443ffe6d5ca77001103f91bb5a027fd  ./DMM/SCP_beta4/many.mis
+57b3cdb4a3b283ee151148cbd98b2c4207e4ec8b6c9f3ee30178570dbdfee82d  ./DMM/SCP_beta4/medsci1.mis
+c6b1488a4e84cfc0c53b12eea8ea847a0ac8dac9c4ac5d1d3cdaefcb6d783ac6  ./DMM/SCP_beta4/medsci2.mis
+f177f5c58e23a3c3d75f2e07c447770832ee25ce5c1f27428cb5f4625e268142  ./DMM/SCP_beta4/ops1.mis
+99f7ef6521b8d7178d23a2c4c7bb0358c61ca5eb01e2b990db861fe45235c080  ./DMM/SCP_beta4/ops2.mis
+fd93639da78831bd1251ab23d106b421809547fdf225c755033d514ad25e51e0  ./DMM/SCP_beta4/ops3.mis
+4b693b14cc39a01715347624597c06bfb040a90cf19e5650c85aac895158a8ec  ./DMM/SCP_beta4/ops4.mis
+9f0cbe5ece726f0314f40230dc6563de202b5c4fb7729e6c1dfef2e3b0db9263  ./DMM/SCP_beta4/rec1.mis
+3dbed2873a8435ff1d672d395e940905bc92304ae5a51c69adf84cc1a093416f  ./DMM/SCP_beta4/rec2.mis
+38319672efd7af203361a1077d5efd7682071949054a4064d78f3e558323cdc6  ./DMM/SCP_beta4/rec3.mis
+48e1ed49363283539e276703e5bb1284a9b9c20b97bb5ea68077396c2027a370  ./DMM/SCP_beta4/rick1.mis
+f4e1f928ac8fd185884f351501a7ecb24afc1b18e5870cef337e99e0bdc3509a  ./DMM/SCP_beta4/rick2.mis
+693135701313146b0f5c73ad81e1356b1e22b33c3d8a261c432beb2349f65e27  ./DMM/SCP_beta4/rick3.mis
+430b17930f7dd1e8b3633de1e896e5156141d2e89c50f644842bc421af2ffdc3  ./DMM/SCP_beta4/shockscp.gam
+d05fb262d18040c0f012170b90b9f4390e467516aacf29846de724036722ad69  ./DMM/SCP_beta4/shodan.mis
+a8e6cce782af1abb66831126d4984c655cb08563aa775eb069ea7d8a1f1b7391  ./DMM/SCP_beta4/sq_scripts/scpScript.nut
+bb6bcbc3ba659a425b677bd412643cdcffc7e2a20bb104987ce7d62d8166e14b  ./DMM/SCP_beta4/station.mis
+255f4230bb72227615d63955d1be5bf30cc8c26b6d86f442436ee3a203759de2  ./DMM/SS2_Rebirth_v05a/earth.mis.dml
+6a8fd0b8b20d29e9b3a8fac482c9329d7fd54addb7fe7772256c6dceb18cde3a  ./DMM/SS2_Rebirth_v05a/eng1.mis.dml
+2c5d223376c0add6ecd69d65b325feaa53b3175405919ebf858d19c7f40da928  ./DMM/SS2_Rebirth_v05a/eng2.mis.dml
+e25cce4fbeda60c6e7b405deadf70a47913bebcc3fa9ddba9a424b681206cbf1  ./DMM/SS2_Rebirth_v05a/gamesys.dml
+73936c44ffa6f3fd6338ddb5e8043299f08ae8babab2d640daf9b7cb6c0ebe8f  ./DMM/SS2_Rebirth_v05a/hydro1.mis.dml
+245bfeba082d90eebc3d1d934dbe2e3a4710fb611394bfc818d86dc10b728001  ./DMM/SS2_Rebirth_v05a/ops1.mis.dml
+7b0050d0419c85dcae61158153a3c08fa9952e31dae882e78618453347c551c2  ./DMM/Vurt's SS2 Flora Overhaul 1.0k/earth.mis.dml
+a84ed86abdbe6307a052c0155ecbd497e09b7586339b79373b4c8114d3159d8e  ./DMM/Vurt's SS2 Flora Overhaul 1.0k/eng1.mis.dml
+2b862e30cd4c3242c46ec6c91949eafdeded70df372758292da128ea95dca27c  ./DMM/Vurt's SS2 Flora Overhaul 1.0k/gamesys.dml
+65a77c1766397b09c3e74659286c740d7bcb64dae0af7497a3321454307f689b  ./DMM/Vurt's SS2 Flora Overhaul 1.0k/hydro1.mis.dml
+6e6abbf3585728be37ced9871594482663b66a76ed4aa1b769b0b4f494e766a8  ./DMM/Vurt's SS2 Flora Overhaul 1.0k/hydro2.mis.dml
+4147616cb353f508c543623268957faeb70909ff529da84658c2abc8d3524f18  ./DMM/Vurt's SS2 Flora Overhaul 1.0k/medsci1.mis.dml
+0a7e52feb52a69aa64039a9b12efd7af9492785e80c3fc8dc4069397d2992e37  ./DMM/Vurt's SS2 Flora Overhaul 1.0k/medsci2.mis.dml
+4343f75b142ca90a51de910563b62bd892c5c254d7f0f8603ffb7f79df615ab4  ./DMM/Vurt's SS2 Flora Overhaul 1.0k/ops2.mis.dml
+3c3598f1a974c3d77e8f6925ba2c9bd0a281291d7bcb71653f9bc7163b96b117  ./DMM/Vurt's SS2 Flora Overhaul 1.0k/rec2.mis.dml
+211252957165a8262340828d1887e02eb9cafecacfb4a2c68fee6c2a9d2ee6a2  ./DMM/Vurt's SS2 Flora Overhaul 1.0k/rec3.mis.dml
+2af73336c867281204fad3dc38afdfb8ef449890dc5162cf4b248b19d0b71c96  ./DMM/obj_fixes_v12/gamesys.dml
+fb472c46d1c66faeee16cb32b2f13c4a1171a54519333ce654e8b717a5797a1d  ./DMM/ss2_quest_note_notifier/gamesys.dml
+5ec29d53c3bad505087e70b21601886e50df085efd1722cd1df1e52bfb84ccd2  ./DMM/ss2_quest_note_notifier/sq_scripts/questnot.nut
+096c3a1e25f9751e71cf3e05c834866ad61ebd9fbced8cf3917a4a6e3466a645  ./Data/allobjs.osm
+0cd85234c5382b7cf80d00ef621bb46ebf445bc471943b11d3b95c0c6fbef210  ./Data/res/bitmap.crf
+4446c3433ecb75664b7fd168b11359f58b3a004582c9d2298a917b976b0e8230  ./Data/res/book.crf
+01489b9b24ac31adfbcbfda36f703dda81984a8ce313a262f26d798469fb0ed8  ./Data/res/editor.crf
+2597cac081ef6e15caaf08aef8dcf660f80b8a4806b90c4e30bfb9119be0d2a1  ./Data/res/fam.crf
+2a79275a481a56af8a278c83f3285d9449346e859e9b8138f7e25d3ae407b15e  ./Data/res/fonts.crf
+04f52d202d4d177a450daca9aebc35559f5d322c39caf2f01772a983f098a4d0  ./Data/res/iface.crf
+97da831067c0a4efaea015898fa0b374c8ed0e1a6cf9f561890dde801cbe72ae  ./Data/res/intrface.crf
+4145d0c38cfc97b98861d22be136a1e771e582e39fa270de032ebd94a2a15165  ./Data/res/mesh.crf
+2a0bcb7a9b7ca7f695152e32cd427573ccd7a1ad420eb9f29cf0c24db7c78578  ./Data/res/motions.crf
+dd5b49e2709bbc9597d7f2dfc811f25678f595665a002c21f1cd59acdfbd6c37  ./Data/res/obj.crf
+a4241b56b54d1fd88ca2cd9d6e853cab88ba7c7824dab10499ee397267bac937  ./Data/res/objicon.crf
+fadff26011317160025987670c955c7f8d7ac41e6d7442fa59aa68f37660a8fd  ./Data/res/pal.crf
+1f133e7f8521144086a0ee3daaa72f68621acdb011471d7ebeccee9d4a7f21af  ./Data/res/snd.crf
+6ad8f9be761f155a7573416eb90ece5ffa1b765f60c97d7adac21d6b0e593064  ./Data/res/snd2.crf
+cd5a4b3e5f11fe578e6eadeff6031315ed8db210df55089310aadcddaa834486  ./Data/res/song.crf
+317a762077d25717956937583de06728cf8e9a2b0d2189e18e2bcdc186956625  ./Data/res/strings.crf
+e51f957863814a59290cb0473f7922cdbce3b48863439608f36dce4d38218652  ./Data/shock2.gam
+6393f0fd0077b4c96cd86426a99803e5bd23f24b6f1ab98566a509f3ee9c0b42  ./Default.bnd
+85ca78ba83aa236f12b8c574ae51ff630df7c9fb0b2c682c70a4e29093e49c3e  ./OpenAL32.dll
+6b924139dbb8ded1ab807d4c45bf41b93e7e27c93576250fb4b8405e83baa92f  ./SHOCK.BND
+ae018d27f2b4a9a699cdc3cbf76d38d3458a50a3d4710cf617183e90d74f2d72  ./User.cfg
+e7f7313c104d51ab4eb5720e2ef971c770663a8d1b0bb85c9db29bc25c6b2eec  ./_am.cfg
+e7f7313c104d51ab4eb5720e2ef971c770663a8d1b0bb85c9db29bc25c6b2eec  ./cam.cfg
+21cb77d8390cc25cfd10ebe038ab57fc9cbe932237148ff8d8f3a4775b95b1fc  ./cam_ext.cfg
+a2e8adf5aac28f49c0aed79385e3924819675371a56d33c8a5f6cf929d80f937  ./cam_mod.ini
+91f7f691d56e9b12cd458df84af0e26366f3f7112d01d996afce30ea387d8147  ./ffmpeg.dll
+539d203f4b279dea2d3f27f5bf7b6fe0d79c07c193ee20a106ef6dc10fae37e4  ./fmsel.dll
+951ac4bbc1b3db9a9bd93a95fd974cef98a30f3bc7b350b11873ff34c5fb8e64  ./install.cfg
+223d1f40a44cceaefb07b309b45996fb625cf6d75c61fd7b0213e4af9812174a  ./lg.ini
+64d55311637315ffcff83eb193a05470a9fb8ded2a2704efcb649d751d8b4eec  ./lgvid.dll
+87c18e14758f21e46aa2eaedd6aa5aeef91349572d490e3c4f685cdb7f0f54af  ./misdml/command1.mis.dml
+d29f8a88521a8aaf8d9e0b38cc58f617893b4b9bcf91825f8d0683141733e66b  ./misdml/command2.mis.dml
+2821c55be693b82bf821a45ed91feaae343c289c1215c76e8cc92afe3c07cc3b  ./misdml/earth.mis.dml
+1440617c0d0ae406c6649b34e13a63d0a241c2cc6907634b274846d8a5a330d2  ./misdml/eng1.mis.dml
+eabd080329beaffc4399db2bedc267f390c44cf38949cea3f0e78821a73953a3  ./misdml/eng2.mis.dml
+9a8d4620d0be8971c3807ecc2e6ae47e3573a74ac567d8ebd9936ddef86c229f  ./misdml/hydro1.mis.dml
+1b75d19b7ea3c30bbf17dcc93290850d203437ce393acd52aa2564a71774bc8e  ./misdml/hydro2.mis.dml
+3c4b996c1162261c385383442a3080e020c35710047448263f986de732291eb4  ./misdml/hydro3.mis.dml
+587d7592998dd65466da539f4a0cda64a55d03b46b0972d97cab883d28f614fd  ./misdml/many.mis.dml
+dc9b9d3ef408e740da85d2e14d18176a315f26c0842c8afd3f847b33f1502729  ./misdml/medsci1.mis.dml
+3705fc1cbdcc98886bd0cfd5f412ebf7cea526d9c3a3ab9aeea6c7f8000a9414  ./misdml/medsci2.mis.dml
+57f0b51f7547e35b842f8be589ce4f47cbbbace38d4094f4b645b009dcff8e76  ./misdml/ops1.mis.dml
+c948526da5bfae243aacdb53d3f1d82f26f12f37a1e08433e0967bd523179645  ./misdml/ops2.mis.dml
+7a55ffb9ce922fc535b5b73eb21a78c6ad0739d864a1c6c42b50d2df99779fdf  ./misdml/ops3.mis.dml
+ded95c78b09f7591e9d5146654b98f0aaf8f184142c46d28d6f055f9a3f57525  ./misdml/ops4.mis.dml
+ee1d97d4a6aaa82cf136a2ddb49e9c826835966500de2fae0791a2c46bf13eec  ./misdml/rec1.mis.dml
+f32bdf61e9154259cb205f745aa2939abde6e657af59406bc6baf668dafe5fa9  ./misdml/rec2.mis.dml
+f462094d16cb18762fc834b85fb6aaa529b1cef05bf6d90ec43542407a3d352a  ./misdml/rec3.mis.dml
+acb62fb3debe9904ebbe7f530f72fe1508800c93462fe2ae6114e10723059e54  ./misdml/rick1.mis.dml
+3cdc87a8639117af4d281a38f1958f646e7b6e71a2ff48324beeff175a6b10c7  ./misdml/rick2.mis.dml
+fd4f53244d87f7feb3ba84591c9938b26bfb3df3df7713821c28d98ed153a386  ./misdml/rick3.mis.dml
+6dd69cd82aae7251fddb6a5b786a0362577ba68f7acc2553cf9a7885f82be677  ./misdml/shock2.gam.dml
+e60b3a5cd099e542a769d4d871e156255f58dbd13f23e6cd15454f4d5471eb67  ./misdml/shodan.mis.dml
+4be264d31f95f4fdc68ff4d0965d60284fa8dde66bc26fe5414a8e35502cfb29  ./misdml/station.mis.dml
+abed4ee229dda567553b7d805f219008b6390c2d2da37459629eb28ac9ee6a9a  ./osm/NVScript.osm
+0d50ee426db5332dafff67d7fb3dd23f5bc6f0a3b2923bdc56bc95156332eca4  ./osm/script-ss2.osm
+0d50ee426db5332dafff67d7fb3dd23f5bc6f0a3b2923bdc56bc95156332eca4  ./osm/script.osm
+50f569ad495129c3c4734ddd1e886943eb9a212ff0a081d0d7a4a6a038aa26f0  ./osm/squirrel.osm
+99a2d2c7a8eea9e69ddf67b3a565d1e38ab72684380c77559594eac01a713b9a  ./patch_ext/gamesys.dml
+ee2f08df82a1f02fa61bc81d47b00c107d2db711938428760ce6cc93e6a99026  ./patch_ext/sq_scripts/allobjs.nut
+91291e83c7f4b5f6f03fc604ba6df131fc12f268a84a7c791ee7e78d9ce3d9ad  ./shock.cfg
+4199aac1d9af1e41385ba83d63470ca8b68c6f9ab684616c73fd6b94fd7a5a55  ./ss2.exe
+190d6a607fcbb41f2b2ca19c747657980d880851eb20bff19906d9576894fe1d  ./ss2bmm.cfg

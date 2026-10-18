@@ -1,0 +1,57 @@
+## 1. Archetype links
+links 143082; unresolved with Beta 4 gamesys: 0 []
+meaning changes with Beta 8 gamesys: 15 save_13 ops2.MIS obj 1647: Once Router -> MatSnow; save_14 ops2.MIS obj 1647: Once Router -> MatSnow; save_14 ops3.MIS obj 1469: Once Router -> MatSnow; save_14 ops3.MIS obj 1478: Once Router -> MatSnow; save_3 ops2.MIS obj 1647: Once Router -> MatSnow; save_4 ops2.MIS obj 1647: Once Router -> MatSnow; save_5 ops2.MIS obj 1647: Once Router -> MatSnow; save_5 ops3.MIS obj 1469: Once Router -> MatSnow; save_5 ops3.MIS obj 1478: Once Router -> MatSnow; save_6 ops2.MIS obj 1647: Once Router -> MatSnow; save_6 ops3.MIS obj 1469: Once Router -> MatSnow; save_6 ops3.MIS obj 1478: Once Router -> MatSnow
+
+## 2. Script providers
+distinct names 324
+   249 allobjs.osm
+    33 NVScript 1.2.4
+    26 scpScript.nut (Beta 4)
+     9 none
+     2 allobjs.osm + patch_ext allobjs.nut (SS2Tool)
+     2 allobjs.osm + Public Scripts (not loaded)
+     1 Public Scripts (not loaded)
+     1 allobjs.osm + NVScript 1.2.4
+     1 questnot.nut
+no loaded provider: AnimLight (b4 missions, saves); BrokenCookie (b4 gamesys; also in vanilla shock2.gam); Charm (b4 gamesys; also in vanilla shock2.gam); CutsceneRoom (b4 gamesys; also in vanilla shock2.gam); PullProjectile (b4 gamesys; also in vanilla shock2.gam); TrapCutscene (b4 gamesys; also in vanilla shock2.gam); TrapDestroy (b4 missions, saves); TrapMedia (b4 gamesys; also in vanilla shock2.gam); stdelevator (b4 missions, saves); tweqtrap (b4 missions)
+NVScript classes used 34; also present by name in Beta 8's NVScript: 34
+
+## 3. Declared script modules (ScrModules)
+   165 files: allobjs, nvscript, squirrel
+     3 files: allobjs, nvscript
+
+## 4. Mod traces in the saves
+Beta 4 earth.mis obj 885 at (-108.05, 30.0, 61.95); Vurt's Flora earth.mis.dml moves it to (-108.248, 30.4444, 62.95)
+  save_0   Hydroponics B/C 3:48:59    Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier ['Hydro2.MIS']
+  save_1   Hydroponics D 3:52:51      Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier ['hydro3.MIS']
+  save_2   Hydroponics B/C 4:08:00    Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier ['Hydro2.MIS']
+  save_3   Operations B 4:26:10       Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier ['ops2.MIS']
+  save_4   Operations B 4:32:45       Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier ['ops2.MIS']
+  save_5   Operations C 4:51:05       Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier ['ops3.MIS']
+  save_6   Operations B 5:47:51       Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier ['ops2.MIS']
+  save_7   Recreation A 5:55:14       Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier ['Rec1.MIS']
+  save_8   Engineering A 2:23:32      Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier -
+  save_9   Engineering A 2:26:02      Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier -
+  save_10  Engineering A 2:41:23      Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier -
+  save_11  Hydroponics B/C 2:45:37    Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier -
+  save_12  Hydroponics A 3:37:51      Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier ['hydro1.MIS']
+  save_13  Quicksave                  Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier ['ops2.MIS']
+  save_14  Auto-save                  Flora obj885 (-108.25, 30.44, 62.95)  Rebirth crpsf_arm yes  quest notifier ['Rec1.MIS']
+
+## 5. Gamesys DMLs
+  DMM\SS2_Rebirth_v05a\gamesys.dml: fingerprints [('FINGERPRINT', 'GAM cnight.gam'), ('FINGERPRINT', 'GAM cshock2.gam'), ('FINGERPRINT', 'GAM polaris.gam'), ('FINGERPRINT', 'GAM urlaub.gam')]; creates archetypes: False; #script []
+  DMM\Vurt's SS2 Flora Overhaul 1.0k\gamesys.dml: fingerprints none; creates archetypes: False; #script []
+  DMM\obj_fixes_v12\gamesys.dml: fingerprints none; creates archetypes: False; #script []
+  DMM\ss2_quest_note_notifier\gamesys.dml: fingerprints none; creates archetypes: False; #script ['squirrel']
+  patch_ext\gamesys.dml: fingerprints [('FINGERPRINT', '!NAME -4755 SCP')]; creates archetypes: False; #script ['NVScript', 'Squirrel']
+  archetype -4755 in Beta 4: None; in Beta 8: 'SCP'  (SS2Tool's patch_ext DML is skipped only if it is named SCP)
+
+## 6. Native modules
+  legacy osm/NVScript.osm             abed4ee229dda567  linker 9.0  base 0x10000000 size 0xa8000  TLS False  imports 78  version '1.2.4'
+  scp8   DMM/SCP_beta8/NVScript.osm   f15fc91b276e73ad  linker 14.16  base 0x10000000 size 0xb2000  TLS True  imports 77  version '\x01.'
+  legacy osm/squirrel.osm             50f569ad495129c3  linker 9.0  base 0x10000000 size 0x29f000  TLS False  imports 112  version '1.01'
+  scp8   osm/squirrel.osm             d95b441565365525  linker 9.0  base 0x10000000 size 0x2a0000  TLS False  imports 112  version '1.02'
+  legacy Data/allobjs.osm             096c3a1e25f9751e  linker 4.20  base 0x10000000 size 0x8b000  TLS False  imports 61  version '-'
+  scp8   Data/allobjs.osm             096c3a1e25f9751e  linker 4.20  base 0x10000000 size 0x8b000  TLS False  imports 61  version '-'
+  legacy lgvid.dll                    64d55311637315ff  linker 9.0  base 0x10000000 size 0x9000  TLS False  imports 60  version '-'
+  scp8   lgvid.dll                    64d55311637315ff  linker 9.0  base 0x10000000 size 0x9000  TLS False  imports 60  version '-'
