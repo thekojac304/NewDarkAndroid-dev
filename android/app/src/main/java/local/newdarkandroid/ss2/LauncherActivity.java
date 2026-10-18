@@ -44,7 +44,7 @@ public class LauncherActivity extends Activity {
         { "neg-exe", "ss2conf", "negative test: wrong executable (expect FAIL)", "missing.exe" },
         { "neg-crash", "ss2conf", "negative test: native crash (expect FAIL)", "--android-crash-test conformance.exe" },
         // Phase 1C: the recompiled game, run from games/ss2/ (read only); saves and configuration go to files/profiles/ss2/.
-        // Arguments are built in startNext. From adb, --ei frames N changes the frame limit (0: none), and
+        // Arguments are built in startNext. From adb, --ei frames N sets a frame limit (bounded test runs; 0: none), and
         // --es env NAME=value,NAME=value adds settings (e.g. SS2PORT_PROFILE=1,SS2PORT_INPUT_DEBUG=1), and --es portargs
         // adds port arguments before the executable (e.g. "--trace-only GetKeyState,MapVirtualKeyA"). The game mode has
         // touch controls; --ez touch false turns them off (touches then reach SDL as before).
@@ -53,7 +53,9 @@ public class LauncherActivity extends Activity {
     };
     static final String GAME = "ss2";                       // games/<GAME>/SS2.exe, profiles/<GAME>/
     static boolean isGame(String m) { return m.startsWith("game"); }
-    static int defaultFrames(String m) { return m.equals("game-null") ? 600 : 3600; }
+    // Frame limit when none is given (0: none). The windowed game is played, so it runs until the player quits; only the
+    // headless mode, which nobody can quit, stops by itself. Bounded windowed runs pass --ei frames N.
+    static int defaultFrames(String m) { return m.equals("game-null") ? 600 : 0; }
     static final long START_GRACE_MS = 15000;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -121,7 +123,7 @@ public class LauncherActivity extends Activity {
         addButton(col, "Run --cache-regs --abi-check", "cr");
         addButton(col, "Run both", "all");
         addButton(col, "Game: headless, 600 frames", "game-null");
-        addButton(col, "Game: SDL2 window", "game");
+        addButton(col, "Game: SDL2 window (play, no frame limit)", "game");
         col.addView(status = text(15, false));
         status.setTypeface(Typeface.DEFAULT_BOLD);
         col.addView(results = text(12, true));
@@ -226,11 +228,11 @@ public class LauncherActivity extends Activity {
             return;
         }
         state.edit().putString("queue", rest).putString("pending", m).putString("last", m).putLong("launched", System.currentTimeMillis()).apply();
-        Log.i(TAG, "starting " + m + ": lib" + x[1] + ".so in " + dir);
+        int frames = state.getInt("frames", -1);
+        if (frames < 0) frames = defaultFrames(m);
+        Log.i(TAG, "starting " + m + ": lib" + x[1] + ".so in " + dir + (isGame(m) ? ", frame limit " + (frames > 0 ? frames : "none") : ""));
         List<String> args = new ArrayList<>(Arrays.asList(dir.getAbsolutePath(), "--verbose"));
         if (isGame(m)) {
-            int frames = state.getInt("frames", -1);
-            if (frames < 0) frames = defaultFrames(m);
             args.addAll(Arrays.asList("--android-env", "SS2PORT_WRITE_DIR=" + profile.getAbsolutePath()));
             if (!state.getBoolean("touch", true)) args.addAll(Arrays.asList("--android-env", "SS2PORT_TOUCH=0"));   // no touch controls
             for (String e : state.getString("env", "").split("[ ,]")) if (e.contains("=")) args.addAll(Arrays.asList("--android-env", e));

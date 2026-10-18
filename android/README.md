@@ -50,8 +50,8 @@ D=/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games
 adb push "<SS2 folder>/." $D/ss2/                     # or each top-level entry; Bonus Content is not needed
 adb shell chmod -R a+rX,go-w $D                        # adb push creates folders the app cannot enter (2770, owner shell)
 adb shell am start -n local.newdarkandroid.ss2/.LauncherActivity --es autorun game-null   # headless, 600 frames
-adb shell am start -n local.newdarkandroid.ss2/.LauncherActivity --es autorun game        # window, 3600 frames
-#   --ei frames N changes the frame limit (0: none, an interactive session that ends when the game quits)
+adb shell am start -n local.newdarkandroid.ss2/.LauncherActivity --es autorun game        # window, no frame limit (play)
+#   --ei frames N sets a frame limit for a bounded test run (0: none; game-null defaults to 600, game to none)
 #   --es env SS2PORT_PROFILE=1,SS2PORT_INPUT_DEBUG=1   extra settings for the game process (comma or space separated)
 #   --es portargs "--trace-only GetKeyState"           extra port arguments, before the executable
 ```

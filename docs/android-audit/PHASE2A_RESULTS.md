@@ -183,6 +183,8 @@ pointers through `TouchSurface`, for example "finger 23/0, 23/1, 23/2" together.
 
 ## 8. Known limitations and usability issues
 
+- **Fixed after Phase 2A:** the **Game: SDL2 window** button started the game with `--frames 3600`, so play ended
+  after about 40 s. The windowed game now has no default limit ([PHASE2A_FRAME_LIMIT_FIX.md](PHASE2A_FRAME_LIMIT_FIX.md)).
 - **Not tested by a person.** Every on-device check used the HID test touchscreen. That is genuine Android multitouch,
   but not a finger. Comfort, sensitivity and button reach need a human pass (checklist below).
 - **Digital movement:** the stick drives W/A/S/D (always full speed). Shockolate's stick is analog; the host has no
