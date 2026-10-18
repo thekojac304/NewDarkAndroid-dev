@@ -40,6 +40,11 @@ static void place(Ss2Touch *s, float x, float y) {          /* the game's cursor
     TouchRect pic = { s->pic_x, s->pic_y, s->pic_w, s->pic_h };
     if (s->pic_w <= 0 || s->pic_h <= 0 || s->game_w <= 0 || s->game_h <= 0) return;
     touch_map_cursor(x, y, pic, s->pic_w / (float)s->game_w, s->pic_h / (float)s->game_h, s->game_w, s->game_h, &gx, &gy);
+    if (s->ui_w > 0 && s->ui_h > 0) {      /* the engine scales the whole window onto its 2D picture (ss2t_ui_rect) */
+        gx = (gx - (float)s->ui_x) * (float)s->game_w / (float)s->ui_w; gy = (gy - (float)s->ui_y) * (float)s->game_h / (float)s->ui_h;
+        if (gx < 0) gx = 0; if (gx > (float)(s->game_w - 1)) gx = (float)(s->game_w - 1);
+        if (gy < 0) gy = 0; if (gy > (float)(s->game_h - 1)) gy = (float)(s->game_h - 1);
+    }
     PlatEvent e; memset(&e, 0, sizeof e); e.type = PLAT_EV_MOUSE_MOVE; e.abs = 1; e.x = (int)gx; e.y = (int)gy;
     push(s, s->now > s->move_hold_until ? s->now : s->move_hold_until, e);
 }
@@ -118,6 +123,11 @@ void ss2t_frame(Ss2Touch *s, uint64_t now, float w, float h, bool enabled, float
         s->syncing = true; touch_set_mode(&s->t, want); s->syncing = false;
     }
     touch_tick(&s->t, (uint32_t)(now / 1000000u));
+}
+
+void ss2t_ui_rect(Ss2Touch *s, int x, int y, int w, int h) {
+    if (w <= 0 || h <= 0 || (x == 0 && y == 0 && w == s->game_w && h == s->game_h)) x = y = w = h = 0;
+    s->ui_x = x; s->ui_y = y; s->ui_w = w; s->ui_h = h;
 }
 
 void ss2t_finger(Ss2Touch *s, TouchPhase phase, int64_t device, int64_t finger, float x, float y, uint32_t ms) {

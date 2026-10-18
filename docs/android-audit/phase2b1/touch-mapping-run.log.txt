@@ -1,0 +1,48 @@
+[android] native entry SDL_main; run directory /data/user/0/local.newdarkandroid.ss2/files/runs/game; port arguments: --verbose --android-env SS2PORT_WRITE_DIR=/data/user/0/local.newdarkandroid.ss2/files/profiles/ss2 --android-env SS2PORT_TOUCH_DEBUG=1 /storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2/SS2.exe
+[touch] mode CURSOR (game interface/menu)
+[port] Direct3D: 2D picture at 0,0 1280x720 of 1280x720
+[port] Direct3D: 2D picture at 160,0 960x720 of 1280x720
+[touch] game 2D picture 160,0 960x720 of 1280x720
+[touch] finger 28/0 down at 115,64
+[touch] finger 28/0 up at 115,64
+[touch] finger 28/0 down at 1549,285
+[touch] cursor at 976,190
+[touch] finger 28/0 up at 1549,285
+[touch] cursor at 976,190
+[touch] button 0 down
+[touch] button 0 up
+[touch] finger 28/0 down at 1549,285
+[touch] cursor at 976,190
+[touch] finger 28/0 up at 1549,285
+[touch] cursor at 976,190
+[touch] button 0 down
+[touch] button 0 up
+[touch] finger 28/0 down at 1086,178
+[touch] cursor at 565,118
+[touch] finger 28/0 up at 1086,178
+[touch] cursor at 565,118
+[touch] button 0 down
+[touch] button 0 up
+[touch] finger 28/0 down at 1743,434
+[touch] cursor at 1149,289
+[touch] finger 28/0 up at 1743,434
+[touch] cursor at 1149,289
+[touch] button 0 down
+[touch] button 0 up
+[port] Direct3D: 2D picture at 0,0 1280x720 of 1280x720
+[touch] game 2D picture 0,0 1280x720 of 1280x720 (whole picture)
+[touch] mode LOOK (game shoot)
+[touch] finger 28/0 down at 2058,88
+[touch] finger 28/0 up at 2058,88
+[touch] finger 28/0 down at 1592,1010
+[touch] cursor at 921,673
+[touch] finger 28/0 up at 1592,1010
+[touch] cursor at 921,673
+[touch] button 0 down
+[touch] button 0 up
+[touch] finger 28/0 down at 267,322
+[touch] cursor at 38,214
+[touch] finger 28/0 up at 267,322
+[touch] cursor at 38,214
+[touch] button 0 down
+[touch] button 0 up

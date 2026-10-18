@@ -56,6 +56,17 @@ public class LauncherActivity extends Activity {
     // Frame limit when none is given (0: none). The windowed game is played, so it runs until the player quits; only the
     // headless mode, which nobody can quit, stops by itself. Bounded windowed runs pass --ei frames N.
     static int defaultFrames(String m) { return m.equals("game-null") ? 600 : 0; }
+    // Interface size (Phase 2B-1): NewDark's own d3d_disp_scaled_2d_overlay, the resolution the game draws its HUD,
+    // inventory, PDA and in-game text at before scaling them over the 3D picture (which keeps the game resolution).
+    // NewDark keeps the height and widens it to the screen's aspect; it ignores anything below 640x480, the size the SS2
+    // interface was laid out for. Setting value (null: left to cam_ext.cfg or your own user.cfg), key, label.
+    static final String[][] UI_SIZES = {
+        { "640 480", "640x480", "largest (640x480, the original layout)" },
+        { "720 540", "720x540", "large (720x540)" },
+        { "800 600", "800x600", "medium (800x600)" },
+        { null, "game", "game config (cam_ext.cfg, whole-number steps only)" },
+    };
+    static final String UI_MARK = "; NewDarkAndroid launcher, Interface size: it rewrites the next line on every game start";
     static final long START_GRACE_MS = 15000;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -124,6 +135,15 @@ public class LauncherActivity extends Activity {
         addButton(col, "Run both", "all");
         addButton(col, "Game: headless, 600 frames", "game-null");
         addButton(col, "Game: SDL2 window (play, no frame limit)", "game");
+        Button size = new Button(this);
+        size.setAllCaps(false);
+        size.setText("Interface size: " + uiSize()[2]);
+        size.setOnClickListener(v -> {                                        // cycles; applied at the next game start
+            int i = 0; while (i < UI_SIZES.length && UI_SIZES[i] != uiSize()) i++;
+            state.edit().putString("ui_size", UI_SIZES[(i + 1) % UI_SIZES.length][1]).apply();
+            size.setText("Interface size: " + uiSize()[2]);
+        });
+        col.addView(size);
         col.addView(status = text(15, false));
         status.setTypeface(Typeface.DEFAULT_BOLD);
         col.addView(results = text(12, true));
@@ -191,6 +211,8 @@ public class LauncherActivity extends Activity {
         state.edit().putInt("frames", intent.getIntExtra("frames", -1))                // -1: each game mode's default
             .putString("env", env != null ? env.trim() : "").putString("portargs", pa != null ? pa.trim() : "")
             .putBoolean("touch", intent.getBooleanExtra("touch", true)).apply();        // --ez touch false: no touch controls
+        String size = intent.getStringExtra("uisize");                                  // --es uisize 640x480|720x540|800x600|game (kept)
+        if (size != null) for (String[] u : UI_SIZES) if (u[1].equals(size)) state.edit().putString("ui_size", u[1]).apply();
         startQueue(which);
     }
 
@@ -221,6 +243,7 @@ public class LauncherActivity extends Activity {
             if (!isGame(m)) Files.copy(getAssets().open("conformance/conformance.exe"), new File(dir, "conformance.exe"));
             else if (!exe.isFile()) throw new IOException("no game: " + exe + " not found (copy the game folder there with adb push)");
             else if (!profile.isDirectory() && !profile.mkdirs()) throw new IOException("cannot create " + profile);
+            if (isGame(m)) applyUiSize(new File(profile, "user.cfg"));
         } catch (IOException e) {
             state.edit().putString("queue", rest).apply();
             finishRun(m, "launcher could not prepare the run: " + e);
@@ -249,6 +272,34 @@ public class LauncherActivity extends Activity {
         startActivity(i);
         refresh();
         handler.postDelayed(poll, 250);
+    }
+
+    private String[] uiSize() {
+        String k = state.getString("ui_size", UI_SIZES[0][1]);
+        for (String[] u : UI_SIZES) if (u[1].equals(k)) return u;
+        return UI_SIZES[0];
+    }
+
+    /** Puts the Interface size into the profile's user.cfg (which cam.cfg includes after cam_ext.cfg, so it wins). Only
+     *  the marked line is the launcher's; anything else in the file stays as it is. */
+    private void applyUiSize(File cfg) throws IOException {
+        String old = cfg.isFile() ? Files.read(cfg) : "", v = uiSize()[0];
+        if (old == null) throw new IOException("cannot read " + cfg);
+        StringBuilder out = new StringBuilder();
+        String[] lines = old.split("\r?\n", -1);
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].equals(UI_MARK)) { i++; continue; }                  // the mark and its line: written again below
+            if (i == lines.length - 1 && lines[i].isEmpty()) break;           // the file's final newline
+            out.append(lines[i]).append("\r\n");
+        }
+        if (v != null) out.append(UI_MARK).append("\r\n").append("d3d_disp_scaled_2d_overlay ").append(v).append("\r\n");
+        String now = out.toString();
+        Log.i(TAG, "interface size: " + uiSize()[1] + (v != null ? " (d3d_disp_scaled_2d_overlay " + v + " in " + cfg + ")" : " (user.cfg not set)"));
+        if (now.equals(old)) return;
+        if (now.isEmpty()) { if (!cfg.delete()) throw new IOException("cannot delete " + cfg); return; }   // the launcher made it
+        File tmp = new File(cfg.getPath() + ".tmp");
+        Files.write(tmp, now, false);
+        if (!tmp.renameTo(cfg)) throw new IOException("cannot replace " + cfg);
     }
 
     private final Runnable poll = new Runnable() {

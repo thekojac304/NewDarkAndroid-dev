@@ -867,6 +867,45 @@ static void ppl_hold(const void *blob, size_t total, int cls) {
     ppl_dump_draw(h, v, ix, cls);
     grp_n += need; grp_cls = cls;
 }
+/* ---------------------------------------------------------------- where the engine put its 2D picture
+ * NewDark draws its menus (ui_scale_mode 2) as one 640x480 image fitted into the back buffer, pillarboxed at a wide
+ * resolution, and with d3d_disp_scaled_2d_overlay its HUD as one image of the 2D resolution over the back buffer.
+ * It maps the window cursor onto that image by scaling the whole window, so a backend that places the cursor at a
+ * touched point (the Android touch controls) maps through this rectangle, not the back buffer.
+ * A candidate is a StretchRect from a large surface into the back buffer, or a pre-transformed quad with a large texture
+ * drawn into the back buffer, covering at least 45 % of it; the largest of the frame wins. A frame without one reports
+ * the whole back buffer. */
+static int32_t ui_cand[4], ui_cand_area, ui_rect[4], ui_bb[2];
+static void ui_candidate(Device *d, int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint32_t tw, uint32_t th) {
+    if (tw < 512 || th < 384) return;
+    if (x0 < 0) x0 = 0; if (y0 < 0) y0 = 0; if (x1 > (int32_t)d->bb_w) x1 = (int32_t)d->bb_w; if (y1 > (int32_t)d->bb_h) y1 = (int32_t)d->bb_h;
+    int32_t a = x1 > x0 && y1 > y0 ? (x1 - x0) * (y1 - y0) : 0;
+    if (a <= ui_cand_area || (int64_t)a * 100 < (int64_t)d->bb_w * d->bb_h * 45) return;
+    ui_cand_area = a; ui_cand[0] = x0; ui_cand[1] = y0; ui_cand[2] = x1 - x0; ui_cand[3] = y1 - y0;
+}
+static void ui_quad(Device *d, const Layout *L, uint32_t vbase, uint32_t stride, uint32_t lo, uint32_t hi, uint32_t prims) {
+    if (!L->rhw || prims > 2 || hi - lo > 7 || L->ntex < 1) return;
+    Res *rt = R(d->rt), *t = R(d->st.tex[0]);
+    if (!rt || !rt->backbuffer || !t || t->kind != R_TEX || !g_valid(vbase + lo * stride, (hi - lo + 1) * stride)) return;
+    float x0 = 1e9f, y0 = 1e9f, x1 = -1e9f, y1 = -1e9f;
+    for (uint32_t v = lo; v <= hi; v++) {
+        float x = u2f(RD32(vbase + v * stride + (uint32_t)L->pos)), y = u2f(RD32(vbase + v * stride + (uint32_t)L->pos + 4));
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+    }
+    ui_candidate(d, (int32_t)(x0 + .5f), (int32_t)(y0 + .5f), (int32_t)(x1 + .5f), (int32_t)(y1 + .5f), t->w, t->h);
+}
+static void ui_frame_end(Device *d) {
+    int32_t r[4] = { 0, 0, (int32_t)d->bb_w, (int32_t)d->bb_h }; if (ui_cand_area) memcpy(r, ui_cand, sizeof r);
+    if (memcmp(r, ui_rect, sizeof r)) { static int n; if (n++ < 200) port_debug("Direct3D: 2D picture at %d,%d %dx%d of %ux%u", r[0], r[1], r[2], r[3], d->bb_w, d->bb_h); }
+    memcpy(ui_rect, r, sizeof r); ui_bb[0] = (int32_t)d->bb_w; ui_bb[1] = (int32_t)d->bb_h; ui_cand_area = 0;
+}
+/* The last presented frame's 2D picture in back-buffer pixels (x, y, w, h) and the back buffer's size; 0 before the
+   first frame. Game thread. */
+int d3d9_ui_rect(int r[4], int *bb_w, int *bb_h) {
+    if (!ui_bb[0]) return 0;
+    for (int i = 0; i < 4; i++) r[i] = ui_rect[i];
+    *bb_w = ui_bb[0]; *bb_h = ui_bb[1]; return 1;
+}
 static void draw(Device *d, uint32_t type, uint32_t prims, uint32_t vbase, uint32_t stride, uint32_t idx, int idx32, int32_t base_vertex, uint32_t min_index, uint32_t num_vertices) {
     uint32_t nseq; int plat_prim;
     if (!prims || !prim_counts(type, prims, &nseq, &plat_prim)) return;
@@ -884,6 +923,7 @@ static void draw(Device *d, uint32_t type, uint32_t prims, uint32_t vbase, uint3
         v = (uint32_t)((int32_t)v + (idx ? base_vertex : 0)); seq[i] = v; if (v < lo) lo = v; if (v > hi) hi = v;
     }
     if (idx && num_vertices && hi - lo + 1 > num_vertices + min_index) { /* trust the indices */ }
+    ui_quad(d, &L, vbase, stride, lo, hi, prims);
     uint32_t span = hi - lo + 1;
     size_t maxidx = (size_t)nseq * 3 + 6;
     if (d->icap < (int)maxidx) { d->icap = (int)maxidx; d->ibuf = realloc(d->ibuf, (size_t)d->icap * sizeof *d->ibuf); }
@@ -1276,6 +1316,7 @@ static void dev_reset(CPU *c, ComObj *s) {
 }
 static void dev_present(CPU *c, ComObj *s) {
     Device *d = DEV(s); (void)c;
+    ui_frame_end(d);
     ppl_flush(); trace_frame_end(); plat_gfx_present(); port_frame_presented(); plat_gfx_begin_frame(); plat_gfx_set_target(surface_target(R(d->rt))); apply_viewport(d);
     c->eax = 0;
 }
@@ -1342,6 +1383,7 @@ static void dev_stretchrect(CPU *c, ComObj *s) {
     Device *d = DEV(s); Res *src = R(com_get(A(1))), *dst = R(com_get(A(3))); if (!src || !dst) { RET(D3DERR_INVALIDCALL); return; }
     uint32_t sw, sh, dw, dh; surf_size(src, &sw, &sh); surf_size(dst, &dw, &dh); int32_t sr[4], dr[4]; rect_or_full(A(2), sw, sh, sr); rect_or_full(A(4), dw, dh, dr);
     int linear = A(5) == 2;
+    if (dst->backbuffer) ui_candidate(d, dr[0], dr[1], dr[2], dr[3], sw, sh);
     if (is_target(dst)) {
         if (is_target(src) && !src->lock_dirty) plat_gfx_copy(surface_target(src), sr[0], sr[1], sr[2] - sr[0], sr[3] - sr[1], surface_target(dst), dr[0], dr[1], dr[2] - dr[0], dr[3] - dr[1], linear);
         else { uint32_t w, h; uint8_t *rgba = surf_rgba(d, src, &w, &h); blit_rgba(d, rgba, w, h, sr, surface_target(dst), dr, linear); free(rgba); }

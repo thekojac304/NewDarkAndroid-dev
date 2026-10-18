@@ -37,7 +37,12 @@ Android touchscreen -> TouchSurface (raw surface pixels) -> touch_surface.c (SDL
 - SDL's touch-to-mouse emulation is off. The launcher's `--ez touch false` turns the controls off (`SS2PORT_TOUCH=0`),
   and the game then gets SDL's touch events as before.
 - Shared code: `PlatEvent.abs` (put the game's cursor at x, y even while the mouse is captured; `win32/user32.c`,
-  `dx/dinput.c`), and `user32_cursor_recentred_ns()` (when the game last recentred its cursor).
+  `dx/dinput.c`), `user32_cursor_recentred_ns()` (when the game last recentred its cursor), and `d3d9_ui_rect()`
+  (`dx/d3d9.c`: where the engine drew its 2D picture in the last frame; Phase 2B-1).
+- **Cursor placement through the engine's 2D picture:** NewDark maps the window cursor onto its 2D picture by scaling
+  the whole window. Its 640x480 menus are fitted into a wide resolution with bars (1280x720: 160,0 960x720), so a tap
+  is placed through that rectangle (`ss2t_ui_rect`); in game, the HUD (scaled with `d3d_disp_scaled_2d_overlay` or not)
+  covers the whole picture and nothing changes. At 4:3 resolutions the menus fill the picture too.
 
 ## SS2 mapping
 
@@ -67,6 +72,6 @@ The keys are the bindings of the game's `user.bnd`, which replaces `SHOCK.BND`.
 `tests/run.sh` builds `tests/touch_ss2_test.c` with the bridge and the core and runs it on the PC, for example with
 `CC="python -m ziglang cc"`. It checks press/release order and minimum hold, several fingers, stick ownership and
 hysteresis, a modifier held across frames, relative look scaling, cursor placement before a click (corners, centre,
-bars), drags, focus-loss release, mode following, weapon wheel and physical/touch aggregation. Shockolate's own core
+bars), placement through a 4:3 menu in a 16:9 game, drags, focus-loss release, mode following, weapon wheel and physical/touch aggregation. Shockolate's own core
 suites (`touch_controls`, `alpha11`, `alpha2`, `alpha3`, `alpha4`, `ammo` from 7502370) also pass against this
 directory's core.

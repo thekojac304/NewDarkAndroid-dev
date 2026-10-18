@@ -26,7 +26,8 @@ typedef struct Ss2Touch {
     TouchControls t;
     /* the game's picture inside the touch surface (letterboxed), and its size in game pixels */
     float pic_x, pic_y, pic_w, pic_h; int game_w, game_h;
-    uint64_t now;                          /* time of the current frame (ns) */
+    int ui_x, ui_y, ui_w, ui_h;            /* the engine's 2D picture in game pixels (ss2t_ui_rect); ui_w 0: the whole picture */
+    uint64_t now;                         /* time of the current frame (ns) */
     /* touch-held keys and buttons (counts: two controls may hold one key) and the physical ones, for aggregation */
     uint8_t touch_key[256], phys_key[256], touch_btn[5], phys_btn[5];
     uint64_t pressed_at_key[256], pressed_at_btn[5];
@@ -47,6 +48,10 @@ void ss2t_init(Ss2Touch *s);
    surface pixels, the game's resolution, and when the game last recentred its cursor (user32_cursor_recentred_ns). */
 void ss2t_frame(Ss2Touch *s, uint64_t now_ns, float surface_w, float surface_h, bool enabled,
                 float pic_x, float pic_y, float pic_w, float pic_h, int game_w, int game_h, uint64_t recentred_ns);
+/* Where the engine drew its 2D picture this frame, in game pixels: a 4:3 menu fitted into a wider resolution, or the
+   scaled HUD (d3d_disp_scaled_2d_overlay). The engine maps the whole window onto it, so a touched point is placed
+   through it. w = 0, or the whole picture: no remapping. */
+void ss2t_ui_rect(Ss2Touch *s, int x, int y, int w, int h);
 void ss2t_finger(Ss2Touch *s, TouchPhase phase, int64_t device, int64_t finger, float x, float y, uint32_t ms);
 void ss2t_cancel(Ss2Touch *s);             /* releases everything touch holds (lifecycle, focus, resize) */
 /* A key or mouse button from a physical keyboard or mouse: returns true when it should reach the game (it does not

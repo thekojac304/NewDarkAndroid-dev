@@ -4,6 +4,7 @@
 #include "touch_ss2.h"
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static int fails, checks;
@@ -134,6 +135,32 @@ static void test_cursor_mapping_and_click(void) {
     CHECK(s.touch_btn[0] == 0);
 }
 
+/* a 1280x720 game (1920x1080 at x = 210): the engine fits its 640x480 menus into 160,0 960x720 and scales the whole
+   window onto them, so a touch on the menu is placed through that rectangle (ss2t_ui_rect) */
+static int place_at(Ss2Touch *s, float x, float y, int *gx, int *gy) {
+    finger(s, TOUCH_DOWN, 1, x, y); now += 50000000ull; finger(s, TOUCH_UP, 1, x, y);
+    ss2t_frame(s, now, W, H, true, 210, 0, 1920, 1080, 1280, 720, 0); nout = ss2t_flush(s, out, 512);
+    int m = -1; for (int k = 0; k < nout; k++) if (out[k].type == PLAT_EV_MOUSE_MOVE && out[k].abs) m = k;
+    for (int i = 0; i < 3; i++) { now += 100000000ull; ss2t_frame(s, now, W, H, true, 210, 0, 1920, 1080, 1280, 720, 0); ss2t_flush(s, out + 256, 256); }
+    if (m < 0) return 0;
+    *gx = out[m].x; *gy = out[m].y; return 1;
+}
+static void test_ui_rect_mapping(void) {
+    Ss2Touch s; ss2t_init(&s); now = 1000000000ull;
+    ss2t_frame(&s, now, W, H, true, 210, 0, 1920, 1080, 1280, 720, 0); ss2t_flush(&s, out, 512);
+    int x, y;
+    ss2t_ui_rect(&s, 160, 0, 960, 720);                     /* a menu */
+    static const float pts[6][4] = { { 450, 0, 0, 0 }, { 1889, 0, 1279, 0 }, { 450, 1079, 0, 719 }, { 1889, 1079, 1279, 719 },
+                                     { 1170, 540, 640, 360 }, { 1742, 434, 1148, 289 } };   /* the last: Load on the load screen */
+    for (int i = 0; i < 6; i++) { CHECK(place_at(&s, pts[i][0], pts[i][1], &x, &y) && abs(x - (int)pts[i][2]) <= 1 && abs(y - (int)pts[i][3]) <= 1); }
+    CHECK(place_at(&s, 300, 500, &x, &y) && x == 0);        /* beside the menu: its edge */
+    CHECK(place_at(&s, 2000, 500, &x, &y) && x == 1279);
+    ss2t_ui_rect(&s, 0, 0, 1280, 720);                      /* in game (the scaled HUD covers the picture): unchanged */
+    CHECK(s.ui_w == 0);
+    CHECK(place_at(&s, 450, 0, &x, &y) && x == 160 && y == 0);
+    CHECK(place_at(&s, 2129, 1079, &x, &y) && x == 1279 && y == 719);
+}
+
 static void test_focus_cleanup(void) {
     Ss2Touch s; ss2t_init(&s); now = 1000000000ull; enter_gameplay(&s);
     TouchCircle f = ctl(&s, TC_FIRE), j = ctl(&s, TC_JUMP); float r = s.t.layout.move_radius;
@@ -196,7 +223,7 @@ static void test_physical_aggregation(void) {
 int main(void) {
     test_tap_min_hold(); test_move_look_fire(); test_ownership_and_hysteresis(); test_modifier_spans_frames();
     test_cursor_mapping_and_click(); test_focus_cleanup(); test_mode_follow_and_toggle(); test_weapon_wheel_and_actions();
-    test_physical_aggregation();
+    test_physical_aggregation(); test_ui_rect_mapping();
     printf("touch_ss2_test: %d of %d checks failed\n", fails, checks);
     return fails != 0;
 }

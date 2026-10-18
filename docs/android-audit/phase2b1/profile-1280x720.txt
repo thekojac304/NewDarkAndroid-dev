@@ -1,0 +1,31 @@
+# SS2PORT_PROFILE, MedSci, 1280x720, 5 s windows: about 16 s in LOOK mode, then inventory + PDA open
+## interface size: game config (cam_ext.cfg 64 = 1x at 720 lines)
+[sdl] profile: 15.2 fps | frame ms mean 65.7 p50 65.5 p95 74.0 p99 78.6 max 78.6 | >50ms 75 >100ms 0 | swap 1% | rss 205 MB | audio 218 callbacks, longest gap 41.5 ms, peak 11366, 1 silent
+[sdl] profile: 19.2 fps | frame ms mean 52.2 p50 64.7 p95 71.6 p99 79.3 max 79.3 | >50ms 70 >100ms 0 | swap 1% | rss 206 MB | audio 216 callbacks, longest gap 40.6 ms, peak 31076, 3 silent
+[sdl] profile: 99.9 fps | frame ms mean 10.0 p50 9.9 p95 12.1 p99 12.7 max 22.3 | >50ms 0 >100ms 0 | swap 3% | rss 208 MB | audio 215 callbacks, longest gap 40.6 ms, peak 13055, 0 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.8 p95 12.1 p99 12.7 max 14.1 | >50ms 0 >100ms 0 | swap 3% | rss 208 MB | audio 216 callbacks, longest gap 40.9 ms, peak 7454, 0 silent
+[sdl] profile: 81.1 fps | frame ms mean 12.3 p50 10.0 p95 12.4 p99 39.1 max 503.0 | >50ms 4 >100ms 2 | swap 2% | rss 279 MB | audio 215 callbacks, longest gap 41.1 ms, peak 11863, 2 silent
+[sdl] profile: 98.7 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 12.6 max 13.4 | >50ms 0 >100ms 0 | swap 2% | rss 279 MB | audio 216 callbacks, longest gap 40.5 ms, peak 12024, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 12.8 max 13.1 | >50ms 0 >100ms 0 | swap 2% | rss 279 MB | audio 215 callbacks, longest gap 40.4 ms, peak 12105, 0 silent
+[sdl] profile: 99.2 fps | frame ms mean 10.1 p50 10.0 p95 10.8 p99 12.4 max 13.3 | >50ms 0 >100ms 0 | swap 2% | rss 279 MB | audio 216 callbacks, longest gap 40.3 ms, peak 11883, 0 silent
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.0 p95 10.8 p99 12.0 max 14.5 | >50ms 0 >100ms 0 | swap 2% | rss 280 MB | audio 215 callbacks, longest gap 42.3 ms, peak 11762, 0 silent
+[sdl] profile: 98.5 fps | frame ms mean 10.2 p50 10.1 p95 11.0 p99 12.3 max 12.9 | >50ms 0 >100ms 0 | swap 2% | rss 279 MB | audio 216 callbacks, longest gap 40.4 ms, peak 12125, 0 silent
+[sdl] profile: 98.0 fps | frame ms mean 10.2 p50 10.1 p95 11.5 p99 12.7 max 17.1 | >50ms 0 >100ms 0 | swap 2% | rss 280 MB | audio 216 callbacks, longest gap 41.5 ms, peak 21842, 0 silent
+[sdl] profile: 98.6 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 12.4 max 13.2 | >50ms 0 >100ms 0 | swap 2% | rss 280 MB | audio 215 callbacks, longest gap 40.3 ms, peak 11580, 0 silent
+[sdl] profile: 98.5 fps | frame ms mean 10.1 p50 10.1 p95 11.0 p99 12.7 max 13.3 | >50ms 0 >100ms 0 | swap 2% | rss 280 MB | audio 215 callbacks, longest gap 40.9 ms, peak 11965, 0 silent
+[sdl] profile: 99.3 fps | frame ms mean 10.1 p50 10.1 p95 10.8 p99 11.0 max 12.6 | >50ms 0 >100ms 0 | swap 2% | rss 280 MB | audio 216 callbacks, longest gap 40.7 ms, peak 11660, 0 silent
+## interface size: largest (d3d_disp_scaled_2d_overlay 640 480)
+[sdl] profile: 15.2 fps | frame ms mean 65.7 p50 65.4 p95 72.4 p99 80.6 max 80.6 | >50ms 75 >100ms 0 | swap 0% | rss 206 MB | audio 218 callbacks, longest gap 40.8 ms, peak 11366, 1 silent
+[sdl] profile: 19.6 fps | frame ms mean 51.1 p50 64.6 p95 72.5 p99 80.7 max 80.7 | >50ms 70 >100ms 0 | swap 1% | rss 207 MB | audio 216 callbacks, longest gap 41.1 ms, peak 31076, 3 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.9 p95 12.3 p99 13.7 max 17.6 | >50ms 0 >100ms 0 | swap 3% | rss 209 MB | audio 215 callbacks, longest gap 40.9 ms, peak 13390, 0 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.0 p95 11.9 p99 12.3 max 13.8 | >50ms 0 >100ms 0 | swap 3% | rss 209 MB | audio 216 callbacks, longest gap 40.8 ms, peak 6350, 0 silent
+[sdl] profile: 80.9 fps | frame ms mean 12.4 p50 10.1 p95 11.8 p99 39.4 max 506.2 | >50ms 4 >100ms 3 | swap 2% | rss 279 MB | audio 216 callbacks, longest gap 40.8 ms, peak 11863, 1 silent
+[sdl] profile: 98.4 fps | frame ms mean 10.2 p50 10.1 p95 11.3 p99 12.4 max 12.5 | >50ms 0 >100ms 0 | swap 2% | rss 279 MB | audio 215 callbacks, longest gap 40.6 ms, peak 12024, 0 silent
+[sdl] profile: 98.9 fps | frame ms mean 10.1 p50 10.0 p95 10.9 p99 12.5 max 12.8 | >50ms 0 >100ms 0 | swap 2% | rss 280 MB | audio 215 callbacks, longest gap 40.5 ms, peak 12105, 0 silent
+[sdl] profile: 99.0 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 12.3 max 13.3 | >50ms 0 >100ms 0 | swap 2% | rss 280 MB | audio 217 callbacks, longest gap 41.6 ms, peak 11883, 0 silent
+[sdl] profile: 98.8 fps | frame ms mean 10.1 p50 10.1 p95 10.9 p99 12.5 max 13.0 | >50ms 0 >100ms 0 | swap 2% | rss 280 MB | audio 215 callbacks, longest gap 41.0 ms, peak 12125, 0 silent
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.0 p95 10.8 p99 12.6 max 13.1 | >50ms 0 >100ms 0 | swap 2% | rss 280 MB | audio 215 callbacks, longest gap 41.2 ms, peak 12024, 0 silent
+[sdl] profile: 97.3 fps | frame ms mean 10.3 p50 10.1 p95 11.6 p99 13.0 max 34.3 | >50ms 0 >100ms 0 | swap 2% | rss 281 MB | audio 216 callbacks, longest gap 41.2 ms, peak 21682, 0 silent
+[sdl] profile: 97.6 fps | frame ms mean 10.2 p50 10.2 p95 11.5 p99 12.2 max 12.8 | >50ms 0 >100ms 0 | swap 2% | rss 281 MB | audio 216 callbacks, longest gap 41.8 ms, peak 11580, 0 silent
+[sdl] profile: 97.2 fps | frame ms mean 10.3 p50 10.2 p95 11.8 p99 12.8 max 13.3 | >50ms 0 >100ms 0 | swap 2% | rss 280 MB | audio 215 callbacks, longest gap 42.8 ms, peak 11965, 0 silent
+[sdl] profile: 97.0 fps | frame ms mean 10.3 p50 10.2 p95 11.8 p99 12.5 max 12.9 | >50ms 0 >100ms 0 | swap 2% | rss 280 MB | audio 216 callbacks, longest gap 41.4 ms, peak 11660, 0 silent

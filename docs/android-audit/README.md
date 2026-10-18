@@ -34,6 +34,7 @@ especially SCP.
 | [PHASE1E_RESULTS.md](PHASE1E_RESULTS.md) | Phase 1E: the Earth grav-shaft "defect" was a test error (only the low-gravity descent shaft was tried). The lift shaft works on Android and a Windows desktop build, with matching scripted position traces. |
 | [PHASE2A_RESULTS.md](PHASE2A_RESULTS.md) | Phase 2A: the Shockolate touch controls (7502370) in SS2 on Android: stick, look, fire, use, jump, crouch, weapons, menus, cursor mode with exact placement, inventory and PDA by touch; multitouch tested on device |
 | [PHASE2A_FRAME_LIMIT_FIX.md](PHASE2A_FRAME_LIMIT_FIX.md) | Phase 2A fix: play from the launcher button ended after ~40 s at the launcher's default 3600-frame limit (a clean exit, not a crash). The windowed game now has no default limit; tests pass `--ei frames N`. |
+| [PHASE2B_UI_SCALING.md](PHASE2B_UI_SCALING.md) | Phase 2B-1: the HUD, inventory, PDA and text up to 1.5x larger at 1280x720 (2.25 screen px per interface px) with NewDark's own `d3d_disp_scaled_2d_overlay`, chosen in the launcher; touch placement fixed for 4:3 menus at wide resolutions |
 
 ## Overall feasibility
 

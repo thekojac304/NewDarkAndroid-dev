@@ -15,6 +15,7 @@
 #include <stdlib.h>
 
 uint64_t user32_cursor_recentred_ns(void) __attribute__((weak));
+int d3d9_ui_rect(int r[4], int *bb_w, int *bb_h) __attribute__((weak));
 int touch_draw_gles(const TouchControls *t, int w, int h, void *(*get_proc)(const char *));
 static void tlog(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 static void tlog(const char *fmt, ...) {
@@ -119,6 +120,14 @@ void android_touch_poll(void (*sink)(const PlatEvent *, void *), void *user, int
     TouchMode before = touch.t.mode;
     ss2t_frame(&touch, now_ns(), (float)dw, (float)dh, focused && !background && !unfocused, (float)bx, (float)by, (float)bw, (float)bh,
                game_w, game_h, user32_cursor_recentred_ns ? user32_cursor_recentred_ns() : 0);
+    int r[4], bbw, bbh;
+    if (d3d9_ui_rect && d3d9_ui_rect(r, &bbw, &bbh) && bbw > 0 && bbh > 0) {      /* back-buffer pixels -> game pixels */
+        int ux = r[0] * game_w / bbw, uy = r[1] * game_h / bbh, uw = r[2] * game_w / bbw, uh = r[3] * game_h / bbh;
+        int was[4] = { touch.ui_x, touch.ui_y, touch.ui_w, touch.ui_h };
+        ss2t_ui_rect(&touch, ux, uy, uw, uh);
+        if (debug && (was[0] != touch.ui_x || was[1] != touch.ui_y || was[2] != touch.ui_w || was[3] != touch.ui_h))
+            tlog("game 2D picture %d,%d %dx%d of %dx%d%s", ux, uy, uw, uh, game_w, game_h, touch.ui_w ? "" : " (whole picture)");
+    }
     if (touch.t.mode != before) tlog("mode %s (game %s)", touch.t.mode == TOUCH_GAMEPLAY ? "LOOK" : "CURSOR", touch.game_shoot ? "shoot" : "interface/menu");
     PlatEvent out[64]; int n;
     do {

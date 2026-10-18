@@ -54,7 +54,14 @@ adb shell am start -n local.newdarkandroid.ss2/.LauncherActivity --es autorun ga
 #   --ei frames N sets a frame limit for a bounded test run (0: none; game-null defaults to 600, game to none)
 #   --es env SS2PORT_PROFILE=1,SS2PORT_INPUT_DEBUG=1   extra settings for the game process (comma or space separated)
 #   --es portargs "--trace-only GetKeyState"           extra port arguments, before the executable
+#   --es uisize 640x480|720x540|800x600|game          Interface size (kept for later starts, like the launcher button)
 ```
+
+**Interface size** (launcher button, Phase 2B-1): the size of the game's HUD, inventory, PDA and in-game text. It sets
+NewDark's own `d3d_disp_scaled_2d_overlay` in the profile's `user.cfg`, in one marked line the launcher rewrites at
+every game start (the rest of `user.cfg` is left alone). `640x480` (the default) is the largest NewDark accepts and the
+size the SS2 interface was laid out for; `game` leaves the setting to `cam_ext.cfg` (whole-number steps only) or your
+own `user.cfg` line. The 3D picture keeps the game resolution. See docs/android-audit/PHASE2B_UI_SCALING.md.
 
 The game folder stays read only (the app's uid has no write permission on it). Saves, configuration and `SS2.log` go
 to `files/profiles/ss2/` through `SS2PORT_WRITE_DIR`. A file placed there (for example a `user.cfg`) is read in

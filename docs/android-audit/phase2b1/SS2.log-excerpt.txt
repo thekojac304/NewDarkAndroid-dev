@@ -1,0 +1,4 @@
+: game_screen_size 1280 720
+: d3d_disp_scaled_2d_overlay 640 480
+: D3DProvider StartMode: smode 1280x720x32 ; mode 640x480x32 (5 9 0 2D) ; 2d_surf_mode: 0
+: D3DProvider StartMode: smode 1280x720x32 ; mode 852x480x32 (7 9 1 3D) ; 2d_surf_mode: 3
