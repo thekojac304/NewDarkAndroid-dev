@@ -40,6 +40,7 @@ especially SCP.
 | [PHASE3B_SCP_RESULTS.md](PHASE3B_SCP_RESULTS.md) | Phase 3B (Milestone C, PARTIAL): SCP Beta 8 on the S26 Ultra from a DMM-style copy: missions, gamesys, assets, Squirrel and NVScript scripts, the module gate, both Earth grav shafts, SCP's UNN changes, quicksave/quickload; level transition and item use not reached |
 | [PHASE4_ANDROID_POLISH_RESULTS.md](PHASE4_ANDROID_POLISH_RESULTS.md) | Phase 4 (Milestone D, PARTIAL): Play button and game folders, folder import (not device-tested), lifecycle and soak tests, dev/play builds (play: 43.7 MB) |
 | [OVERNIGHT_INTEGRATION_REPORT.md](OVERNIGHT_INTEGRATION_REPORT.md) | The overnight session (Phase 2B-2 to Phase 4): milestone labels, commits, APK hashes, tests, open items |
+| [GAME_IMPORT_FIX.md](GAME_IMPORT_FIX.md) | Import fix: `games/` belongs to the adb shell, so imports go to the app-owned `imported/`; scan-then-confirm import with saves into the new game's own profile, crash recovery, `SS2.exe` version check (the user's install is NewDark 2.47); validated on the S26 Ultra |
 
 ## Overall feasibility
 

@@ -80,31 +80,101 @@ public class LauncherActivity extends Activity {
     private final List<Button> buttons = new ArrayList<>();
     private static final int REQUEST_IMPORT = 0x5353;
     private TextView importStatus;
-    private volatile boolean importing;
+    private Button importButton;
+    private GameFolders folders;
+    private GameImport shownChoice;                     // the import whose choice dialog this activity shows
+    private GameImport.Stage shownStage;
 
-    /** The picked folder is copied into games/NAME on a worker thread (GameImport); the new folder becomes the game folder. */
+    /** The picked folder is scanned on a worker thread (GameImport); the player then chooses, and it is copied. */
     @Override
     protected void onActivityResult(int request, int result, Intent data) {
         super.onActivityResult(request, result, data);
         if (request != REQUEST_IMPORT) return;
         Uri tree = data != null ? data.getData() : null;
         if (result != RESULT_OK || tree == null) { importStatus.setText("Import: no folder was picked."); return; }
-        importing = true;
-        importStatus.setText("Importing...");
-        new Thread(() -> {
-            String msg;
-            try {
-                GameImport.Result r = new GameImport(getContentResolver(), tree, m -> runOnUiThread(() -> importStatus.setText(m))).run(gamesDir());
-                state.edit().putString("game", r.name).apply();
-                msg = String.format(Locale.US, "Imported %d files (%.0f MB) into the game folder %s. It is now the selected game folder.", r.files, r.bytes / 1048576.0, r.name);
-                Log.i(TAG, "import: " + msg);
-            } catch (Exception e) {
-                msg = "Import failed: " + e.getMessage() + " Nothing was changed.";
-                Log.e(TAG, "import failed", e);
+        if (GameImport.busy()) return;
+        Log.i(TAG, "import: picked " + tree);
+        GameImport.start(this, tree);
+        importPoll.run();
+    }
+
+    /** Follows the import while this activity is in front: progress, the choice dialog, the result. */
+    private final Runnable importPoll = new Runnable() {
+        @Override
+        public void run() {
+            handler.removeCallbacks(this);
+            GameImport j = GameImport.current;
+            if (j == null || importStatus == null) return;
+            GameImport.Stage s = j.stage;
+            boolean active = s == GameImport.Stage.SCANNING || s == GameImport.Stage.COPYING;
+            setText(importButton, s == GameImport.Stage.COPYING ? (j.cancel ? "Cancelling..." : "Cancel import") : active ? "Reading the folder..." : "Import a game folder...");
+            if (active) getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            else getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            if (s == GameImport.Stage.DONE || s == GameImport.Stage.FAILED) {
+                if (shownStage != s) {                                          // once: the new game folder is listed and selected
+                    shownStage = s;
+                    buildUi();
+                    importStatus.setText(j.message);
+                    refresh();
+                }
+                return;
             }
-            final String m = msg;
-            runOnUiThread(() -> { importing = false; importStatus.setText(m); buildUi(); importStatus.setText(m); refresh(); });
-        }, "game-import").start();
+            shownStage = s;
+            setText(importStatus, j.status);
+            if (s == GameImport.Stage.CHOOSING && shownChoice != j) { shownChoice = j; showImportChoice(j); }
+            handler.postDelayed(this, 250);
+        }
+    };
+
+    private static void setText(TextView t, String s) { if (!s.contentEquals(t.getText())) t.setText(s); }   // no redraw (and no busy UI) when nothing changed
+
+    /** What the scan found, and the choice: import (with or without the saves) or not. Nothing has been written yet. */
+    private void showImportChoice(GameImport j) {
+        GameImport.Plan p = j.plan;
+        List<String> others = folders.list();
+        StringBuilder t = new StringBuilder();
+        if (p.spaceProblem != null) t.append("Cannot import: ").append(p.spaceProblem).append("\n\n");
+        if (p.exeProblem != null) t.append("Warning: this game will not start. ").append(Character.toUpperCase(p.exeProblem.charAt(0))).append(p.exeProblem.substring(1))
+            .append(". Import it anyway only to keep its mods and saves on the phone until you replace its SS2.exe.\n\n");
+        t.append(String.format(Locale.US, "Copies %,d files (%s) into a new game folder, %s. The selected folder is only read. Your other game folders (%s), their saves "
+            + "and your touch settings are not changed.\n\n", p.gameFiles, GameImport.mb(p.gameBytes), p.name, others.isEmpty() ? "none" : String.join(", ", others)));
+        if (!p.slots.isEmpty()) t.append(String.format(Locale.US, "Saved games: %d (%s, %s). If you import them, they go into %s's own save folder, which is new and empty: "
+            + "no save is overwritten, and they never mix with another game folder's saves.\n\n", p.slots.size(), j.slotRange(), GameImport.mb(p.saveBytes), p.name));
+        else t.append("Saved games: none in this folder.\n\n");
+        if (!p.configs.isEmpty()) t.append("Its settings come along and are used as they are: ").append(String.join(", ", p.configs)).append(".\n\n");
+        if (p.currentFiles > 0) t.append(String.format(Locale.US, "Not copied: current/ (%d files), the working state of the PC's last session; the game makes a new one.\n\n", p.currentFiles));
+        for (String w : p.moduleWarnings) t.append("Note: ").append(w).append(".\n");
+        if (p.free >= 0) t.append(String.format(Locale.US, "\nFree storage: %s.", GameImport.mb(p.free)));
+        LinearLayout v = new LinearLayout(this);
+        v.setOrientation(LinearLayout.VERTICAL);
+        v.setPadding(56, 24, 56, 0);
+        TextView msg = new TextView(this);
+        msg.setText(t.toString().trim());
+        msg.setTextIsSelectable(true);
+        v.addView(msg);
+        android.widget.CheckBox saves = new android.widget.CheckBox(this);
+        saves.setText(String.format(Locale.US, p.slots.size() == 1 ? "Also import the saved game" : "Also import the %d saved games", p.slots.size()));
+        saves.setChecked(true);
+        if (!p.slots.isEmpty()) v.addView(saves);
+        ScrollView sv = new ScrollView(this);
+        sv.addView(v);
+        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(this).setTitle("Import \"" + p.source + "\"?").setView(sv).setCancelable(false)
+            .setNegativeButton("Cancel", (d, w) -> { j.choose(false, false); importPoll.run(); });
+        if (p.spaceProblem == null)
+            b.setPositiveButton(p.exeProblem != null ? "Import anyway" : "Import", (d, w) -> {
+                Log.i(TAG, "import: confirmed, saves " + (p.slots.isEmpty() ? "none" : saves.isChecked() ? "included" : "not included"));
+                j.choose(true, saves.isChecked());
+                importPoll.run();
+            });
+        b.show();
+    }
+
+    /** adb test settings for the importer (GAME_IMPORT_FIX.md), kept until cleared: --es import_test "free=BYTES,enospc=BYTES,kill=copy|commit" or "". */
+    private void importTest(Intent in) {
+        String t = in != null ? in.getStringExtra("import_test") : null;
+        if (t == null) return;
+        state.edit().putString("import_test", t.trim()).apply();
+        Log.w(TAG, "import test settings: " + (t.trim().isEmpty() ? "cleared" : t.trim()));
     }
 
     @Override
@@ -115,6 +185,12 @@ public class LauncherActivity extends Activity {
         Intent in = getIntent();
         if (!isTaskRoot() && Intent.ACTION_MAIN.equals(in.getAction()) && in.hasCategory(Intent.CATEGORY_LAUNCHER)) { finish(); return; }
         state = getSharedPreferences("runs", MODE_PRIVATE);
+        folders = new GameFolders(this);
+        importTest(in);
+        if (GameImport.current == null) {                                      // a fresh process: no import of ours is running
+            String r = folders.recover();
+            if (!r.isEmpty()) state.edit().putString("recovered", "An earlier import did not finish: " + r).apply();
+        }
         buildUi();
         Log.i(TAG, "onCreate" + (saved != null ? " (restored)" : "") + ", autorun=" + getIntent().getStringExtra("autorun"));
         if (saved == null) autorun(getIntent());
@@ -124,6 +200,7 @@ public class LauncherActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+        importTest(intent);
         Log.i(TAG, "onNewIntent, autorun=" + intent.getStringExtra("autorun"));
         autorun(intent);
     }
@@ -134,12 +211,14 @@ public class LauncherActivity extends Activity {
         resumed = true;
         refresh();
         poll.run();
+        importPoll.run();
     }
 
     @Override
     protected void onPause() {
         resumed = false;
         handler.removeCallbacks(poll);
+        handler.removeCallbacks(importPoll);
         super.onPause();
     }
 
@@ -174,7 +253,7 @@ public class LauncherActivity extends Activity {
         folder.setAllCaps(false);
         folder.setText(gameLabel());
         folder.setOnClickListener(v -> {                                      // cycles through the folders that have SS2.exe
-            List<String> g = installedGames(); if (g.isEmpty()) return;
+            List<String> g = folders.list(); if (g.isEmpty()) return;
             int i = g.indexOf(game());
             state.edit().putString("game", g.get((i + 1) % g.size())).apply();
             folder.setText(gameLabel());
@@ -189,17 +268,23 @@ public class LauncherActivity extends Activity {
             size.setText("Interface size: " + uiSize()[2]);
         });
         col.addView(size);
-        Button imp = new Button(this);
+        Button imp = importButton = new Button(this);
         imp.setAllCaps(false);
         imp.setText("Import a game folder...");
         imp.setOnClickListener(v -> {                                          // Android's folder picker; no storage permission
-            if (importing) return;
+            GameImport j = GameImport.current;
+            if (j != null && j.stage == GameImport.Stage.COPYING) { j.cancel = true; Log.i(TAG, "import: cancel requested"); importPoll.run(); return; }
+            if (GameImport.busy()) return;
             try { startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), REQUEST_IMPORT); }
             catch (android.content.ActivityNotFoundException e) { importStatus.setText("This device has no folder picker. Copy the game with adb push (android/README.md)."); }
         });
         col.addView(imp);
         col.addView(importStatus = text(13, false));
-        importStatus.setText("Game folders: " + (installedGames().isEmpty() ? "none yet. Import your System Shock 2 folder (NewDark 2.48, modded or not), or copy it with adb push." : String.join(", ", installedGames())));
+        List<String> games = folders.list();
+        String recovered = state.getString("recovered", null);
+        importStatus.setText((recovered != null ? recovered + "\n" : "") + "Game folders: " + (games.isEmpty()
+            ? "none yet. Import your System Shock 2 folder (NewDark 2.48, modded or not), or copy it with adb push." : String.join(", ", games)));
+        if (recovered != null) state.edit().remove("recovered").apply();
         TextView diag = text(14, false);
         diag.setTypeface(Typeface.DEFAULT_BOLD);
         diag.setText(BuildConfig.DIAGNOSTICS ? "Diagnostics" : "About");
@@ -224,7 +309,7 @@ public class LauncherActivity extends Activity {
         info.setText(String.format(Locale.US, "%s %s\n%s %s, Android %s (API %d), %s\nlauncher pid %d; runs in %s%s",
             getPackageName(), versionName(), Build.MANUFACTURER, Build.MODEL, Build.VERSION.RELEASE, Build.VERSION.SDK_INT,
             String.join(",", Build.SUPPORTED_ABIS), android.os.Process.myPid(), getPackageName(), GAME_PROCESS_SUFFIX)
-            + "\ngame folders (adb push): " + gamesDir() + "\nwrite folders (saves, logs): " + new File(getFilesDir(), "profiles"));
+            + "\ngame folders (adb push): " + folders.adb + "\nimported game folders: " + folders.imported + "\nwrite folders (saves, logs): " + folders.profiles);
     }
 
     private void addButton(LinearLayout col, String label, String which) {
@@ -236,21 +321,10 @@ public class LauncherActivity extends Activity {
         buttons.add(b);
     }
 
-    /** Game files are copied here (IMPLEMENTATION_PLAN.md section 2, option A); later phases run the game from it. */
-    private File gamesDir() {
-        File ext = getExternalFilesDir(null), d = new File(ext != null ? ext : getFilesDir(), "games");
-        d.mkdirs();
-        return d;
-    }
-
     private String game() { return state.getString("game", DEFAULT_GAME); }
-    private String gameLabel() { return "Game folder: " + game() + (new File(new File(gamesDir(), game()), "SS2.exe").isFile() ? "" : " (no SS2.exe there)"); }
-    private List<String> installedGames() {
-        List<String> g = new ArrayList<>();
-        File[] d = gamesDir().listFiles();
-        if (d != null) for (File f : d) if (!f.getName().endsWith(".importing") && new File(f, "SS2.exe").isFile()) g.add(f.getName());   // not a half import
-        java.util.Collections.sort(g);
-        return g;
+    private String gameLabel() {
+        File exe = GameFolders.exe(folders.dir(game()));
+        return "Game folder: " + game() + (exe == null ? " (no SS2.exe there)" : GameFolders.exeProblem(exe) != null ? " (its SS2.exe is not supported)" : "");
     }
 
     private String versionName() {
@@ -316,16 +390,21 @@ public class LauncherActivity extends Activity {
         int comma = q.indexOf(',');
         String m = comma < 0 ? q : q.substring(0, comma), rest = comma < 0 ? "" : q.substring(comma + 1);
         String[] x = mode(m);
-        File dir = runDir(m), exe = new File(new File(gamesDir(), game()), "SS2.exe"), profile = new File(getFilesDir(), "profiles/" + game());
+        File dir = runDir(m), gameDir = folders.dir(game()), found = GameFolders.exe(gameDir), exe = found != null ? found : new File(gameDir, "SS2.exe");
+        File profile = new File(folders.profiles, game());
         try {
             Files.deleteTree(dir);
             if (!dir.mkdirs()) throw new IOException("cannot create " + dir);
+            String bad;
             if (!isGame(m)) Files.copy(getAssets().open("conformance/conformance.exe"), new File(dir, "conformance.exe"));
             else if (!exe.isFile()) throw new IOException("there is no System Shock 2 in the game folder \"" + game() + "\" (" + exe
                 + " not found). Tap Import a game folder to copy your NewDark 2.48 installation, pick another Game folder, or copy one with adb push.");
+            else if ((bad = GameFolders.exeProblem(exe)) != null) throw new IOException("the game folder \"" + game() + "\" cannot be started: " + bad
+                + ". Put the NewDark 2.48 SS2.exe into " + gameDir + ", or pick another Game folder.");
             else if (!profile.isDirectory() && !profile.mkdirs()) throw new IOException("cannot create " + profile);
-            if (isGame(m)) applyUiSize(new File(profile, "user.cfg"));
+            if (isGame(m)) applyUiSize(new File(profile, "user.cfg"), gameDir);
         } catch (IOException e) {
+            if (isGame(m) && importStatus != null) importStatus.setText("Cannot start: " + e.getMessage());   // next to Play, not only in the results
             state.edit().putString("queue", rest).apply();
             finishRun(m, "launcher could not prepare the run: " + e);
             handler.post(poll);
@@ -362,10 +441,14 @@ public class LauncherActivity extends Activity {
     }
 
     /** Puts the Interface size into the profile's user.cfg (which cam.cfg includes after cam_ext.cfg, so it wins). Only
-     *  the marked line is the launcher's; anything else in the file stays as it is. */
-    private void applyUiSize(File cfg) throws IOException {
-        String old = cfg.isFile() ? Files.read(cfg) : "", v = uiSize()[0];
-        if (old == null) throw new IOException("cannot read " + cfg);
+     *  the marked line is the launcher's; anything else in the file stays as it is. The profile's user.cfg hides the game
+     *  folder's (vfs.c reads the write folder first), so a profile without one starts from the game folder's copy: an
+     *  imported installation keeps its own user.cfg settings. */
+    private void applyUiSize(File cfg, File gameDir) throws IOException {
+        File seed = cfg.isFile() ? null : GameFolders.findIgnoreCase(gameDir, "user.cfg");
+        String old = cfg.isFile() ? Files.read(cfg) : seed != null && seed.isFile() ? Files.read(seed) : "", v = uiSize()[0];
+        if (old == null) throw new IOException("cannot read " + (seed != null ? seed : cfg));
+        if (seed != null && seed.isFile()) Log.i(TAG, "user.cfg: the new profile starts from " + seed);
         StringBuilder out = new StringBuilder();
         String[] lines = old.split("\r?\n", -1);
         for (int i = 0; i < lines.length; i++) {
@@ -376,8 +459,8 @@ public class LauncherActivity extends Activity {
         if (v != null) out.append(UI_MARK).append("\r\n").append("d3d_disp_scaled_2d_overlay ").append(v).append("\r\n");
         String now = out.toString();
         Log.i(TAG, "interface size: " + uiSize()[1] + (v != null ? " (d3d_disp_scaled_2d_overlay " + v + " in " + cfg + ")" : " (user.cfg not set)"));
-        if (now.equals(old)) return;
-        if (now.isEmpty()) { if (!cfg.delete()) throw new IOException("cannot delete " + cfg); return; }   // the launcher made it
+        if (now.equals(old) && seed == null) return;
+        if (now.isEmpty()) { if (cfg.exists() && !cfg.delete()) throw new IOException("cannot delete " + cfg); return; }   // the launcher made it
         File tmp = new File(cfg.getPath() + ".tmp");
         Files.write(tmp, now, false);
         if (!tmp.renameTo(cfg)) throw new IOException("cannot replace " + cfg);

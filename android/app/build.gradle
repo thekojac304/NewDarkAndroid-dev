@@ -6,6 +6,24 @@ def repo = rootProject.file('..')
 def sdl2 = file(project.findProperty('sdl2.dir') ?: System.getenv('SDL2_SOURCE') ?: "${repo}/build/deps/SDL2")
 def nativeOut = file(project.findProperty('native.dir') ?: "${repo}/build/android")
 
+// What the recompiled game was generated from, so the launcher can check a game folder before copying or starting it:
+// SS2.exe "size:crc32" (host.c refuses any other file) and each recompiled module "name:SizeOfImage:ImageBase" (modules.c
+// skips another version). Read from build_native.py's generated sources; empty when they are missing (no check then).
+def gameIdentity = {
+    def gen = file("${nativeOut}/game/gen"), hd = new File(gen, 'nd/nd_hostdata.c'), exe = '', mods = []
+    if (hd.isFile()) {
+        def t = hd.text, s = t =~ /hd_exe_size = (\d+)u/, c = t =~ /hd_exe_crc = 0x([0-9a-f]+)u/
+        if (s.find() && c.find()) exe = "${s.group(1)}:${c.group(1)}"
+    }
+    (gen.listFiles() ?: []).sort().each { d ->
+        def f = new File(d, "${d.name}_moddata.c")
+        def m = f.isFile() ? (f.text =~ /_desc = \{ "([^"]+)", 0x[0-9a-f]+u, 0x([0-9a-f]+)u, 0x[0-9a-f]+u, 0x([0-9a-f]+)u/) : null
+        if (m?.find()) mods << "${m.group(1)}:${m.group(2)}:${m.group(3)}"
+    }
+    if (!exe) logger.warn("no ${hd}: the launcher will not check game folders' SS2.exe")
+    [exe, mods.join(',')]
+}()
+
 android {
     namespace 'local.newdarkandroid.ss2'
     compileSdk 34
@@ -15,9 +33,11 @@ android {
         applicationId 'local.newdarkandroid.ss2'
         minSdk 26
         targetSdk 34
-        versionCode 9
-        versionName '0.8.0-phase4'
+        versionCode 10
+        versionName '0.8.1-import-fix'
         ndk { abiFilters 'arm64-v8a' }
+        buildConfigField 'String', 'GAME_EXE', "\"${gameIdentity[0]}\""
+        buildConfigField 'String', 'GAME_MODULES', "\"${gameIdentity[1]}\""
     }
 
     // Two builds of the same app (same package: one replaces the other and keeps its data):

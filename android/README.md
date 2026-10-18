@@ -6,8 +6,9 @@ contains code generated from your game files: it is a personal build, never to b
 
 | Part | What it is |
 | --- | --- |
-| `LauncherActivity` (main process) | The launcher: **Play**, **Game folder** (`games/NAME`, each with its own write folder), **Interface size**, **Import a game folder...** (`GameImport`), then the diagnostics (dev build). It prepares a run directory, starts `NewDarkActivity`, and shows the verdict, preflight checks and log once the run's process has ended. |
-| `GameImport` | Copies a folder picked with Android's folder picker (no storage permission) into `games/NAME/` through `NAME.importing/`, keeping its layout (modded installs too), never replacing an existing folder or touching saves |
+| `LauncherActivity` (main process) | The launcher: **Play**, **Game folder** (`games/NAME` or `imported/NAME`, each with its own write folder), **Interface size**, **Import a game folder...** (`GameImport`), then the diagnostics (dev build). It prepares a run directory, starts `NewDarkActivity`, and shows the verdict, preflight checks and log once the run's process has ended. It refuses to start an `SS2.exe` other than the one the game was recompiled from, and says why. |
+| `GameFolders` | Where game folders live (`games/` from adb, `imported/` from the importer), names, the `SS2.exe` check (`BuildConfig.GAME_EXE`), and recovery of interrupted imports |
+| `GameImport` | Copies a folder picked with Android's folder picker (no storage permission) into a new `imported/NAME/`, keeping its layout (modded installs too). Scans first and asks: the `SS2.exe` and recompiled-module check, free space, and whether to bring the installation's saves into the new game's own write folder. Staging folders and a commit journal make an interrupted import invisible and recoverable. Never replaces a game folder, save or setting (docs/android-audit/GAME_IMPORT_FIX.md) |
 | `NewDarkActivity` (`:game` process) | An `SDLActivity`. SDL loads `libSDL2.so` and the library named by the `lib` extra, then calls its `SDL_main` (`port/backends/android/`) with the `args` extra. A log overlay shows progress. |
 | `build_native.py` | Builds SDL 2 and the native libraries with the NDK, and stages them with their assets in `build/android/`. With `--game SS2.exe` it also lifts the game (default lift) and builds `libss2null.so` (headless) and `libss2game.so` (SDL2 + OpenGL ES). |
 | `tools/` | Test tools that run outside the app: `uhid_input.c`, a USB keyboard and mouse made from adb ([tools/README.md](tools/README.md)). |
@@ -109,8 +110,10 @@ reported as FAIL the next time the launcher starts a run.
 
 | Folder | Holds |
 | --- | --- |
-| `/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/<name>/` | Read-only game folders, copied with `adb push` |
-| `files/profiles/<name>/` (internal storage) | The write folder (`SS2PORT_WRITE_DIR`): saves, configuration changes, logs |
-| `files/` | App settings |
+| `/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/<name>/` | Read-only game folders, copied with `adb push`. adb creates `games/` as the shell account (uid 2000), so the app can read it but not create anything in it |
+| `/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/imported/<name>/` | Game folders made by **Import a game folder...**: created by the app, so always writable by it (adb can still read and write them). `<name>.importing/` and `<name>.commit` are imports in progress, never game folders |
+| `files/profiles/<name>/` (internal storage) | The write folder (`SS2PORT_WRITE_DIR`): saves, configuration changes, logs. An import's saves (`save_N/`) go here |
+| `files/` | App settings, `touch-settings.cfg` |
 
-Uninstalling the app removes both.
+A name is used once across `games/`, `imported/` and `profiles/`; if both `games/NAME` and `imported/NAME` hold an
+`SS2.exe`, `games/` is used. Uninstalling the app removes all of them.
