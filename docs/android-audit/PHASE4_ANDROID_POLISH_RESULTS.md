@@ -15,7 +15,7 @@ touch input all night (PHASE2B2_RESULTS.md). The `adb push` workflow stays docum
 | D2 Import | **Implemented, not device-tested.** **Import a game folder...**: Android's folder picker, copy into `games/NAME/` through `NAME.importing/`, never over an existing folder |
 | D3 Stability | **Tested** (scripted input; no touch): Home/resume, audio pause/resume, surface recreation, 6.5-minute SCP soak (`phase4/soak-scp-profile.log.txt`), crash and missing-file reporting, save/load. Touch after resume not tested |
 | D4 Packaging | **Done.** `dev` (everything, 88.6 MB) and `play` (the game only, **43.7 MB**) builds of the same app |
-| APKs | `0.8.0-phase4`: dev `afef2798be81fefd5addf4745e346a41f4bad22aab5b71417c1670f0dda75b58`, play `3b4ed73db444e550ad13613ed1ddd438d171e5e942e3176f725d2af2c49b9f1c`, in `build/android/baseline/phase4/` with `libss2game.so` (`6c319481…`, unchanged since Phase 3A) |
+| APKs | `0.8.0-phase4`: dev `89f28ce444d1685c649155d60f811862cb67624c0ecf605264ec542681f5b3db`, play `3b4ed73db444e550ad13613ed1ddd438d171e5e942e3176f725d2af2c49b9f1c`, in `build/android/baseline/phase4/` with `libss2game.so` (`6c319481…`, unchanged since Phase 3A) |
 
 ## 1. Launching (D1)
 
