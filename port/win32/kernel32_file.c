@@ -41,8 +41,8 @@ static int open_flags(uint32_t access, uint32_t disp) {
     if (fl & (PLAT_CREATE | PLAT_TRUNCATE)) fl |= PLAT_WRITE;
     return fl;
 }
-SHIM(CreateFileA) {
-    const char *name = gs(A(0)); uint32_t disp = A(4); char hp[1200];
+static void create_file(CPU *c, const char *name) {
+    uint32_t disp = A(4); char hp[1200];
     if (!_stricmp_ascii(name, "CONOUT$")) { RET(std_handle(1)); return; }
     char probe[1200]; vfs_map(name, probe, sizeof probe); PlatStat st; int existed = !plat_fs_stat(probe, &st);
     if (existed && st.is_dir) { set_last_error(5); RET(0xFFFFFFFFu); return; }
@@ -51,6 +51,11 @@ SHIM(CreateFileA) {
     set_last_error(existed && (disp == 2 || disp == 4) ? 183 : 0);
     RET(new_file(f, 0, hp));
 }
+SHIM(CreateFileA) { create_file(c, gs(A(0))); }
+static void narrow(uint32_t w, char *b, size_t n) {              /* a guest UTF-16 path: file names here are ASCII */
+    size_t i = 0; for (; i + 1 < n && RD16(w + 2 * (uint32_t)i); i++) { uint16_t ch = RD16(w + 2 * (uint32_t)i); b[i] = ch < 128 ? (char)ch : '?'; } b[i] = 0;
+}
+SHIM(CreateFileW) { char b[1024]; narrow(A(0), b, sizeof b); create_file(c, b); }   /* MSVC 2015+ CRT (fopen) */
 SHIM(ReadFile) {
     KFile *f = FH(A(0)); if (A(3)) WR32(A(3), 0);
     if (!f || !f->f) { set_last_error(6); RET(0); return; }
@@ -71,6 +76,11 @@ SHIM(SetFilePointer) {
     int64_t off = (int32_t)A(1); if (A(2)) off = (int64_t)(((uint64_t)RD32(A(2)) << 32) | A(1));
     int64_t r = plat_fs_seek(f->f, off, (int)A(3)); if (r < 0) { set_last_error(131); RET(0xFFFFFFFFu); return; }
     if (A(2)) WR32(A(2), (uint32_t)((uint64_t)r >> 32)); set_last_error(0); RET((uint32_t)r);
+}
+SHIM(SetFilePointerEx) {                                       /* (file, LARGE_INTEGER distance, new position out, method) */
+    KFile *f = FH(A(0)); if (!f || !f->f) { set_last_error(6); RET(0); return; }
+    int64_t r = plat_fs_seek(f->f, (int64_t)(((uint64_t)A(2) << 32) | A(1)), (int)A(4)); if (r < 0) { set_last_error(131); RET(0); return; }
+    if (A(3)) { WR32(A(3), (uint32_t)r); WR32(A(3) + 4, (uint32_t)((uint64_t)r >> 32)); } RET(1);
 }
 SHIM(GetFileSize) { KFile *f = FH(A(0)); PlatStat st; if (!f || !f->f || plat_fs_fstat(f->f, &st)) { RET(0xFFFFFFFFu); return; } if (A(1)) WR32(A(1), (uint32_t)(st.size >> 32)); RET((uint32_t)st.size); }
 SHIM(SetEndOfFile) { KFile *f = FH(A(0)); if (!f || !f->f) { RET(0); return; } int64_t pos = plat_fs_seek(f->f, 0, PLAT_SEEK_CUR); RET(pos >= 0 && !plat_fs_truncate(f->f, (uint64_t)pos)); }
@@ -142,8 +152,8 @@ static int find_next(KFind *h, uint32_t out) {
         return 1;
     }
 }
-SHIM(FindFirstFileA) {
-    const char *w = gs(A(0)); char wdir[1024]; snprintf(wdir, sizeof wdir, "%s", w);
+static void find_first(CPU *c, const char *w, uint32_t data) {
+    char wdir[1024]; snprintf(wdir, sizeof wdir, "%s", w);
     char *sl = strrchr(wdir, '\\'), *s2 = strrchr(wdir, '/'); if (s2 > sl) sl = s2;
     const char *pat = sl ? sl + 1 : wdir; char patc[300]; snprintf(patc, sizeof patc, "%s", pat);
     if (sl) sl[1] = 0; else wdir[0] = 0;
@@ -152,9 +162,11 @@ SHIM(FindFirstFileA) {
     f->dots = strpbrk(patc, "*?") ? 0 : 2;                  /* "." and ".." only for wildcard searches */
     f->d = vfs_opendir(wdir[0] ? wdir : ".");               /* the write folder and the game folder */
     if (!f->d) { free(f); port_miss("FindFirstFile", w); set_last_error(3); RET(0xFFFFFFFFu); return; }
-    if (!find_next(f, A(1))) { kfind_destroy(&f->k); set_last_error(2); RET(0xFFFFFFFFu); return; }
+    if (!find_next(f, data)) { kfind_destroy(&f->k); set_last_error(2); RET(0xFFFFFFFFu); return; }
     RET(handle_new(&f->k));
 }
+SHIM(FindFirstFileA) { find_first(c, gs(A(0)), A(1)); }
+SHIM(FindFirstFileExA) { find_first(c, gs(A(0)), A(2)); }      /* FindExInfoStandard/Basic, FindExSearchNameMatch: the same */
 SHIM(FindNextFileA) { KFind *f = (KFind *)handle_get(A(0), K_FIND); if (!f) { set_last_error(6); RET(0); return; } if (!find_next(f, A(1))) { set_last_error(18); RET(0); return; } RET(1); }
 SHIM(FindClose) { RET(handle_close(A(0))); }
 
@@ -223,12 +235,12 @@ SHIM(WritePrivateProfileStringA) {
 }
 
 const ShimDef kernel32_file_shims[] = {
-    S(CreateFileA, STD(7)), S(ReadFile, STD(5)), S(WriteFile, STD(5)), S(SetFilePointer, STD(4)), S(GetFileSize, STD(2)), S(SetEndOfFile, STD(1)), S(FlushFileBuffers, STD(1)),
+    S(CreateFileA, STD(7)), S(CreateFileW, STD(7)), S(ReadFile, STD(5)), S(WriteFile, STD(5)), S(SetFilePointer, STD(4)), S(SetFilePointerEx, STD(5)), S(GetFileSize, STD(2)), S(SetEndOfFile, STD(1)), S(FlushFileBuffers, STD(1)),
     S(GetFileType, STD(1)), S(GetFileTime, STD(4)), S(SetFileTime, STD(4)), S(GetFileAttributesA, STD(1)), S(SetFileAttributesA, STD(2)), S(DeleteFileA, STD(1)), S(MoveFileA, STD(2)),
     S(CopyFileA, STD(3)), S(CreateDirectoryA, STD(2)), S(RemoveDirectoryA, STD(1)), S(GetCurrentDirectoryA, STD(2)), S(SetCurrentDirectoryA, STD(1)), S(GetFullPathNameA, STD(4)),
     S(GetShortPathNameA, STD(3)), S(GetLongPathNameA, STD(3)), S(GetTempPathA, STD(2)), S(GetWindowsDirectoryA, STD(2)), S(GetSystemDirectoryA, STD(2)), S(GetDriveTypeA, STD(1)), S(GetLogicalDrives, 0),
     S(GetVolumeInformationA, STD(8)), S(GetDiskFreeSpaceExA, STD(4)), S(GetDiskFreeSpaceA, STD(5)),
-    S(FindFirstFileA, STD(2)), S(FindNextFileA, STD(2)), S(FindClose, STD(1)),
+    S(FindFirstFileA, STD(2)), S(FindFirstFileExA, STD(6)), S(FindNextFileA, STD(2)), S(FindClose, STD(1)),
     S(GetStdHandle, STD(1)), S(SetStdHandle, STD(2)), S(WriteConsoleA, STD(5)), S(WriteConsoleW, STD(5)), SA("SetConsoleCursorPosition", ConsoleOk, STD(2)), SA("SetConsoleTextAttribute", ConsoleOk, STD(2)),
     S(GetConsoleScreenBufferInfo, STD(2)), S(GetConsoleMode, STD(2)), S(GetConsoleCP, 0), SA("GetConsoleOutputCP", GetConsoleCP, 0), SA("SetConsoleCtrlHandler", ConsoleOk, STD(2)),
     S(GetPrivateProfileIntA, STD(4)), S(GetPrivateProfileStringA, STD(6)), S(GetProfileIntA, STD(3)), S(WritePrivateProfileStringA, STD(4)),

@@ -3,7 +3,7 @@
 #   cmake -S port -B build/port -DPORT_GENERATED=<lifter output> [-DPORT_BACKEND=sdl2|null]
 #   cmake --build build/port
 #
-# PORT_GENERATED contains nd/ (SS2.exe) and mods/ (mods.c), plus ao/ sq/ lv/ fm/ for the recompiled DLLs when they
+# PORT_GENERATED contains nd/ (SS2.exe) and mods/ (mods.c), plus ao/ sq/ lv/ fm/ nv/ for the recompiled DLLs when they
 # were lifted. A port to a new platform adds a directory under backends/ and selects it with PORT_BACKEND.
 cmake_minimum_required(VERSION 3.16)
 project(ss2port C)
@@ -29,7 +29,7 @@ if(NOT CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 # ---- the recompiled game (generated, unchanged between platforms)
-file(GLOB GEN_SRC ${PORT_GENERATED}/nd/*.c ${PORT_GENERATED}/ao/*.c ${PORT_GENERATED}/sq/*.c ${PORT_GENERATED}/lv/*.c ${PORT_GENERATED}/fm/*.c ${PORT_GENERATED}/mods/*.c)
+file(GLOB GEN_SRC ${PORT_GENERATED}/nd/*.c ${PORT_GENERATED}/ao/*.c ${PORT_GENERATED}/sq/*.c ${PORT_GENERATED}/lv/*.c ${PORT_GENERATED}/fm/*.c ${PORT_GENERATED}/nv/*.c ${PORT_GENERATED}/mods/*.c)
 set(GEN_DEFS "")
 if(PORT_PREEMPT)
   list(APPEND GEN_DEFS RT_PREEMPT)

@@ -34,6 +34,16 @@ def find_ci(base, *parts):
     return p
 MODULES = [("allobjs.osm", "Data", "ao", None), ("Squirrel.osm", "osm", "sq", 0x30000000), ("lgvid.dll", ".", "lv", 0x30300000)]
 MODULES_LOW = [("allobjs.osm", "Data", "ao", 0x00E00000), ("Squirrel.osm", "osm", "sq", 0x00E90000), ("lgvid.dll", ".", "lv", 0x01130000)]   # --low-dll-bases: for hosts with a small guest space (PS Vita)
+# --nvscript FILE: Nameless Voice's NVScript.osm, which the System Shock 2 Community Patch (SCP) needs. It is not part of the
+# game, so its path is given (a mod folder's copy, e.g. DMM/SCP_beta8/NVScript.osm); the engine finds it by name in the mod
+# paths, and the host loads it only when the file there is byte-identical to the one lifted (as for the other modules).
+NVSCRIPT_BASE, NVSCRIPT_BASE_LOW = 0x30400000, 0x01140000
+def modules(nvscript=None, low=False):
+    """(file name, folder (None: fname is a full path), prefix, rebase) of every module to lift"""
+    m = list(MODULES_LOW if low else MODULES)
+    if nvscript: m.append((os.path.abspath(nvscript), None, "nv", NVSCRIPT_BASE_LOW if low else NVSCRIPT_BASE))
+    return m
+LIFT_SOURCES = ("lift.py", "lift_preserve.py", "lift_x87.py", "lift_sse.py")   # the lifter: any change relifts
 
 def run(cmd, what):
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
@@ -63,6 +73,7 @@ def main():
     ap.add_argument("--abi-check", action="store_true", help="with --cache-regs: check at run time that indirect calls and imports keep EBX/EBP/ESI/EDI, log and correct violations (slower; for test sessions)")
     ap.add_argument("--symbols", action="store_true", help="embed a function-name table (tools/annotate.py + symbols/manual.sym) so crash reports show names instead of addresses; adds a few hundred KB, so it is off by default")
     ap.add_argument("--low-dll-bases", action="store_true", help="lift the game's DLLs for load addresses below 32 MB (hosts with a small guest space, e.g. the PS Vita backend)")
+    ap.add_argument("--nvscript", metavar="FILE", help="also recompile this NVScript.osm (needed by SCP; e.g. the copy in its mod folder)")
     a = ap.parse_args(); exe = os.path.abspath(a.ss2exe)
     win = a.target == "windows"
     if a.abi_check and not a.cache_regs: sys.exit("--abi-check checks code lifted with --cache-regs: add --cache-regs")
@@ -90,7 +101,7 @@ def main():
     for flag in ("no_x87", "no_preserve", "no_abi_calls"):                 # feature switches for bisecting: they relift
         if getattr(a, flag): cr += ["--" + flag.replace("_", "-")]; crs += flag
     nd = os.path.join(OUT, "nd"); lift_py = os.path.join(ROOT, "lift.py"); sigf = os.path.join(nd, "src.sha1")
-    lift_srcs = [lift_py] + [os.path.join(ROOT, f) for f in ("lift_preserve.py", "lift_x87.py")]   # the lifter: any change relifts
+    lift_srcs = [os.path.join(ROOT, f) for f in LIFT_SOURCES]
     s = sha(exe, *lift_srcs, extra=crs)
     if not (os.path.exists(sigf) and open(sigf).read().strip() == s and os.path.exists(os.path.join(nd, "nd_meta.json"))):
         shutil.rmtree(nd, ignore_errors=True); run([PY, "lift.py", "--smc"] + cr + [exe, "nd", nd], "lift SS2.exe"); open(sigf, "w").write(s)
@@ -105,16 +116,18 @@ def main():
         run([PY, os.path.join("host", "gen_symtab.py"), "--functions", os.path.join(nd, "nd_meta.json"), exe, symc, auto, os.path.join(ROOT, "symbols", "manual.sym")], "symbol table")
     elif os.path.exists(symc): os.remove(symc)
     mods = []
-    for fname, sub, pfx, rebase in (MODULES_LOW if a.low_dll_bases else MODULES):
-        src = find_ci(os.path.dirname(exe), sub, fname); md = os.path.join(OUT, pfx)
+    if a.nvscript and not os.path.isfile(a.nvscript): sys.exit(f"--nvscript: {a.nvscript} not found")
+    for fname, sub, pfx, rebase in modules(a.nvscript, a.low_dll_bases):
+        src = fname if sub is None else find_ci(os.path.dirname(exe), sub, fname); md = os.path.join(OUT, pfx)
         if not os.path.isfile(src): print(f"  warning: {src} not found; the game will not run without it"); shutil.rmtree(md, ignore_errors=True); continue
         s = sha(src, *lift_srcs, extra=str(rebase) + crs); sigf = os.path.join(md, "src.sha1")
         if not (os.path.exists(sigf) and open(sigf).read().strip() == s and os.path.exists(os.path.join(md, f"{pfx}_meta.json"))):
-            print(f"  lifting {fname}", flush=True); shutil.rmtree(md, ignore_errors=True)
+            print(f"  lifting {os.path.basename(fname)}", flush=True); shutil.rmtree(md, ignore_errors=True)
             run([PY, "lift.py", "--iat-indirect"] + cr + (["--rebase", hex(rebase)] if rebase else []) + [src, pfx, md], f"lift {fname}"); open(sigf, "w").write(s)
-        else: print(f"  {fname}: already lifted")
+        else: print(f"  {os.path.basename(fname)}: already lifted")
         run([PY, os.path.join("host", "gen_moddata.py"), src, pfx, os.path.join(md, f"{pfx}_moddata.c")] + (["--rebase", hex(rebase)] if rebase else []), f"{fname} data")
         mods.append(pfx)
+    if not a.nvscript: shutil.rmtree(os.path.join(OUT, "nv"), ignore_errors=True)      # an earlier --nvscript lift: not built in
     md = os.path.join(OUT, "mods"); os.makedirs(md, exist_ok=True)
     with open(os.path.join(md, "mods.c"), "w") as f:
         f.write('#include "recomp_mod.h"\n' + "".join(f"extern const RecompModDesc {p}_desc;\n" for p in mods) + "const RecompModDesc *const recomp_mods[] = { " + "".join(f"&{p}_desc, " for p in mods) + "0 };\n")

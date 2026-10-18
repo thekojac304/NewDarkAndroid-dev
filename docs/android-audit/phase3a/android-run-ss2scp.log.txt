@@ -1,0 +1,18 @@
+[port] lgvid.dll: first call into its code (30303d97, thread 1004)
+[port] lgvid.dll: loaded the recompiled module at 30300000 (60 imports bound), DllMain -> 1
+[port] lgvid.dll: 6883 calls from outside it in the last 20 s (6883 in all)
+[port] allobjs.osm: first call into its code (1004c9d5, thread 1004)
+[port] allobjs.osm: loaded the recompiled module at 10000000 (61 imports bound), DllMain -> 1
+[port] NVScript.osm: static TLS slot 0 (8 bytes per thread)
+[port] NVScript.osm: first call into its code (3045d989, thread 1004)
+[port] NVScript.osm: loaded the recompiled module at 30400000 (77 imports bound), DllMain -> 1
+[port] Squirrel.osm: first call into its code (30209829, thread 1004)
+[port] Squirrel.osm: loaded the recompiled module at 30000000 (112 imports bound), DllMain -> 1
+[port] allobjs.osm: 8893 calls from outside it in the last 20 s (8893 in all)
+[port] Squirrel.osm: 3274 calls from outside it in the last 20 s (3274 in all)
+[port] lgvid.dll: 4261 calls from outside it in the last 20 s (11144 in all)
+[port] NVScript.osm: 4023 calls from outside it in the last 20 s (4023 in all)
+[port] allobjs.osm: 1452 calls from outside it in the last 20 s (10345 in all)
+[port] Squirrel.osm: 393 calls from outside it in the last 20 s (3667 in all)
+[port] NVScript.osm: 6004 calls from outside it in the last 20 s (10027 in all)
+[android] process exit(0) after 67.449 s

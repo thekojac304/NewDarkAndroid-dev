@@ -41,6 +41,42 @@ static uint32_t code_crc(const RecompModDesc *d) {
     }
     return crc;
 }
+uint32_t mod_containing(uint32_t a) {          /* GetModuleHandleExW(FROM_ADDRESS): the loaded module that holds a */
+    for (int i = 0; recomp_mods[i] && i < 16; i++) if (st[i].refs && a >= recomp_mods[i]->base && a < recomp_mods[i]->base + recomp_mods[i]->size) return recomp_mods[i]->base;
+    return 0;
+}
+
+/* Static TLS (IMAGE_TLS_DIRECTORY). MSVC 2015 and later use it in every module for thread-safe local statics: the code
+ * reads fs:[2Ch] (the TEB's TLS pointer array), takes entry [_tls_index] and uses the data there. Windows gives each
+ * thread a copy of the template for modules loaded with LoadLibrary too, so the loader does the same: slot k's copy lives
+ * in each thread's TEB block at TEB + 0x2000 + k * 0x1000 (the block is 64 KB; TlsAlloc slots are at TEB + 0xE10, the
+ * pointer array at TEB + 0x1000), for threads that exist at load time and for every thread started later. */
+#define TLS_SLOTS 8
+#define TLS_BLOCK 0x1000u
+static struct { uint32_t start, len; int mod; } tls_slot[TLS_SLOTS];
+static void tls_fill(uint32_t teb, int k) {
+    uint32_t b = teb + 0x2000u + TLS_BLOCK * (uint32_t)k;
+    memset(GP(b), 0, TLS_BLOCK); memcpy(GP(b), GP(tls_slot[k].start), tls_slot[k].len); WR32(teb + 0x1000u + 4u * (uint32_t)k, b);
+}
+static int tls_new;                            /* the slot being set up by mod_load, for thread_foreach_teb */
+static void tls_fill_new(uint32_t teb) { tls_fill(teb, tls_new); }
+void mod_tls_thread(uint32_t teb) { for (int k = 0; k < TLS_SLOTS; k++) if (tls_slot[k].len || tls_slot[k].start) tls_fill(teb, k); }
+void thread_foreach_teb(void (*fn)(uint32_t teb));
+static int tls_attach(int m, const RecompModDesc *d, uint32_t dir) {
+    uint32_t rva = RD32(dir + 8 * 9), sz = RD32(dir + 8 * 9 + 4); if (!rva || sz < 24) return 1;
+    uint32_t t = d->base + rva, start = RD32(t), end = RD32(t + 4), idx = RD32(t + 8), cbs = RD32(t + 12), zero = RD32(t + 16);
+    if (end < start || end - start + zero > TLS_BLOCK) { port_log("%s: its static TLS (%u bytes) is larger than the loader supports", d->name, end - start + zero); return 0; }
+    if (cbs && RD32(cbs)) { port_log("%s: TLS callbacks are not supported", d->name); return 0; }
+    int k = 0; while (k < TLS_SLOTS && (tls_slot[k].len || tls_slot[k].start)) k++;
+    if (k == TLS_SLOTS) { port_log("%s: no static TLS slot left", d->name); return 0; }
+    tls_slot[k].start = start; tls_slot[k].len = end - start; tls_slot[k].mod = m;
+    if (!start) tls_slot[k].start = d->base;   /* an empty template still needs a slot (never 0, so the slot counts as used) */
+    WR32(idx, (uint32_t)k); tls_new = k; thread_foreach_teb(tls_fill_new);
+    port_log("%s: static TLS slot %d (%u bytes per thread)", d->name, k, end - start + zero);
+    return 1;
+}
+static void tls_detach(int m) { for (int k = 0; k < TLS_SLOTS; k++) if (tls_slot[k].mod == m && (tls_slot[k].len || tls_slot[k].start)) tls_slot[k].start = tls_slot[k].len = 0; }
+
 static uint32_t import_thunk(const char *dll, const char *fn) {
     uint32_t a = port_proc(fn); if (a) return a;
     size_t l = strlen(dll) + strlen(fn) + 2; char *nm = malloc(l); snprintf(nm, l, "%s!%s", dll, fn);
@@ -91,10 +127,11 @@ uint32_t mod_load(CPU *c, const char *name) {
             WR32(d->base + ft + 4 * i, a);
         }
     }
+    if (!tls_attach(k, d, dir)) { memset(GP(d->base), 0, d->size); return 0; }
     st[k].refs = 1;
     uint32_t ok = g_call(c, d->entry, 3, d->base, 1u, 0u);
     port_log("%s: loaded the recompiled module at %08x (%u imports bound), DllMain -> %u", d->name, d->base, nb, ok);
-    if (!ok) { st[k].refs = 0; memset(GP(d->base), 0, d->size); return 0; }
+    if (!ok) { st[k].refs = 0; tls_detach(k); memset(GP(d->base), 0, d->size); return 0; }
     return d->base;
 }
 int mod_free(CPU *c, uint32_t h) {
@@ -105,7 +142,7 @@ int mod_free(CPU *c, uint32_t h) {
     if (st[k].unloading) return 1;                          /* FreeLibrary again from inside DllMain(DETACH): already going away */
     st[k].unloading = 1;
     uint32_t r = g_call(c, recomp_mods[k]->entry, 3, h, 0u, 0u);   /* DllMain(DLL_PROCESS_DETACH) while the module still counts as loaded: its code must stay callable */
-    st[k].unloading = 0; st[k].refs = 0; memset(GP(recomp_mods[k]->base), 0, recomp_mods[k]->size);
+    st[k].unloading = 0; st[k].refs = 0; tls_detach(k); memset(GP(recomp_mods[k]->base), 0, recomp_mods[k]->size);
     port_debug("%s: unloaded (DllMain -> %u)", recomp_mods[k]->name, r);
     return 1;
 }
@@ -125,10 +162,26 @@ uint32_t mod_export(uint32_t h, const char *name, int *is_mod) {
     for (uint32_t i = 0; i < nnm; i++) if (!strcmp((const char *)GP(b + RD32(nm + 4 * i)), name)) { uint32_t o = RD16(ord + 2 * i); return o < nfn ? b + RD32(fn + 4 * o) : 0; }
     return 0;
 }
+/* Calls into a module from outside it (the engine calling a script's methods): the first one is logged, so a log shows
+ * that a module's code runs, not only that it loaded. SS2PORT_MODSTATS=1 also logs each module's count every 20 s. */
+static uint64_t calls[16], calls_logged[16]; static int first_logged[16];
+static void mod_stats(void) {
+    static int on = -1; static uint64_t next; if (on < 0) on = getenv("SS2PORT_MODSTATS") && atoi(getenv("SS2PORT_MODSTATS"));
+    if (!on) return;
+    uint64_t now = plat_time_ns(); if (!next) next = now + 20000000000ull; if (now < next) return; next = now + 20000000000ull;
+    for (int i = 0; recomp_mods[i] && i < 16; i++) if (calls[i] != calls_logged[i]) {
+        port_log("%s: %llu calls from outside it in the last 20 s (%llu in all)", recomp_mods[i]->name, (unsigned long long)(calls[i] - calls_logged[i]), (unsigned long long)calls[i]);
+        calls_logged[i] = calls[i];
+    }
+}
 int mod_call(CPU *c, uint32_t t) {
     for (int i = 0; recomp_mods[i] && i < 16; i++) {
         const RecompModDesc *d = recomp_mods[i]; if (!st[i].refs || t < d->base || t >= d->base + d->size) continue;
-        guest_fn f = d->lookup(t); if (f) { f(c); return 1; }
+        guest_fn f = d->lookup(t);
+        if (f) {
+            if (!first_logged[i]) { first_logged[i] = 1; port_log("%s: first call into its code (%08x, thread %u)", d->name, t, cur_thread_id()); }
+            calls[i]++; mod_stats(); f(c); return 1;
+        }
     }
     return 0;
 }

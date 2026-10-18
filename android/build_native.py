@@ -29,11 +29,11 @@ def cmake_build(src, bdir, a, defs, target):
            f"-DANDROID_ABI={ABI}", f"-DANDROID_PLATFORM=android-{a.api}", f"-DCMAKE_BUILD_TYPE={a.config}"] + [f"-D{k}={v}" for k, v in defs.items()]
     rc.run(cfg, stdout=subprocess.DEVNULL); rc.run([cmake, "--build", bdir, "--target", target], stdout=subprocess.DEVNULL)
 
-def lift_game(exe, gen):
+def lift_game(exe, gen, nvscript=None):
     """Lift SS2.exe and its DLLs into gen/ exactly as port/build.py's step 1 does with its defaults (no --cache-regs, no
     fast paths, no symbols); unchanged inputs are not lifted again. Returns the seconds each lift took."""
     sys.path.insert(0, PORT); import build as pb           # port/build.py: MODULES, find_ci, sha, run (cwd = repository)
-    times, lift_srcs = {}, [os.path.join(ROOT, f) for f in ("lift.py", "lift_preserve.py", "lift_x87.py")]
+    times, lift_srcs = {}, [os.path.join(ROOT, f) for f in pb.LIFT_SOURCES]
     def lift(src, pfx, md, cmd, extra):
         sigf, s = os.path.join(md, "src.sha1"), pb.sha(src, *lift_srcs, extra=extra)
         if os.path.exists(sigf) and open(sigf).read().strip() == s and os.path.exists(os.path.join(md, f"{pfx}_meta.json")): print(f"  {os.path.basename(src)}: already lifted"); return
@@ -45,13 +45,14 @@ def lift_game(exe, gen):
     pb.run([sys.executable, os.path.join("host", "gen_hostdata.py"), os.path.join(nd, "nd_meta.json"), exe, os.path.join(nd, "nd_hostdata.c")], "host data")
     if os.path.exists(os.path.join(nd, "nd_symtab.c")): os.remove(os.path.join(nd, "nd_symtab.c"))
     mods = []
-    for fname, sub, pfx, rebase in pb.MODULES:
-        src = pb.find_ci(os.path.dirname(exe), sub, fname); md = os.path.join(gen, pfx)
+    for fname, sub, pfx, rebase in pb.modules(nvscript):
+        src = fname if sub is None else pb.find_ci(os.path.dirname(exe), sub, fname); md = os.path.join(gen, pfx)
         if not os.path.isfile(src): sys.exit(f"{src} not found")
         reb = ["--rebase", hex(rebase)] if rebase else []
         lift(src, pfx, md, [sys.executable, "lift.py", "--iat-indirect"] + reb + [src, pfx, md], str(rebase))
-        pb.run([sys.executable, os.path.join("host", "gen_moddata.py"), src, pfx, os.path.join(md, f"{pfx}_moddata.c")] + reb, f"{fname} data")
+        pb.run([sys.executable, os.path.join("host", "gen_moddata.py"), src, pfx, os.path.join(md, f"{pfx}_moddata.c")] + reb, f"{os.path.basename(fname)} data")
         mods.append(pfx)
+    if not nvscript: shutil.rmtree(os.path.join(gen, "nv"), ignore_errors=True)     # an earlier --nvscript lift: not built in
     md = os.path.join(gen, "mods"); os.makedirs(md, exist_ok=True)
     with open(os.path.join(md, "mods.c"), "w") as f:
         f.write('#include "recomp_mod.h"\n' + "".join(f"extern const RecompModDesc {p}_desc;\n" for p in mods) + "const RecompModDesc *const recomp_mods[] = { " + "".join(f"&{p}_desc, " for p in mods) + "0 };\n")
@@ -62,7 +63,7 @@ def build_game(a, libs):
     exe = os.path.abspath(a.game); game = os.path.join(a.build, "game"); gen = os.path.join(game, "gen")
     if not os.path.isfile(exe): sys.exit(f"SS2.exe not found: {exe}")
     print(f"lift {exe} (default lift) ...", flush=True)
-    for pfx, s in lift_game(exe, gen).items(): print(f"  {pfx}: lifted in {s:.0f} s")
+    for pfx, s in lift_game(exe, gen, a.nvscript).items(): print(f"  {pfx}: lifted in {s:.0f} s")
     for name, backend in (("ss2null", "null"), ("ss2game", "sdl2")):
         if a.game_backend not in ("all", backend): continue
         print(f"lib{name}.so ({backend}) ...", flush=True); t = time.time()
@@ -84,6 +85,7 @@ def main():
     ap.add_argument("--no-rebuild-guest", action="store_true", help="reuse the conformance program and its lifted C if present")
     ap.add_argument("--game", metavar="SS2.EXE", help="also lift your own NewDark 2.48 SS2.exe (with its allobjs.osm, Squirrel.osm, lgvid.dll) and build the game libraries; read only, nothing is written next to it")
     ap.add_argument("--game-only", action="store_true", help="with --game: rebuild only the game libraries, keep SDL2 and the conformance libraries already staged")
+    ap.add_argument("--nvscript", metavar="FILE", help="with --game: also recompile this NVScript.osm (SCP needs it; e.g. its mod folder's copy). Without it, an earlier lift of it is dropped")
     ap.add_argument("--game-backend", default="all", choices=["all", "null", "sdl2"], help="with --game: which game libraries to build")
     a = ap.parse_args(); a.build = os.path.abspath(a.build)
     if not os.path.isfile(os.path.join(a.sdl2, "CMakeLists.txt")): sys.exit(f"no SDL 2 source in {a.sdl2} (--sdl2)")

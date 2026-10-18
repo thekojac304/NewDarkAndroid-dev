@@ -61,6 +61,11 @@ static uint32_t peb(void) {
     if (!g_peb) { extern const uint32_t hd_base; g_peb = vm_alloc(0x1000, 0, "PEB"); WR32(g_peb + 0x08, hd_base); WR32(g_peb + 0x18, 0x100); }
     return g_peb;
 }
+/* every live thread's TEB, so a script module with static TLS that is loaded later reaches threads that already exist */
+static uint32_t tebs[256]; static int ntebs;
+void thread_foreach_teb(void (*fn)(uint32_t teb)) { for (int i = 0; i < ntebs; i++) fn(tebs[i]); }
+static void teb_forget(uint32_t teb) { for (int i = 0; i < ntebs; i++) if (tebs[i] == teb) { tebs[i] = tebs[--ntebs]; return; } }
+void mod_tls_thread(uint32_t teb);
 static GuestThread *thread_alloc(const char *name, uint32_t stack) {
     GuestThread *t = calloc(1, sizeof *t);
     if (stack < 0x10000u) stack = STACK_SIZE;
@@ -76,6 +81,8 @@ static GuestThread *thread_alloc(const char *name, uint32_t stack) {
     WR32(teb + 0x20, 0x100); WR32(teb + 0x24, t->id);
     WR32(teb + 0x2c, teb + 0x1000);                /* static TLS pointer array (empty) */
     WR32(teb + 0x30, peb());
+    if (ntebs < 256) tebs[ntebs++] = teb; else port_warn("more than 256 guest threads: script module TLS is not set up for %s", name);
+    mod_tls_thread(teb);                           /* static TLS of the recompiled modules loaded so far */
     memset(&t->cpu, 0, sizeof t->cpu);
     t->cpu.cw = 0x27f; t->cpu.fs_base = teb; t->cpu.esp = t->stack_hi - 0x40;
     snprintf(t->name, sizeof t->name, "%s", name);
@@ -195,7 +202,7 @@ uint32_t kwait(KObj **objs, int n, int all, uint32_t timeout_ms, int msgs) {
 /* ---------------------------------------------------------------- creating and ending threads */
 static void th_destroy(KObj *o) {      /* the last reference: the handle is closed and the thread has ended */
     KThread *k = (KThread *)o;
-    if (k->t && k->done && k->t != g_cur) { vm_free(k->t->region); free(k->t); }
+    if (k->t && k->done && k->t != g_cur) { teb_forget(k->t->teb); vm_free(k->t->region); free(k->t); }
     free(k);
 }
 static void thread_entry(void *p) {

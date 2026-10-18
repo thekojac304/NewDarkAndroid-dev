@@ -125,7 +125,10 @@ modelled with `double`. Guest memory is flat: guest address `a` lives at host `M
 - **Script and helper modules.** `allobjs.osm` (object scripts), `Squirrel.osm` (NewDark scripting), `lgvid.dll` (cutscene
   player) and `fmsel.dll` (fan-mission selector) are recompiled the same way. When the engine loads one, the host checks
   it is the exact file that was recompiled and runs the recompiled code, falling back to the original if a mod ships its
-  own copy. `Squirrel.osm` is lifted as if loaded at 0x30000000 and relocated there.
+  own copy. `Squirrel.osm` is lifted as if loaded at 0x30000000 and relocated there. `port/build.py --nvscript FILE`
+  (and `android/build_native.py --nvscript FILE`) also recompiles Nameless Voice's `NVScript.osm`, which the System
+  Shock 2 Community Patch needs, at 0x30400000; newer script modules built with MSVC 2015+ use SSE2, static TLS and
+  the newer CRT, which the lifter (`lift_sse.py`) and the host support (docs/android-audit/PHASE3A_NVSCRIPT_RESULTS.md).
 - **Cutscenes without `ffmpeg.dll`.** `lgvid.dll` still asks for the 2011 `ffmpeg.dll` API; `video/lavshim.c` answers
   with an AVI reader, FFmpeg's Indeo 5 decoder and a YUV-to-RGB scaler, all plain C (details in `video/README.md`).
 - **Self-modifying Code.** The software renderer patches its own instructions; the lifter maps every such write to the

@@ -120,6 +120,8 @@ class Image:
         i = next(self.md.disasm(self.img[off:off + 16], va), None) if self.is_code(va) else None
         if i is not None and i.mnemonic == 'repz ret':
             i = _AsRet(i)
+        elif i is not None and i.mnemonic.startswith('bnd '):
+            i = _NoBnd(i)
         if len(self._cache) > 250000:   # bounded: full-detail capstone objects are large
             self._cache.clear()
         self._cache[va] = i
@@ -131,6 +133,12 @@ class _AsRet:
     def __init__(self, i): self._i = i
     def __getattr__(self, k): return getattr(self._i, k)
     mnemonic = 'ret'
+
+
+class _NoBnd:
+    """'bnd ret/jmp/call/jcc' (the MPX prefix, in MSVC 2017's CRT): the plain instruction."""
+    def __init__(self, i): self._i = i; self.mnemonic = i.mnemonic[4:]
+    def __getattr__(self, k): return getattr(self._i, k)
 
 
 # ------------------------------------------------------------------ analysis
@@ -595,6 +603,10 @@ class Fn:
             pass
         pre = []
         mem = [o for o in ops if o.type == X86_OP_MEM]
+        import lift_sse                  # SSE/SSE2 (before the string ops: movsd/cmpsd with xmm operands are SSE2)
+        if lift_sse.is_sse(i, m):
+            pre = [f'uint32_t ea = {self.ea(i, mem[0])};'] if mem else []
+            return ['{'] + ['    ' + x for x in pre + lift_sse.lift(self, i, m, Unsupported)] + ['}']
         is_string = any(m.endswith(s) or m.split()[-1] == s for s in
                         ('movsb', 'movsw', 'movsd', 'stosb', 'stosw', 'stosd', 'lodsb', 'lodsw', 'lodsd',
                          'scasb', 'scasw', 'scasd', 'cmpsb', 'cmpsw', 'cmpsd'))
@@ -610,6 +622,8 @@ class Fn:
                 fl = self.i_setcc
             elif m.startswith('j') and (m[1:] in CC or m[1:] in CC_ALIAS):
                 fl = self.i_jcc
+            elif m.startswith('cmov') and (m[4:] in CC or m[4:] in CC_ALIAS):
+                fl = self.i_cmovcc
             else:
                 raise Unsupported(m)
         body = fl(i, m, ops, nxt)
@@ -756,6 +770,32 @@ class Fn:
 
     def i_setcc(self, i, m, o, n):
         return [self.wr(i, o[0], f'({cond(m[3:])}) ? 1 : 0')]
+
+    # P6 and 486 instructions of newer compilers' code (MSVC 2017: NVScript.osm)
+    def i_cmovcc(self, i, m, o, n):
+        return [f'if ({cond(m[4:])}) {{ {self.wr(i, o[0], self.rd(i, o[1], o[0].size))} }}']
+
+    def _bscan(self, i, o, rev):
+        d, s = o; T = UT[d.size]
+        r = '31u - (uint32_t)__builtin_clz((uint32_t)v)' if rev else '(uint32_t)__builtin_ctz((uint32_t)v)'
+        return [f'{T} v = {self.rd(i, s)};', 'CF = 0; OF = 0; SF = 0; PF = 0;',     # undefined on the CPU; defined here
+                f'if (v == 0) ZF = 1; else {{ ZF = 0; {self.wr(i, d, r)} }}']
+
+    def i_bsf(self, i, m, o, n): return self._bscan(i, o, False)
+    def i_bsr(self, i, m, o, n): return self._bscan(i, o, True)
+
+    def i_xadd(self, i, m, o, n):
+        d, s = o; T = UT[d.size]; sb = SB[d.size]
+        return [f'{T} a = {self.rd(i, d)}, b = {self.rd(i, s)}, r = ({T})(a + b); CF = r < a;',
+                f'OF = (((a ^ r) & (b ^ r)) & {sb}) != 0;', self._szp('r').replace('SB_', sb),
+                self.wr(i, s, 'a'), self.wr(i, d, 'r')]
+
+    def i_cmpxchg(self, i, m, o, n):
+        d, s = o; T = UT[d.size]; sb = SB[d.size]
+        acc = {1: 'al', 2: 'ax', 4: 'eax'}[d.size]
+        return [f'{T} a = {self.reg_rd(acc)}, b = {self.rd(i, d)}, r = ({T})(a - b); CF = a < b;',
+                f'OF = (((a ^ b) & (a ^ r)) & {sb}) != 0;', self._szp('r').replace('SB_', sb),
+                f'if (ZF) {{ {self.wr(i, d, self.rd(i, s))} }} else {{ {self.reg_wr(acc, "b")} }}']
 
     # shifts / rotates
     def _shift(self, i, o, kind):

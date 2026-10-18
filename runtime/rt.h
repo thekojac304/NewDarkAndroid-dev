@@ -17,7 +17,13 @@ typedef struct CPU {
     uint32_t fs_base;       /* guest address of the TIB (fs:[0] = SEH chain) */
     int64_t  budget;        /* harness: block budget; <0 => abort */
     void    *rc;            /* this guest thread's indirect-call cache (rt_icache, --cache-regs); NULL until first used */
+    /* SSE/SSE2 state, for modules built with MSVC's default /arch:SSE2 (lift_sse.py). Appended, so the fields above keep
+       their offsets. mxcsr_x holds MXCSR XOR its power-on value 0x1F80, so a zeroed CPU struct starts as the CPU does. */
+    union rt_xmm { uint8_t b[16]; uint16_t w[8]; uint32_t d[4]; uint64_t q[2]; int8_t sb[16]; int16_t sw[8];
+                   int32_t sd[4]; int64_t sq[2]; float f[4]; double g[2]; } xmm[8];
+    uint32_t mxcsr_x;
 } CPU;
+typedef union rt_xmm XMM;
 
 typedef void (*guest_fn)(CPU *);
 
@@ -218,6 +224,30 @@ static inline uint64_t F2I64(CPU *c, double v){
     double r = FROUND(c, v);
     if (!(r >= -9223372036854775808.0 && r < 9223372036854775808.0)) return 0x8000000000000000ull;
     return (uint64_t)(int64_t)r;
+}
+
+/* ---- SSE/SSE2 (lift_sse.py). Scalar and packed float maths is done in C float/double, which is IEEE single/double
+   like SSE (generated code keeps one operation per statement, so the C compiler cannot fuse them). */
+static inline XMM XLD128(uint32_t a){ XMM x; x.q[0] = RD64(a); x.q[1] = RD64(a + 8); return x; }
+static inline void XST128(uint32_t a, XMM x){ WR64(a, x.q[0]); WR64(a + 8, x.q[1]); }
+static inline float  XF32(uint32_t v){ float f; memcpy(&f, &v, 4); return f; }
+static inline double XF64(uint64_t v){ double d; memcpy(&d, &v, 8); return d; }
+/* cvtt*2si: truncate; NaN and out-of-range give the "integer indefinite" 0x80000000, as the CPU does */
+static inline uint32_t SSE_CVTT32(double v){ return v > -2147483649.0 && v < 2147483648.0 ? (uint32_t)(int32_t)v : 0x80000000u; }
+/* cvt*2si: round as MXCSR.RC says (nearest even by default) */
+static inline uint32_t SSE_CVT32(CPU *c, double v){
+    uint32_t rc = ((c->mxcsr_x ^ 0x1F80u) >> 13) & 3;
+    double r = rc == 0 ? nearbyint(v) : rc == 1 ? floor(v) : rc == 2 ? ceil(v) : trunc(v);
+    return r >= -2147483648.0 && r <= 2147483647.0 ? (uint32_t)(int32_t)r : 0x80000000u;
+}
+/* comiss/ucomiss/comisd/ucomisd: ZF PF CF = 111 unordered, 000 greater, 001 less, 100 equal; OF SF cleared */
+#define SSE_COMI(a, b) do { double a_ = (a), b_ = (b); \
+    if (a_ != a_ || b_ != b_) { ZF = PF = CF = 1; } else { ZF = a_ == b_; CF = a_ < b_; PF = 0; } OF = SF = 0; } while (0)
+/* cmpXXss/sd/ps/pd predicate 0-7: eq lt le unord neq nlt nle ord */
+static inline int SSE_CMP(double a, double b, int p){
+    int un = a != a || b != b;
+    switch (p & 7) { case 0: return !un && a == b; case 1: return !un && a < b; case 2: return !un && a <= b; case 3: return un;
+                     case 4: return un || a != b; case 5: return un || !(a < b); case 6: return un || !(a <= b); default: return !un; }
 }
 
 /* eflags pack/unpack (for pushfd/popfd/lahf/sahf) */

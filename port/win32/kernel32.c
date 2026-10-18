@@ -123,6 +123,7 @@ SHIM(LeaveCriticalSection) {
     if (!r) { WR32(cs + 12, 0); WR32(cs + 4, 0xFFFFFFFFu); kobj_changed(); } else WR32(cs + 4, RD32(cs + 4) - 1);
 }
 SHIM(CreateEventA) { RET(handle_new(kevent_new(A(1) != 0, A(2) != 0))); }
+SHIM(CreateEventW) { sh_CreateEventA(c); }                         /* the name is not used here either */
 SHIM(SetEvent) { KObj *e = handle_get(A(0), K_EVENT); if (!e) { set_last_error(6); RET(0); return; } kevent_set(e); RET(1); }
 SHIM(ResetEvent) { KObj *e = handle_get(A(0), K_EVENT); if (!e) { set_last_error(6); RET(0); return; } kevent_reset(e); RET(1); }
 SHIM(PulseEvent) { KObj *e = handle_get(A(0), K_EVENT); if (!e) { RET(0); return; } RET(kevent_pulse(e)); }
@@ -149,6 +150,11 @@ SHIM(DuplicateHandle) {
     if (!h) { set_last_error(6); RET(0); return; }
     if (A(3)) WR32(A(3), h); if (A(6) & 1) handle_close(A(1)); RET(1);
 }
+/* MSVC 2015+ CRT (NVScript.osm of SCP): pointer obfuscation, the interlocked singly linked list of its atexit lists */
+SHIM(EncodePointer) { RET(A(0)); }
+SHIM(DecodePointer) { RET(A(0)); }
+SHIM(InitializeSListHead) { WR32(A(0), 0); WR32(A(0) + 4, 0); }
+SHIM(InterlockedFlushSList) { uint32_t h = A(0), first = RD32(h); WR32(h, 0); WR16(h + 4, 0); RET(first); }   /* atomic: one guest thread runs */
 SHIM(InterlockedIncrement) { uint32_t p = A(0), v = RD32(p) + 1; WR32(p, v); RET(v); }        /* atomic: only one guest thread runs at a time */
 SHIM(InterlockedDecrement) { uint32_t p = A(0), v = RD32(p) - 1; WR32(p, v); RET(v); }
 SHIM(InterlockedExchange) { uint32_t p = A(0), o = RD32(p); WR32(p, A(1)); RET(o); }
@@ -244,6 +250,7 @@ SHIM(IsValidCodePage) { RET(A(0) == 1252 || A(0) == 437 || A(0) == 0 || A(0) == 
 SHIM(IsDBCSLeadByte) { RET(0); }
 SHIM(IsValidLocale) { RET(1); }
 SHIM(EnumSystemLocalesA) { RET(1); }
+SHIM(EnumSystemLocalesW) { RET(1); }
 SHIM(GetUserDefaultLCID) { RET(0x409); }
 SHIM(GetUserDefaultLangID) { RET(0x409); }
 SHIM(GetSystemDefaultLangID) { RET(0x409); }
@@ -326,6 +333,13 @@ SHIM(LoadLibraryA) {
     port_debug("LoadLibraryA(%s): not available on this host", n); set_last_error(126); RET(0);
 }
 SHIM(LoadLibraryExA) { sh_LoadLibraryA(c); }
+static void wide_name(uint32_t w, char *b, size_t n) { size_t i = 0; for (; i + 1 < n && RD16(w + 2 * (uint32_t)i); i++) { uint16_t ch = RD16(w + 2 * (uint32_t)i); b[i] = ch < 128 ? (char)ch : '?'; } b[i] = 0; }
+SHIM(LoadLibraryExW) {        /* the MSVC 2015+ CRT probes api-ms-win-core-* DLLs this way: not available, it falls back to KERNEL32 */
+    char n[260]; wide_name(A(0), n, sizeof n);
+    uint32_t m = mod_load(c, n); if (m) { RET(m); return; }
+    int i = dll_index(n); if (i >= 0) { RET(DLL_HANDLE(i)); return; }
+    port_debug("LoadLibraryExW(%s): not available on this host", n); set_last_error(126); RET(0);
+}
 SHIM(FreeLibrary) { mod_free(c, A(0)); RET(1); }
 SHIM(GetModuleHandleA) {
     if (!A(0)) { RET(hd_base); return; }
@@ -335,6 +349,14 @@ SHIM(GetModuleHandleA) {
     set_last_error(126); RET(0);
 }
 SHIM(GetModuleHandleW) { if (!A(0)) { RET(hd_base); return; } char b[260]; uint32_t i = 0; for (; i < 259 && RD16(A(0) + 2 * i); i++) b[i] = (char)RD16(A(0) + 2 * i); b[i] = 0; int k = dll_index(b); RET(k >= 0 ? DLL_HANDLE(k) : 0); }
+uint32_t mod_containing(uint32_t a);
+SHIM(GetModuleHandleExW) {    /* (flags, name or address, HMODULE *): FROM_ADDRESS (4) finds the recompiled module holding an address */
+    uint32_t h = 0;
+    if (A(0) & 4) { h = mod_containing(A(1)); if (!h) h = hd_base; }
+    else if (!A(1)) h = hd_base;
+    else { char n[260]; wide_name(A(1), n, sizeof n); h = mod_handle_of(n); if (!h) { int k = dll_index(n); h = k >= 0 ? DLL_HANDLE(k) : 0; } }
+    if (A(2)) WR32(A(2), h); if (!h) set_last_error(126); RET(h != 0);
+}
 SHIM(GetModuleFileNameA) {
     char nm[300]; if (!A(0) || A(0) == hd_base) snprintf(nm, sizeof nm, "C:\\SS2.exe"); else snprintf(nm, sizeof nm, "C:\\module_%08x.dll", A(0));
     uint32_t cap = A(2), l = (uint32_t)strlen(nm); if (!cap) { RET(0); return; } if (l >= cap) { memcpy(GP(A(1)), nm, cap - 1); WR8(A(1) + cap - 1, 0); set_last_error(122); RET(cap); return; }
@@ -375,7 +397,8 @@ const ShimDef kernel32_shims[] = {
     S(VirtualAlloc, STD(4)), S(VirtualFree, STD(3)), S(VirtualProtect, STD(4)), S(VirtualQuery, STD(3)), SA("IsBadReadPtr", IsBadPtr, STD(2)), SA("IsBadWritePtr", IsBadPtr, STD(2)),
     S(IsBadCodePtr, STD(1)), S(IsBadStringPtrA, STD(2)),
     S(InitializeCriticalSection, STD(1)), S(InitializeCriticalSectionAndSpinCount, STD(2)), S(DeleteCriticalSection, STD(1)), S(EnterCriticalSection, STD(1)),
-    S(TryEnterCriticalSection, STD(1)), S(LeaveCriticalSection, STD(1)), S(CreateEventA, STD(4)), S(SetEvent, STD(1)), S(ResetEvent, STD(1)), S(PulseEvent, STD(1)),
+    S(TryEnterCriticalSection, STD(1)), S(LeaveCriticalSection, STD(1)), S(CreateEventA, STD(4)), S(CreateEventW, STD(4)), S(EncodePointer, STD(1)), S(DecodePointer, STD(1)),
+    S(InitializeSListHead, STD(1)), S(InterlockedFlushSList, STD(1)), S(SetEvent, STD(1)), S(ResetEvent, STD(1)), S(PulseEvent, STD(1)),
     S(CreateMutexA, STD(3)), S(ReleaseMutex, STD(1)), S(CreateSemaphoreA, STD(4)), S(ReleaseSemaphore, STD(3)), S(OpenEventA, STD(3)),
     S(WaitForSingleObject, STD(2)), S(WaitForSingleObjectEx, STD(3)), S(WaitForMultipleObjects, STD(4)), S(CloseHandle, STD(1)), S(DuplicateHandle, STD(7)),
     S(InterlockedIncrement, STD(1)), S(InterlockedDecrement, STD(1)), S(InterlockedExchange, STD(2)), S(InterlockedExchangeAdd, STD(2)), S(InterlockedCompareExchange, STD(3)),
@@ -387,11 +410,11 @@ const ShimDef kernel32_shims[] = {
     S(FileTimeToSystemTime, STD(2)), S(SystemTimeToFileTime, STD(2)), S(FileTimeToLocalFileTime, STD(2)), S(LocalFileTimeToFileTime, STD(2)), S(CompareFileTime, STD(2)),
     S(FileTimeToDosDateTime, STD(3)), S(DosDateTimeToFileTime, STD(3)), S(GetTimeZoneInformation, STD(1)),
     S(MultiByteToWideChar, STD(6)), S(WideCharToMultiByte, STD(8)), S(GetACP, 0), S(GetOEMCP, 0), S(GetCPInfo, STD(2)), S(IsValidCodePage, STD(1)), S(IsDBCSLeadByte, STD(1)),
-    S(IsValidLocale, STD(2)), S(EnumSystemLocalesA, STD(2)), S(GetUserDefaultLCID, 0), S(GetUserDefaultLangID, 0), S(GetSystemDefaultLangID, 0), S(GetThreadLocale, 0),
+    S(IsValidLocale, STD(2)), S(EnumSystemLocalesA, STD(2)), S(EnumSystemLocalesW, STD(2)), S(GetUserDefaultLCID, 0), S(GetUserDefaultLangID, 0), S(GetSystemDefaultLangID, 0), S(GetThreadLocale, 0),
     S(GetLocaleInfoA, STD(4)), S(GetLocaleInfoW, STD(4)), S(GetDateFormatA, STD(6)), S(GetTimeFormatA, STD(6)), S(CompareStringA, STD(6)), S(CompareStringW, STD(6)),
     S(GetStringTypeA, STD(5)), S(GetStringTypeExA, STD(5)), S(GetStringTypeW, STD(4)), S(LCMapStringA, STD(6)), S(LCMapStringW, STD(6)),
     S(lstrlenA, STD(1)), S(lstrcpyA, STD(2)), S(lstrcpynA, STD(3)), S(lstrcatA, STD(2)), S(lstrcmpA, STD(2)), S(lstrcmpiA, STD(2)),
-    S(LoadLibraryA, STD(1)), S(LoadLibraryExA, STD(3)), S(FreeLibrary, STD(1)), S(GetModuleHandleA, STD(1)), S(GetModuleHandleW, STD(1)), S(GetModuleFileNameA, STD(3)),
+    S(LoadLibraryA, STD(1)), S(LoadLibraryExA, STD(3)), S(LoadLibraryExW, STD(3)), S(FreeLibrary, STD(1)), S(GetModuleHandleA, STD(1)), S(GetModuleHandleW, STD(1)), S(GetModuleHandleExW, STD(3)), S(GetModuleFileNameA, STD(3)),
     S(GetModuleFileNameW, STD(3)), S(GetProcAddress, STD(2)), S(DisableThreadLibraryCalls, STD(1)), S(FindResourceA, STD(3)), S(WinExec, STD(2)), S(CreateProcessA, STD(10)),
     S(GetSystemInfo, STD(1)), S(GlobalMemoryStatus, STD(1)), S(GlobalMemoryStatusEx, STD(1)), S(SetHandleCount, STD(1)),
     { 0, 0, 0 }

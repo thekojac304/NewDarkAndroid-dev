@@ -1,0 +1,15 @@
+[port] lgvid.dll: first call into its code (30303d97, thread 1004)
+[port] lgvid.dll: loaded the recompiled module at 30300000 (60 imports bound), DllMain -> 1
+[port] lgvid.dll: 6860 calls from outside it in the last 20 s (6860 in all)
+[port] allobjs.osm: first call into its code (1004c9d5, thread 1004)
+[port] allobjs.osm: loaded the recompiled module at 10000000 (61 imports bound), DllMain -> 1
+[port] C:\nvscript.osm: could not be opened (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2scp-nonv/nvscript.osm)
+[port] LoadLibraryA(C:\nvscript.osm): not available on this host
+[port] Squirrel.osm: first call into its code (30209829, thread 1004)
+[port] Squirrel.osm: loaded the recompiled module at 30000000 (112 imports bound), DllMain -> 1
+[port] allobjs.osm: 8886 calls from outside it in the last 20 s (8886 in all)
+[port] Squirrel.osm: 3270 calls from outside it in the last 20 s (3270 in all)
+[port] lgvid.dll: 4252 calls from outside it in the last 20 s (11112 in all)
+[port] allobjs.osm: 1460 calls from outside it in the last 20 s (10346 in all)
+[port] Squirrel.osm: 402 calls from outside it in the last 20 s (3672 in all)
+[android] process exit(0) after 67.467 s

@@ -1,0 +1,17 @@
+[port] lgvid.dll: first call into its code (30303d97, thread 1004)
+[port] lgvid.dll: loaded the recompiled module at 30300000 (60 imports bound), DllMain -> 1
+[port] lgvid.dll: 8303 calls from outside it in the last 20 s (8303 in all)
+[port] allobjs.osm: first call into its code (1004c9d5, thread 1004)
+[port] allobjs.osm: loaded the recompiled module at 10000000 (61 imports bound), DllMain -> 1
+[port] NVScript.osm: static TLS slot 0 (8 bytes per thread)
+[port] NVScript.osm: first call into its code (3045d989, thread 1004)
+[port] NVScript.osm: loaded the recompiled module at 30400000 (77 imports bound), DllMain -> 1
+[port] Squirrel.osm: first call into its code (30209829, thread 1004)
+[port] Squirrel.osm: loaded the recompiled module at 30000000 (112 imports bound), DllMain -> 1
+[port] allobjs.osm: 8911 calls from outside it in the last 20 s (8911 in all)
+[port] Squirrel.osm: 3282 calls from outside it in the last 20 s (3282 in all)
+[port] lgvid.dll: 5200 calls from outside it in the last 20 s (13503 in all)
+[port] NVScript.osm: 4901 calls from outside it in the last 20 s (4901 in all)
+[port] allobjs.osm: 1458 calls from outside it in the last 20 s (10369 in all)
+[port] Squirrel.osm: 400 calls from outside it in the last 20 s (3682 in all)
+[port] NVScript.osm: 6036 calls from outside it in the last 20 s (10937 in all)
