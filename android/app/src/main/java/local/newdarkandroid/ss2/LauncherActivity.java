@@ -410,6 +410,11 @@ public class LauncherActivity extends Activity {
                 + ". Put the NewDark 2.48 SS2.exe into " + gameDir + ", or pick another Game folder.");
             else if (!profile.isDirectory() && !profile.mkdirs()) throw new IOException("cannot create " + profile);
             if (isGame(m)) applyUiSize(new File(profile, "user.cfg"), gameDir);
+            if (isGame(m)) {                // an OpenAL sound driver (silent here) becomes DirectSound: SoundDevice.java
+                File own = GameFolders.findIgnoreCase(profile, "cam.cfg");
+                String sound = SoundDevice.apply(own != null ? own : new File(profile, "cam.cfg"), GameFolders.findIgnoreCase(gameDir, "cam.cfg"));
+                if (sound != null) Log.i(TAG, sound);
+            }
         } catch (IOException e) {
             if (isGame(m) && importStatus != null) importStatus.setText("Cannot start: " + e.getMessage());   // next to Play, not only in the results
             state.edit().putString("queue", rest).apply();

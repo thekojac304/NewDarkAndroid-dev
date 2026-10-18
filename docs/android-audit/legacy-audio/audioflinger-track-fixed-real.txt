@@ -1,0 +1,2 @@
+                                                         Type     Id Active Client(pid/uid) Session Port Id S  Flags   Format Chn mask  SRate ST Usg CT  G db  L dB  R dB  VS dB  PortVol dB  PortMuted   Server FrmCnt  FrmRdy F Underruns  Flushed BitPerfect InternalMute    L Vol    R Vol Drain State CType   Latency
+            228    yes   29671/  10035    1681     204 A  0x000 00000001 00000003  44100  3   e  0     0     0     0     0          -53      false 000DB6C6   2652    2646 A         0        0      false        false 1.000000 1.000000     N     6     0  125.96 t 

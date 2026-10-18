@@ -112,6 +112,14 @@ release a key or button the other holds. Mouse look uses Android pointer capture
 | `SS2PORT_TOUCH_DEBUG=1` | Touch controls: every finger, and the keys, buttons and cursor placements they send |
 | `SS2PORT_INPUT_SCRIPT=<file>` | Not a log: plays scripted input at set times, in `game` or headless `game-null`. Put the file where the app can read it, for example `run-as local.newdarkandroid.ss2 cp /data/local/tmp/x.txt files/x.txt`, then `--es env SS2PORT_INPUT_SCRIPT=/data/user/0/local.newdarkandroid.ss2/files/x.txt` (see `port/README.md` and docs/android-audit/PHASE1E_RESULTS.md) |
 
+**Sound driver.** The port plays sound through DirectSound only. NewDark's `sfx_device` (the Audio menu's "Hardware
+Acceleration": 1 Off, 2 On, 4 OpenAL) set to 4 makes the game load `openal32.dll`, which does not exist here, and then
+play nothing at all. A PC installation that used OpenAL brings that setting along, so at every game start the launcher
+changes an `sfx_device 4` line in the profile's `cam.cfg` (or in a profile copy of the game folder's) to
+`sfx_device 1` and logs `sound: ...`. The first time a profile's own `cam.cfg` changes, its original is kept as
+`cam.cfg.openal`. Nothing else in the file changes (`SoundDevice.java`; test: `tools/SoundDeviceTest.java`;
+docs/android-audit/LEGACY_AUDIO_RESULTS.md).
+
 **Lifecycle.** Home, then the app icon or Recents, resumes the running game where it was: same process, sound resumes
 and mouse capture comes back. The launcher does not open a second copy on top. Back is passed to the game and does not
 close it. If the game's activity is destroyed (for example cleared from its task), the game ends the process with

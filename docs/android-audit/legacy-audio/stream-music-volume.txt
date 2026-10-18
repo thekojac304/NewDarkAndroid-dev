@@ -1,0 +1,9 @@
+- STREAM_MUSIC:
+   Muted: false
+   Muted Internally: false
+   Min: 0
+   Max: 15
+   streamVolume:2
+   Current: 1 (earpiece): 2\20, 2 (speaker): 2\20, 4 (headset): 8\80, 8 (headphone): 8\80, 80 (bt_a2dp): 3\30, 8000 (remote_submix): 15\150, 4000000 (usb_headset): 8\80, 8000000 (hearing_aid_out): 8\80, 20000000 (ble_headset): 7\70, 20000002 (ble_broadcast): 7\70, 40000000 (default): 7\70
+   Devices: speaker(2)
+   Volume Group: AUDIO_STREAM_MUSIC

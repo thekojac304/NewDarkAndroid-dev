@@ -44,6 +44,7 @@ especially SCP.
 | [LEGACY_SAVE_COMPATIBILITY.md](LEGACY_SAVE_COMPATIBILITY.md) | The user's 15 NewDark 2.47 / SCP Beta 4 saves under the port's SCP Beta 8 setup: they load and play in short tests, with SCP's "mid-game activation" warning, one reused archetype ID in Operations and two missing models |
 | [LEGACY_SCP4_FEASIBILITY.md](LEGACY_SCP4_FEASIBILITY.md) | Audit: running the original SCP Beta 4 mod set on the 2.48 port. Every save dependency resolves in the original set; the blocker is recompiling NVScript 1.2.4; recommends a side-by-side build and a PC-referenced validation |
 | [LEGACY_SCP4_RUNTIME_RESULTS.md](LEGACY_SCP4_RUNTIME_RESULTS.md) | Phase 3C: NVScript 1.2.4 recompiled; the original SCP Beta 4 + 17-mod setup runs in a side-by-side app (`…ss2.legacytest`). All 15 saves load on desktop and 8 on the phone; saving keeps every quest variable and NVScript record. Level changes, replicators and psi are not yet tested |
+| [LEGACY_AUDIO_RESULTS.md](LEGACY_AUDIO_RESULTS.md) | Phase 3D-A: the legacy app was silent because the PC's `cam.cfg` selects OpenAL (`sfx_device 4`), which the port does not have; the launcher now switches that one line to DirectSound. PCM, Android player and lifecycle verified; listening is the user's |
 
 ## Overall feasibility
 

@@ -1,0 +1,189 @@
+# Per-run audio evidence (Phase 3D). profile = SS2PORT_PROFILE line every 5 s (audio: callbacks per 5 s, longest gap, peak |sample|, silent callbacks).
+# base-orig, var-dev*, menu-*, trace-dev1, beta8-ss2-menu: disposable write folder (copies of the profile; one cam.cfg variable changed). fixed-real, lifecycle-real: the real profile after the fix (APK c8212078).
+# player = Android's AudioPlaybackConfiguration for the game's uid, from dumpsys audio at the given second (none = no player exists).
+
+== base-orig
+script: 8000 tap esc;8500 tap esc;9000 tap esc;9550 place 976 190;9750 btn 1 down;9850 btn 1 up;11250 place 667 91;11450 btn 1 down;11550 btn 1 up;11950 place 1147 288;12150 btn 1 down;12250 btn 1 up;32600 down w;35600 up w;35800 shot;39200 quit;
+SS2.log: sfx_device 4
+SS2.log: OpenAL Init...
+SS2.log:    OpenAL not found on system or failed to load, install AL redist package or chose other sound driver
+[port] LoadLibraryA(openal32.dll): not available on this host
+[sdl] profile: 99.1 fps | frame ms mean 10.1 p50 10.0 p95 12.4 p99 13.4 max 39.7 | >50ms 0 >100ms 0 | swap 2% | rss 207 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 99.9 fps | frame ms mean 10.0 p50 10.0 p95 11.5 p99 12.6 max 23.7 | >50ms 0 >100ms 0 | swap 3% | rss 208 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 51.7 fps | frame ms mean 19.4 p50 10.0 p95 16.2 p99 585.7 max 770.1 | >50ms 6 >100ms 4 | swap 2% | rss 433 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 62.1 fps | frame ms mean 16.1 p50 16.0 p95 16.7 p99 17.3 max 19.6 | >50ms 0 >100ms 0 | swap 1% | rss 426 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 62.3 fps | frame ms mean 16.1 p50 16.0 p95 16.8 p99 17.0 max 18.8 | >50ms 0 >100ms 0 | swap 1% | rss 426 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 62.1 fps | frame ms mean 16.1 p50 16.1 p95 16.9 p99 17.1 max 18.1 | >50ms 0 >100ms 0 | swap 1% | rss 426 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 62.1 fps | frame ms mean 16.1 p50 16.1 p95 16.9 p99 17.2 max 19.6 | >50ms 0 >100ms 0 | swap 1% | rss 431 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+2026-10-18 17:03:31 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=24217 seconds=39.426
+player 12s: none
+
+== var-dev1
+script: 8000 tap esc;8500 tap esc;9000 tap esc;9550 place 976 190;9750 btn 1 down;9850 btn 1 up;11250 place 667 91;11450 btn 1 down;11550 btn 1 up;11950 place 1147 288;12150 btn 1 down;12250 btn 1 up;32600 down w;35600 up w;35800 shot;39200 quit;
+SS2.log: sfx_device 1
+[port] DirectSound: mixing to 44100 Hz stereo
+[sdl] profile: 62.9 fps | frame ms mean 15.9 p50 10.0 p95 12.6 p99 14.2 max 1857.3 | >50ms 1 >100ms 1 | swap 2% | rss 279 MB | audio 215 callbacks, longest gap 40.6 ms, peak 12742, 79 silent
+[sdl] profile: 89.8 fps | frame ms mean 11.1 p50 9.9 p95 12.7 p99 14.6 max 544.4 | >50ms 1 >100ms 1 | swap 2% | rss 266 MB | audio 234 callbacks, longest gap 40.5 ms, peak 18312, 15 silent
+[sdl] profile: 47.7 fps | frame ms mean 21.0 p50 10.2 p95 19.3 p99 643.6 max 833.5 | >50ms 4 >100ms 4 | swap 1% | rss 479 MB | audio 217 callbacks, longest gap 41.2 ms, peak 18061, 3 silent
+[sdl] profile: 62.2 fps | frame ms mean 16.1 p50 16.1 p95 16.8 p99 17.3 max 19.9 | >50ms 0 >100ms 0 | swap 1% | rss 478 MB | audio 215 callbacks, longest gap 40.9 ms, peak 13143, 0 silent
+[sdl] profile: 62.2 fps | frame ms mean 16.1 p50 16.1 p95 16.8 p99 17.1 max 17.5 | >50ms 0 >100ms 0 | swap 1% | rss 478 MB | audio 215 callbacks, longest gap 40.2 ms, peak 12172, 0 silent
+[sdl] profile: 62.3 fps | frame ms mean 16.1 p50 16.1 p95 16.7 p99 17.0 max 18.5 | >50ms 0 >100ms 0 | swap 1% | rss 481 MB | audio 216 callbacks, longest gap 40.9 ms, peak 12172, 0 silent
+[sdl] profile: 62.0 fps | frame ms mean 16.1 p50 16.1 p95 16.9 p99 18.6 max 21.1 | >50ms 0 >100ms 0 | swap 1% | rss 484 MB | audio 216 callbacks, longest gap 40.2 ms, peak 15599, 0 silent
+2026-10-18 17:04:21 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=24948 seconds=39.472
+player 12s: type:OpenSL ES AudioPlayer (Buffer Queue) u/pid:10035/249 state:started 
+
+== var-dev0
+script: 8000 tap esc;8500 tap esc;9000 tap esc;9550 place 976 190;9750 btn 1 down;9850 btn 1 up;11250 place 667 91;11450 btn 1 down;11550 btn 1 up;11950 place 1147 288;12150 btn 1 down;12250 btn 1 up;32600 down w;35600 up w;35800 shot;39200 quit;
+SS2.log: sfx_device 0
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.0 p95 12.6 p99 13.3 max 32.7 | >50ms 0 >100ms 0 | swap 2% | rss 206 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.0 p95 11.4 p99 13.2 max 22.8 | >50ms 0 >100ms 0 | swap 3% | rss 208 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 55.4 fps | frame ms mean 18.1 p50 10.1 p95 16.8 p99 532.7 max 709.3 | >50ms 4 >100ms 4 | swap 2% | rss 431 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 62.2 fps | frame ms mean 16.1 p50 16.1 p95 16.9 p99 17.0 max 17.5 | >50ms 0 >100ms 0 | swap 1% | rss 429 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 62.1 fps | frame ms mean 16.1 p50 16.1 p95 16.9 p99 17.1 max 17.9 | >50ms 0 >100ms 0 | swap 1% | rss 428 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 62.1 fps | frame ms mean 16.1 p50 16.1 p95 16.8 p99 17.5 max 18.9 | >50ms 0 >100ms 0 | swap 1% | rss 428 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 62.1 fps | frame ms mean 16.1 p50 16.1 p95 16.8 p99 17.3 max 20.5 | >50ms 0 >100ms 0 | swap 1% | rss 433 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+2026-10-18 17:05:43 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=25668 seconds=39.415
+player 12s: none
+
+== var-dev2
+script: 12000 quit;
+SS2.log: sfx_device 2
+[port] DirectSound: mixing to 44100 Hz stereo
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[sdl] profile: 62.9 fps | frame ms mean 15.9 p50 10.0 p95 12.7 p99 15.9 max 1858.0 | >50ms 1 >100ms 1 | swap 2% | rss 279 MB | audio 215 callbacks, longest gap 40.8 ms, peak 12742, 79 silent
+[sdl] profile: 99.9 fps | frame ms mean 10.0 p50 10.0 p95 12.4 p99 13.7 max 15.6 | >50ms 0 >100ms 0 | swap 3% | rss 279 MB | audio 216 callbacks, longest gap 40.7 ms, peak 18312, 0 silent
+2026-10-18 17:06:05 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=1 fatal=no preflight=0/4 status="exit 0" pid=26616 seconds=12.291
+
+== var-dev3
+script: 12000 quit;
+SS2.log: sfx_device 3
+[sdl] profile: 99.4 fps | frame ms mean 10.1 p50 10.0 p95 12.3 p99 13.4 max 32.4 | >50ms 0 >100ms 0 | swap 2% | rss 206 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.0 p95 11.4 p99 12.8 max 13.6 | >50ms 0 >100ms 0 | swap 3% | rss 206 MB | audio 0 callbacks, longest gap 0.0 ms, peak 0, 0 silent
+2026-10-18 17:06:21 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=1 fatal=no preflight=0/4 status="exit 0" pid=27208 seconds=12.189
+
+== trace-dev1
+script: 12000 quit;
+SS2.log: sfx_device 1
+[port] DirectSound: mixing to 44100 Hz stereo
+[sdl] profile: 62.9 fps | frame ms mean 15.9 p50 9.8 p95 12.5 p99 15.5 max 1859.8 | >50ms 1 >100ms 1 | swap 2% | rss 278 MB | audio 215 callbacks, longest gap 41.0 ms, peak 12742, 79 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.9 p95 12.2 p99 13.5 max 13.8 | >50ms 0 >100ms 0 | swap 3% | rss 278 MB | audio 215 callbacks, longest gap 41.3 ms, peak 18312, 0 silent
+fopen ... from 006a145d "c:\dmm\thelovebat-SS2-altMusic\snd\sfx\mloop" "rb"
+2026-10-18 17:07:54 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=1 fatal=no preflight=0/4 status="exit 0" pid=28322 seconds=12.278
+
+== beta8-ss2-menu
+script: 15000 quit;
+SS2.log: sfx_device 1
+[port] DirectSound: mixing to 44100 Hz stereo
+[sdl] profile: 15.2 fps | frame ms mean 65.8 p50 65.5 p95 76.7 p99 80.2 max 80.2 | >50ms 75 >100ms 0 | swap 1% | rss 207 MB | audio 218 callbacks, longest gap 34.8 ms, peak 11366, 1 silent
+[sdl] profile: 15.0 fps | frame ms mean 66.6 p50 65.3 p95 78.3 p99 79.7 max 79.7 | >50ms 76 >100ms 0 | swap 1% | rss 207 MB | audio 218 callbacks, longest gap 37.1 ms, peak 31076, 3 silent
+2026-10-18 17:12:35 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=1 fatal=no preflight=0/4 status="exit 0" pid=30515 seconds=15.242
+
+== fixed-real
+script: 8000 tap esc;8500 tap esc;9000 tap esc;9550 place 976 190;9750 btn 1 down;9850 btn 1 up;11250 place 667 91;11450 btn 1 down;11550 btn 1 up;11950 place 1147 288;12150 btn 1 down;12250 btn 1 up;32600 down w;35600 up w;35800 shot;39200 quit;
+SS2.log: sfx_device 1
+[port] DirectSound: mixing to 44100 Hz stereo
+[sdl] profile: 63.0 fps | frame ms mean 15.9 p50 10.0 p95 12.3 p99 13.5 max 1855.3 | >50ms 1 >100ms 1 | swap 2% | rss 278 MB | audio 215 callbacks, longest gap 40.9 ms, peak 12742, 78 silent
+[sdl] profile: 90.3 fps | frame ms mean 11.1 p50 10.0 p95 12.5 p99 14.3 max 519.3 | >50ms 1 >100ms 1 | swap 2% | rss 265 MB | audio 234 callbacks, longest gap 41.0 ms, peak 19743, 15 silent
+[sdl] profile: 50.6 fps | frame ms mean 19.8 p50 10.3 p95 17.0 p99 591.3 max 693.3 | >50ms 5 >100ms 4 | swap 2% | rss 476 MB | audio 215 callbacks, longest gap 40.8 ms, peak 18061, 4 silent
+[sdl] profile: 62.1 fps | frame ms mean 16.1 p50 16.1 p95 16.8 p99 17.9 max 18.9 | >50ms 0 >100ms 0 | swap 1% | rss 479 MB | audio 215 callbacks, longest gap 40.4 ms, peak 13143, 0 silent
+[sdl] profile: 62.2 fps | frame ms mean 16.1 p50 16.1 p95 16.8 p99 17.2 max 18.8 | >50ms 0 >100ms 0 | swap 1% | rss 480 MB | audio 216 callbacks, longest gap 40.2 ms, peak 12172, 0 silent
+[sdl] profile: 62.2 fps | frame ms mean 16.1 p50 16.0 p95 16.8 p99 18.0 max 18.6 | >50ms 0 >100ms 0 | swap 1% | rss 480 MB | audio 216 callbacks, longest gap 40.2 ms, peak 12172, 0 silent
+[sdl] profile: 62.3 fps | frame ms mean 16.1 p50 16.1 p95 16.7 p99 17.0 max 18.5 | >50ms 0 >100ms 0 | swap 1% | rss 482 MB | audio 216 callbacks, longest gap 40.4 ms, peak 16610, 0 silent
+2026-10-18 17:11:40 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=29671 seconds=39.514
+player 12s: type:OpenSL ES AudioPlayer (Buffer Queue) u/pid:10035/296 state:started 
+
+== lifecycle-real
+script: 8000 tap esc;8500 tap esc;9000 tap esc;9550 place 976 190;9750 btn 1 down;9850 btn 1 up;11250 place 667 91;11450 btn 1 down;11550 btn 1 up;11950 place 1147 288;12150 btn 1 down;12250 btn 1 up;62600 down w;64600 up w;64800 shot;68200 quit;
+SS2.log: sfx_device 1
+[port] DirectSound: mixing to 44100 Hz stereo
+[sdl] profile: 62.9 fps | frame ms mean 15.9 p50 10.1 p95 12.4 p99 14.7 max 1858.2 | >50ms 1 >100ms 1 | swap 2% | rss 278 MB | audio 216 callbacks, longest gap 34.4 ms, peak 12742, 79 silent
+[sdl] profile: 90.4 fps | frame ms mean 11.1 p50 10.0 p95 12.4 p99 13.8 max 513.8 | >50ms 1 >100ms 1 | swap 3% | rss 265 MB | audio 233 callbacks, longest gap 36.6 ms, peak 19743, 14 silent
+[sdl] profile: 50.8 fps | frame ms mean 19.7 p50 10.3 p95 17.0 p99 596.5 max 677.4 | >50ms 4 >100ms 4 | swap 1% | rss 476 MB | audio 216 callbacks, longest gap 34.0 ms, peak 18061, 3 silent
+[sdl] profile: 62.4 fps | frame ms mean 16.0 p50 16.0 p95 16.8 p99 17.1 max 18.1 | >50ms 0 >100ms 0 | swap 1% | rss 478 MB | audio 215 callbacks, longest gap 33.8 ms, peak 13143, 0 silent
+[sdl] profile: 62.2 fps | frame ms mean 16.1 p50 16.1 p95 16.8 p99 17.0 max 17.1 | >50ms 0 >100ms 0 | swap 1% | rss 481 MB | audio 216 callbacks, longest gap 34.3 ms, peak 12172, 0 silent
+[sdl] profile: 62.1 fps | frame ms mean 16.1 p50 16.0 p95 16.9 p99 17.1 max 19.2 | >50ms 0 >100ms 0 | swap 1% | rss 481 MB | audio 216 callbacks, longest gap 33.9 ms, peak 12172, 0 silent
+[sdl] profile: 62.3 fps | frame ms mean 16.1 p50 16.1 p95 16.8 p99 17.1 max 19.2 | >50ms 0 >100ms 0 | swap 1% | rss 481 MB | audio 215 callbacks, longest gap 33.9 ms, peak 12172, 0 silent
+[sdl] profile: 8.9 fps | frame ms mean 112.6 p50 16.1 p95 16.9 p99 18.5 max 17096.5 | >50ms 1 >100ms 1 | swap 0% | rss 481 MB | audio 178 callbacks, longest gap 33.9 ms, peak 12172, 0 silent
+[sdl] profile: 62.3 fps | frame ms mean 16.1 p50 16.1 p95 16.7 p99 16.9 max 19.0 | >50ms 0 >100ms 0 | swap 1% | rss 482 MB | audio 214 callbacks, longest gap 15866.8 ms, peak 12172, 0 silent
+[sdl] profile: 61.9 fps | frame ms mean 16.1 p50 16.0 p95 16.9 p99 17.9 max 37.9 | >50ms 0 >100ms 0 | swap 1% | rss 486 MB | audio 216 callbacks, longest gap 34.3 ms, peak 14335, 0 silent
+2026-10-18 17:14:26 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=4 fatal=no preflight=0/4 status="exit 0" pid=30964 seconds=68.467
+player 26s: type:OpenSL ES AudioPlayer (Buffer Queue) u/pid:10035/309 state:started 
+player 40s: type:OpenSL ES AudioPlayer (Buffer Queue) u/pid:10035/309 state:paused 
+player 56s: type:OpenSL ES AudioPlayer (Buffer Queue) u/pid:10035/309 state:started 
+
+== menu-hw0
+script: 10050 place 978 304;10250 btn 1 down;10350 btn 1 up;11750 place 798 55;11950 btn 1 down;12050 btn 1 up;13400 shot;25800 quit;
+SS2.log: sfx_device 1
+[port] DirectSound: mixing to 44100 Hz stereo
+[sdl] profile: 63.0 fps | frame ms mean 15.9 p50 9.8 p95 12.7 p99 15.3 max 1851.6 | >50ms 1 >100ms 1 | swap 2% | rss 279 MB | audio 215 callbacks, longest gap 41.1 ms, peak 12742, 79 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.8 p95 12.5 p99 13.7 max 14.1 | >50ms 0 >100ms 0 | swap 3% | rss 280 MB | audio 215 callbacks, longest gap 40.8 ms, peak 18312, 0 silent
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[sdl] profile: 89.0 fps | frame ms mean 11.2 p50 9.9 p95 12.5 p99 16.8 max 527.3 | >50ms 1 >100ms 1 | swap 2% | rss 255 MB | audio 217 callbacks, longest gap 40.5 ms, peak 15425, 125 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.1 p95 12.0 p99 12.5 max 14.4 | >50ms 0 >100ms 0 | swap 3% | rss 255 MB | audio 215 callbacks, longest gap 41.0 ms, peak 0, 215 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.0 p95 12.0 p99 12.9 max 14.9 | >50ms 0 >100ms 0 | swap 3% | rss 255 MB | audio 215 callbacks, longest gap 40.5 ms, peak 0, 215 silent
+2026-10-18 17:18:36 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=1 fatal=no preflight=0/4 status="exit 0" pid=2074 seconds=26.077
+
+== menu-hw1
+script: 10050 place 978 304;10250 btn 1 down;10350 btn 1 up;11750 place 798 55;11950 btn 1 down;12050 btn 1 up;13450 place 663 212;13650 btn 1 down;13750 btn 1 up;15600 shot;28000 quit;
+SS2.log: sfx_device 1
+[port] DirectSound: mixing to 44100 Hz stereo
+[sdl] profile: 63.1 fps | frame ms mean 15.9 p50 10.1 p95 12.3 p99 14.6 max 1850.4 | >50ms 1 >100ms 1 | swap 2% | rss 279 MB | audio 215 callbacks, longest gap 40.8 ms, peak 12742, 79 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.0 p95 12.3 p99 13.5 max 14.3 | >50ms 0 >100ms 0 | swap 3% | rss 279 MB | audio 215 callbacks, longest gap 40.8 ms, peak 18312, 0 silent
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[sdl] profile: 89.3 fps | frame ms mean 11.2 p50 9.9 p95 12.7 p99 15.7 max 525.8 | >50ms 1 >100ms 1 | swap 2% | rss 254 MB | audio 216 callbacks, longest gap 41.5 ms, peak 15425, 124 silent
+[sdl] profile: 99.7 fps | frame ms mean 10.0 p50 9.9 p95 12.3 p99 13.3 max 28.4 | >50ms 0 >100ms 0 | swap 3% | rss 254 MB | audio 216 callbacks, longest gap 40.8 ms, peak 0, 216 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.7 p95 12.5 p99 12.9 max 13.4 | >50ms 0 >100ms 0 | swap 3% | rss 254 MB | audio 215 callbacks, longest gap 40.9 ms, peak 0, 215 silent
+2026-10-18 17:17:23 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=1 fatal=no preflight=0/4 status="exit 0" pid=784 seconds=28.272
+
+== menu-hw2
+script: 10050 place 978 304;10250 btn 1 down;10350 btn 1 up;11750 place 798 55;11950 btn 1 down;12050 btn 1 up;13450 place 663 212;13650 btn 1 down;13750 btn 1 up;15650 place 663 212;15850 btn 1 down;15950 btn 1 up;17800 shot;30200 quit;
+SS2.log: sfx_device 1
+SS2.log: OpenAL Init...
+SS2.log:    OpenAL not found on system or failed to load, install AL redist package or chose other sound driver
+[port] DirectSound: mixing to 44100 Hz stereo
+[sdl] profile: 62.9 fps | frame ms mean 15.9 p50 10.0 p95 12.2 p99 15.7 max 1859.8 | >50ms 1 >100ms 1 | swap 2% | rss 280 MB | audio 216 callbacks, longest gap 41.3 ms, peak 12742, 80 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.9 p95 12.2 p99 13.4 max 14.4 | >50ms 0 >100ms 0 | swap 3% | rss 280 MB | audio 215 callbacks, longest gap 40.7 ms, peak 18312, 0 silent
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[sdl] profile: 89.2 fps | frame ms mean 11.2 p50 9.9 p95 12.5 p99 16.0 max 527.4 | >50ms 1 >100ms 1 | swap 2% | rss 255 MB | audio 216 callbacks, longest gap 41.4 ms, peak 15425, 125 silent
+[port] LoadLibraryA(openal32.dll): not available on this host
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[sdl] profile: 99.7 fps | frame ms mean 10.0 p50 9.9 p95 12.4 p99 13.2 max 31.6 | >50ms 0 >100ms 0 | swap 3% | rss 255 MB | audio 215 callbacks, longest gap 41.2 ms, peak 0, 215 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.7 p95 12.5 p99 12.9 max 13.8 | >50ms 0 >100ms 0 | swap 3% | rss 255 MB | audio 215 callbacks, longest gap 41.2 ms, peak 0, 215 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.9 p95 12.3 p99 13.2 max 14.8 | >50ms 0 >100ms 0 | swap 3% | rss 255 MB | audio 216 callbacks, longest gap 41.0 ms, peak 0, 216 silent
+2026-10-18 17:17:58 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=1 fatal=no preflight=0/4 status="exit 0" pid=1620 seconds=30.453
+
+== menu-done0
+script: 10050 place 978 304;10250 btn 1 down;10350 btn 1 up;11750 place 798 55;11950 btn 1 down;12050 btn 1 up;13450 place 638 655;13650 btn 1 down;13750 btn 1 up;30100 shot;30500 quit;
+SS2.log: sfx_device 1
+[port] DirectSound: mixing to 44100 Hz stereo
+[sdl] profile: 62.9 fps | frame ms mean 15.9 p50 9.9 p95 12.7 p99 16.0 max 1856.1 | >50ms 1 >100ms 1 | swap 2% | rss 279 MB | audio 215 callbacks, longest gap 41.2 ms, peak 12742, 79 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.8 p95 12.4 p99 13.5 max 14.3 | >50ms 0 >100ms 0 | swap 3% | rss 279 MB | audio 215 callbacks, longest gap 41.3 ms, peak 18312, 0 silent
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[sdl] profile: 89.1 fps | frame ms mean 11.2 p50 9.9 p95 12.7 p99 16.4 max 523.0 | >50ms 1 >100ms 1 | swap 2% | rss 290 MB | audio 217 callbacks, longest gap 41.3 ms, peak 15425, 72 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.1 p95 12.3 p99 13.2 max 14.2 | >50ms 0 >100ms 0 | swap 3% | rss 290 MB | audio 215 callbacks, longest gap 40.6 ms, peak 16728, 0 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.0 p95 12.3 p99 13.2 max 14.0 | >50ms 0 >100ms 0 | swap 3% | rss 289 MB | audio 215 callbacks, longest gap 40.5 ms, peak 19304, 0 silent
+[sdl] profile: 99.9 fps | frame ms mean 10.0 p50 10.0 p95 12.2 p99 13.1 max 15.1 | >50ms 0 >100ms 0 | swap 3% | rss 289 MB | audio 216 callbacks, longest gap 40.7 ms, peak 16821, 0 silent
+2026-10-18 17:19:52 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=1 fatal=no preflight=0/4 status="exit 0" pid=3145 seconds=30.756
+
+== menu-done2
+script: 10050 place 978 304;10250 btn 1 down;10350 btn 1 up;11750 place 798 55;11950 btn 1 down;12050 btn 1 up;13450 place 663 212;13650 btn 1 down;13750 btn 1 up;15650 place 663 212;15850 btn 1 down;15950 btn 1 up;17850 place 638 655;18050 btn 1 down;18150 btn 1 up;34500 shot;34900 quit;
+SS2.log: sfx_device 1
+SS2.log: OpenAL Init...
+SS2.log:    OpenAL not found on system or failed to load, install AL redist package or chose other sound driver
+[port] DirectSound: mixing to 44100 Hz stereo
+[sdl] profile: 63.1 fps | frame ms mean 15.8 p50 10.0 p95 12.5 p99 15.7 max 1849.6 | >50ms 1 >100ms 1 | swap 2% | rss 279 MB | audio 215 callbacks, longest gap 41.8 ms, peak 12742, 78 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 9.8 p95 12.4 p99 13.4 max 14.8 | >50ms 0 >100ms 0 | swap 3% | rss 280 MB | audio 215 callbacks, longest gap 41.3 ms, peak 18312, 0 silent
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[sdl] profile: 89.2 fps | frame ms mean 11.2 p50 9.9 p95 12.6 p99 16.2 max 523.4 | >50ms 1 >100ms 1 | swap 2% | rss 255 MB | audio 216 callbacks, longest gap 40.9 ms, peak 15425, 124 silent
+[port] LoadLibraryA(openal32.dll): not available on this host
+[port] IDirectSound3DBuffer::QueryInterface: interface 31efac30-... not available
+[sdl] profile: 99.6 fps | frame ms mean 10.0 p50 10.0 p95 12.4 p99 14.3 max 19.1 | >50ms 0 >100ms 0 | swap 3% | rss 290 MB | audio 216 callbacks, longest gap 40.8 ms, peak 12742, 138 silent
+[sdl] profile: 99.9 fps | frame ms mean 10.0 p50 10.0 p95 12.4 p99 13.9 max 15.1 | >50ms 0 >100ms 0 | swap 3% | rss 289 MB | audio 215 callbacks, longest gap 40.5 ms, peak 16728, 0 silent
+[sdl] profile: 100.0 fps | frame ms mean 10.0 p50 10.1 p95 12.4 p99 13.1 max 15.2 | >50ms 0 >100ms 0 | swap 3% | rss 289 MB | audio 217 callbacks, longest gap 41.2 ms, peak 19304, 0 silent
+2026-10-18 17:20:31 RESULT mode=game verdict=PASS first_frame=yes frames=? modules=1 fatal=no preflight=0/4 status="exit 0" pid=3577 seconds=35.169
