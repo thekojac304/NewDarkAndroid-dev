@@ -39,6 +39,7 @@ typedef struct Ss2Touch {
     uint64_t recent[3];                    /* the last three distinct recentring times the bridge saw */
     uint64_t move_hold_until;              /* a drag's press must reach the game a frame before the cursor moves on */
     bool game_shoot;
+    int crouch_dik;                        /* the key CROUCH presses: the installation's own binding (ss2t_set_crouch_key), Shift by default */
     bool typing;                           /* the Android keyboard is up: in look mode only II, KBD, MODE and SET take a touch */
     /* relative (trackpad) cursor, settings.cursor_relative: the cursor finger moves the game's cursor from where it is */
     enum { SS2T_REL_IDLE, SS2T_REL_DOWN, SS2T_REL_MOVING, SS2T_REL_HELD } rel_state;
@@ -65,6 +66,9 @@ void ss2t_frame(Ss2Touch *s, uint64_t now_ns, float surface_w, float surface_h, 
 void ss2t_ui_rect(Ss2Touch *s, int x, int y, int w, int h);
 void ss2t_finger(Ss2Touch *s, TouchPhase phase, int64_t device, int64_t finger, float x, float y, uint32_t ms);
 void ss2t_cancel(Ss2Touch *s);             /* releases everything touch holds (lifecycle, focus, resize) */
+/* The key the CROUCH button presses (a DirectInput code from the game's bind file, touch_binds.h; 0: back to Shift). If touch
+   holds the old key, everything touch holds is released first. */
+void ss2t_set_crouch_key(Ss2Touch *s, int dik);
 /* A key or mouse button from a physical keyboard or mouse: returns true when it should reach the game (it does not
    when touch already holds the same key, so neither source can release the other's press). */
 bool ss2t_physical(Ss2Touch *s, const PlatEvent *e);

@@ -47,7 +47,9 @@ Android touchscreen -> TouchSurface (raw surface pixels) -> touch_surface.c (SDL
 
 ## SS2 mapping
 
-The keys are the bindings of the game's `user.bnd`, which replaces `SHOCK.BND`.
+The keys are the bindings of the game's stock `user.bnd`, which replaces `SHOCK.BND`. Only CROUCH follows a player's own
+`user.bnd` (a 2023 SCP Beta 4 installation binds Shift to `+creepon`, C to `crouch` and Ctrl to `+crouchhold`); the other
+keys are the same in every installation checked.
 
 | Control | Sends |
 | --- | --- |
@@ -55,7 +57,7 @@ The keys are the bindings of the game's `user.bnd`, which replaces `SHOCK.BND`.
 | Look swipe | Relative mouse motion: 1 game pixel per game-pixel width of swipe, times Look X/Y |
 | FIRE | Left button held (`+fire_weapon`). The finger also aims. |
 | USE | Right click (`frob_object`) |
-| JUMP / CROUCH | Space held (`+jump`) / Shift (`crouch`, a toggle) |
+| JUMP / CROUCH | Space held (`+jump`) / the installation's own crouch key: the key `user.bnd` binds to `crouch` (a toggle), else to `+crouchhold` (held while the finger is down); Shift (the stock binding) when it is one of them or when nothing is bound. Read through the profile overlay (the copy the game reads and writes) each time touch enters LOOK mode; logged as `[touch] CROUCH key from ...` (`touch_binds.c`) |
 | `<` / `>` | Mouse wheel down / up (`cycle_weapon -1` / `1`) |
 | RELOAD / AMMO | R (`reload_gun`) / B (`cycle_ammo`). In cursor mode the AMMO button is a right click at the cursor, labelled USE. |
 | II | Esc (`sim_menu`; also skips cutscenes) |

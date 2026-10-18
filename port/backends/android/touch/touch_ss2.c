@@ -6,7 +6,7 @@
  *   - stick       -> W A S D held (with hysteresis), the game's +walkfast/+backfast/+move*fast bindings;
  *   - look finger -> relative mouse motion (mouse look; the game's DirectInput mouse);
  *   - FIRE / USE  -> left button held / right click (+fire_weapon, frob_object);
- *   - actions     -> Space (jump), Shift (crouch), wheel up / down (next / previous weapon), R (reload), B (ammo), Esc;
+ *   - actions     -> Space (jump), the crouch key (Shift by default, else the installation's own, ss2t_set_crouch_key), wheel up / down (next / previous weapon), R (reload), B (ammo), Esc;
  *     these are the bindings of the game's user.bnd (which replaces SHOCK.BND; Y is not bound there);
  *   - cursor mode -> the game's own cursor placed at the touched point (PlatEvent.abs), then left clicks or drags;
  *     or, with the relative cursor style (settings.cursor_relative), moved like a trackpad from where it is: a moving
@@ -124,7 +124,7 @@ static void release_touch(Ss2Touch *s) {
 static void action(Ss2Touch *s, TouchAction a, bool down) {
     switch (a) {
     case TOUCH_JUMP: key(s, SS2_DIK_SPACE, down, s->now); break;          /* +jump: held */
-    case TOUCH_CROUCH: key(s, SS2_DIK_LSHIFT, down, s->now); break;       /* crouch */
+    case TOUCH_CROUCH: key(s, s->crouch_dik, down, s->now); break;        /* crouch (a toggle) or +crouchhold (held) */
     case TOUCH_WEAPON_NEXT: if (down) wheel(s, 1); break;                 /* mouse_wheel_up: cycle_weapon 1 */
     case TOUCH_WEAPON_PREV: if (down) wheel(s, -1); break;                /* mouse_wheel_down: cycle_weapon -1 */
     case TOUCH_CONSUMABLE: if (down) tap_key(s, SS2_DIK_R); break;        /* RELOAD: reload_gun */
@@ -178,6 +178,14 @@ void ss2t_init(Ss2Touch *s) {
     touch_init(&s->t, output, s);
     s->rel_x = s->rel_y = -1; s->rel_placed_x = s->rel_placed_y = INT_MIN;     /* not known yet */
     s->t.radial_populate = NULL;           /* no item wheels yet: hold-to-wheel cancels, a tap still acts */
+    s->crouch_dik = SS2_DIK_LSHIFT;        /* the stock user.bnd: bind shift crouch */
+}
+
+void ss2t_set_crouch_key(Ss2Touch *s, int dik) {
+    if (dik <= 0 || dik > 255) dik = SS2_DIK_LSHIFT;
+    if (dik == s->crouch_dik) return;
+    if (s->touch_key[s->crouch_dik]) ss2t_cancel(s);     /* CROUCH is down: its key must not stay pressed */
+    s->crouch_dik = dik;
 }
 
 void ss2t_frame(Ss2Touch *s, uint64_t now, float w, float h, bool enabled, float px, float py, float pw, float ph,

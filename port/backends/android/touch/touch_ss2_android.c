@@ -6,6 +6,7 @@
  * game thread, which also owns the GL context on Android.
  * SPDX-License-Identifier: GPL-3.0-or-later */
 #include "touch_ss2.h"
+#include "touch_binds.h"
 #include "touch_surface.h"
 #include <SDL.h>
 #include <SDL_system.h>
@@ -13,10 +14,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 uint64_t user32_cursor_recentred_ns(void) __attribute__((weak));
 void user32_cursor_pos(int *x, int *y) __attribute__((weak));
 int d3d9_ui_rect(int r[4], int *bb_w, int *bb_h) __attribute__((weak));
+char *vfs_map(const char *win, char *out, size_t n) __attribute__((weak));
 int touch_draw_gles(const TouchControls *t, int w, int h, void *(*get_proc)(const char *));
 static void tlog(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 static void tlog(const char *fmt, ...) {
@@ -100,6 +103,29 @@ static void late_init(void) {                /* once SDL runs: the event type an
     } else settings_path[0] = 0;
 }
 
+/* CROUCH presses the key the installation's own bind file gives crouch. The game reads user.bnd through the folder overlay
+   (the profile's copy, which the game itself writes, before the game folder's), and so does this. Prefer the toggle
+   (crouch), else the held form (+crouchhold); Shift, the stock binding, when it is one of them. Read again each time
+   touch enters LOOK mode, so a binding changed in the game's Options applies once the menu closes. */
+static void resolve_crouch(void) {
+    static char last[160];
+    static const char *const cmds[] = { "crouch", "+crouchhold" };
+    static char text[65536];
+    char path[1024], msg[160]; TouchBind b; int dik = SS2_DIK_LSHIFT;
+    if (!vfs_map || !vfs_map("user.bnd", path, sizeof path)) return;
+    FILE *f = fopen(path, "rb");
+    if (!f) snprintf(msg, sizeof msg, "no user.bnd: Shift (the stock binding)");
+    else {
+        size_t n = fread(text, 1, sizeof text, f); fclose(f);
+        if (touch_bind_find(text, n, cmds, 2, SS2_DIK_LSHIFT, &b)) {
+            dik = b.dik;
+            snprintf(msg, sizeof msg, "'%s' (%s, %s), DIK 0x%02x", b.key, b.command, b.command[0] == '+' ? "held" : "toggle", b.dik);
+        } else snprintf(msg, sizeof msg, "nothing bound to crouch: Shift (the stock binding)");
+    }
+    ss2t_set_crouch_key(&touch, dik);
+    if (strcmp(msg, last)) { snprintf(last, sizeof last, "%s", msg); tlog("CROUCH key from %s: %s", path, msg); }
+}
+
 static uint64_t now_ns(void) { return plat_time_ns(); }
 
 /* Every SDL event: returns 1 when it was a touch event (consumed). Lifecycle and window events cancel held controls. */
@@ -158,6 +184,9 @@ void android_touch_poll(void (*sink)(const PlatEvent *, void *), void *user, int
         if (debug && (was[0] != touch.ui_x || was[1] != touch.ui_y || was[2] != touch.ui_w || was[3] != touch.ui_h))
             tlog("game 2D picture %d,%d %dx%d of %dx%d%s", ux, uy, uw, uh, game_w, game_h, touch.ui_w ? "" : " (whole picture)");
     }
+    static int was_gameplay;                /* also when the MODE button switched (in the event handler, before this poll) */
+    if (touch.t.mode == TOUCH_GAMEPLAY && !was_gameplay) resolve_crouch();
+    was_gameplay = touch.t.mode == TOUCH_GAMEPLAY;
     if (touch.t.mode != before) tlog("mode %s (game %s)", touch.t.mode == TOUCH_GAMEPLAY ? "LOOK" : "CURSOR", touch.game_shoot ? "shoot" : "interface/menu");
     PlatEvent out[64]; int n;
     do {
