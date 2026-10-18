@@ -187,6 +187,7 @@ public class LauncherActivity extends Activity {
         state = getSharedPreferences("runs", MODE_PRIVATE);
         folders = new GameFolders(this);
         importTest(in);
+        labelIntent(in);
         if (GameImport.current == null) {                                      // a fresh process: no import of ours is running
             String r = folders.recover();
             if (!r.isEmpty()) state.edit().putString("recovered", "An earlier import did not finish: " + r).apply();
@@ -202,6 +203,8 @@ public class LauncherActivity extends Activity {
         super.onNewIntent(intent);
         setIntent(intent);
         importTest(intent);
+        labelIntent(intent);
+        if (intent.getStringExtra("label_game") != null && intent.getStringExtra("autorun") == null) buildUi();
         Log.i(TAG, "onNewIntent, autorun=" + intent.getStringExtra("autorun"));
         autorun(intent);
     }
@@ -265,6 +268,7 @@ public class LauncherActivity extends Activity {
             state.edit().putString("game", g.get((i + 1) % g.size())).apply();
             folder.setText(gameLabel());
         });
+        folder.setOnLongClickListener(v -> { editLabel(folder); return true; });   // a name for people; changes nothing else
         col.addView(folder);
         Button size = new Button(this);
         size.setAllCaps(false);
@@ -290,7 +294,8 @@ public class LauncherActivity extends Activity {
         List<String> games = folders.list();
         String recovered = state.getString("recovered", null);
         importStatus.setText((recovered != null ? recovered + "\n" : "") + "Game folders: " + (games.isEmpty()
-            ? "none yet. Import your System Shock 2 folder (NewDark 2.48, modded or not), or copy it with adb push." : String.join(", ", games)));
+            ? "none yet. Import your System Shock 2 folder (NewDark 2.48, modded or not), or copy it with adb push." : shownList(games))
+            + (games.size() > 1 ? "\nTap Game folder to switch, hold it to name the selected one. Each folder has its own saves and game configuration; the touch controls are shared." : ""));
         if (recovered != null) state.edit().remove("recovered").apply();
         TextView diag = text(14, false);
         diag.setTypeface(Typeface.DEFAULT_BOLD);
@@ -331,7 +336,32 @@ public class LauncherActivity extends Activity {
     private String game() { return state.getString("game", DEFAULT_GAME); }
     private String gameLabel() {
         File exe = GameFolders.exe(folders.dir(game()));
-        return "Game folder: " + game() + (exe == null ? " (no SS2.exe there)" : GameFolders.exeProblem(exe) != null ? " (its SS2.exe is not supported)" : "");
+        return "Game folder: " + GameFolders.shown(this, game()) + (exe == null ? " (no SS2.exe there)" : GameFolders.exeProblem(exe) != null ? " (its SS2.exe is not supported)" : "");
+    }
+    private String shownList(List<String> games) {
+        List<String> s = new ArrayList<>(); for (String g : games) s.add(GameFolders.shown(this, g)); return String.join(", ", s);
+    }
+    /** Hold Game folder: name the selected folder (blank removes the name). */
+    private void editLabel(Button folder) {
+        String name = game();
+        android.widget.EditText e = new android.widget.EditText(this);
+        e.setSingleLine(true); e.setText(GameFolders.label(this, name)); e.setHint("for example: System Shock 2 - SCP Beta 4 (Legacy)");
+        new android.app.AlertDialog.Builder(this).setTitle("Name for game folder \"" + name + "\"")
+            .setMessage("Only shown here. The game, its saves and which script modules load do not depend on it.")
+            .setView(e)
+            .setPositiveButton("Save", (d, w) -> { GameFolders.setLabel(this, name, e.getText().toString()); folder.setText(gameLabel()); refreshGames(); })
+            .setNegativeButton("Cancel", null).show();
+    }
+    private void refreshGames() {
+        if (importStatus == null) return;
+        List<String> games = folders.list();
+        importStatus.setText("Game folders: " + shownList(games)
+            + (games.size() > 1 ? "\nTap Game folder to switch, hold it to name the selected one. Each folder has its own saves and game configuration; the touch controls are shared." : ""));
+    }
+    /** adb: --es label_game NAME --es label TEXT names a game folder (a blank TEXT removes the name); kept. */
+    private void labelIntent(Intent in) {
+        String g = in != null ? in.getStringExtra("label_game") : null, l = in != null ? in.getStringExtra("label") : null;
+        if (g != null && l != null && GameFolders.isGameName(g)) GameFolders.setLabel(this, g, l);
     }
 
     private String versionName() {

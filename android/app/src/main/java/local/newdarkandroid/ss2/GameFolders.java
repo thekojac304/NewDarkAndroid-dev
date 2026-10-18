@@ -62,6 +62,22 @@ final class GameFolders {
         return null;
     }
 
+    // ---------------------------------------------------------------- presentation labels
+    // A name for people ("System Shock 2 - SCP Beta 4 (Legacy)") per game folder, kept in the app's preferences, never
+    // in the game folder or its write folder. Only shown: the game, its saves and which recompiled modules load (by the
+    // files' identity, modules.c) do not depend on it.
+    static final String LABELS = "game_labels";
+    static String label(Context c, String name) { return c.getSharedPreferences(LABELS, Context.MODE_PRIVATE).getString(name, ""); }
+    static void setLabel(Context c, String name, String label) {
+        String l = label == null ? "" : label.replaceAll("[\r\n\t]", " ").trim();
+        if (l.length() > 80) l = l.substring(0, 80);
+        if (l.isEmpty()) c.getSharedPreferences(LABELS, Context.MODE_PRIVATE).edit().remove(name).apply();
+        else c.getSharedPreferences(LABELS, Context.MODE_PRIVATE).edit().putString(name, l).apply();
+        Log.i(LauncherActivity.TAG, "game folder " + name + ": label " + (l.isEmpty() ? "removed" : "\"" + l + "\""));
+    }
+    /** "label (NAME)", or NAME when it has no label. */
+    static String shown(Context c, String name) { String l = label(c, name); return l.isEmpty() ? name : l + " (" + name + ")"; }
+
     /** Every game folder with an SS2.exe, sorted, each name once (games/ wins over imported/). */
     List<String> list() {
         List<String> g = new ArrayList<>();
