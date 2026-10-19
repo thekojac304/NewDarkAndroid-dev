@@ -8,6 +8,7 @@
 #include "touch_ss2.h"
 #include "touch_binds.h"
 #include "touch_surface.h"
+#include "ss2game.h"
 #include <SDL.h>
 #include <SDL_system.h>
 #include <jni.h>
@@ -20,7 +21,7 @@ uint64_t user32_cursor_recentred_ns(void) __attribute__((weak));
 void user32_cursor_pos(int *x, int *y) __attribute__((weak));
 int d3d9_ui_rect(int r[4], int *bb_w, int *bb_h) __attribute__((weak));
 char *vfs_map(const char *win, char *out, size_t n) __attribute__((weak));
-int touch_draw_gles(const TouchControls *t, int w, int h, void *(*get_proc)(const char *));
+int touch_draw_gles(const TouchControls *t, const Ss2Overlay *o, int w, int h, void *(*get_proc)(const char *));
 static void tlog(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 static void tlog(const char *fmt, ...) {
     char b[300]; int n = snprintf(b, sizeof b, "[touch] "); va_list ap; va_start(ap, fmt); vsnprintf(b + n, sizeof b - (size_t)n, fmt, ap); va_end(ap);
@@ -74,14 +75,52 @@ static void keyboard_poll(void) {
     if (keyboard_changed) { keyboard_changed = 0; ss2t_cancel(&touch); }   /* nothing touch holds (a walk, a turn) stays held */
 }
 
+/* Phase 3F: the radial menus read the game through core/ss2game.c (its wheels, by the core's categories) */
+static int wheel_of(int category) {
+    switch (category) {
+    case TOUCH_RADIAL_WEAPON: return SS2G_WEAPONS;
+    case TOUCH_RADIAL_AMMO: return SS2G_AMMO;
+    case TOUCH_RADIAL_CONSUMABLE: return SS2G_ITEMS;
+    case TOUCH_RADIAL_SYSTEM: return SS2G_SYSTEM;
+    default: return -1;
+    }
+}
+static void game_refresh(Ss2Touch *s) { (void)s; ss2g_refresh(); }
+static int game_wheel(Ss2Touch *s, int category, TouchRadialEntry *e, int max, char *title, size_t tn, char *why, size_t wn) {
+    (void)s; int w = wheel_of(category); if (w < 0) return 0;
+    Ss2gEntry g[SS2G_MAX]; if (max > SS2G_MAX) max = SS2G_MAX;
+    int n = ss2g_wheel((Ss2gWheel)w, g, max, title, tn, why, wn);
+    for (int i = 0; i < n; i++) {
+        memset(&e[i], 0, sizeof e[i]);
+        e[i].id = g[i].id; snprintf(e[i].label, sizeof e[i].label, "%s", g[i].label); snprintf(e[i].name, sizeof e[i].name, "%s", g[i].name);
+        e[i].available = g[i].available != 0; e[i].current = g[i].current != 0;
+        e[i].count = g[i].count > 0 ? (unsigned)g[i].count : 0; e[i].no_count = g[i].count < 0;
+    }
+    if (debug) tlog("wheel %d: %d entries '%s'%s%s", category, n, title ? title : "", why && why[0] ? ": " : "", why ? why : "");
+    return n;
+}
+static bool game_select(Ss2Touch *s, int category, int id) {
+    (void)s; int w = wheel_of(category); bool r = w >= 0 && ss2g_select((Ss2gWheel)w, id);
+    tlog("wheel %d: selected %d%s", category, id, r ? "" : " (refused)");
+    return r;
+}
+static bool game_message(Ss2Touch *s, char *out, size_t n) { (void)s; return ss2g_message(out, n) != 0; }
+_Static_assert(SS2T_SYS_QUICKLOAD == SS2G_SYS_QUICKLOAD, "the bridge's quickload id");
+/* System Shock 2's touch settings on top of Shockolate's: its three wheels on (< > held, ITEM, II held). A file saved
+   before Phase 3F keeps these (its wheel keys did nothing in System Shock 2) and puts ITEM, never shown, at its default. */
+static void ss2_settings_defaults(TouchSettings *s) { s->wheel_enabled[0] = s->wheel_enabled[1] = s->wheel_enabled[2] = true; }
+static const TouchSettingsGame ss2_settings = { ss2_settings_defaults, TC_EXPLOSIVE };
+
 /* Before SDL_Init: touches must never become SDL mouse events (they would enter the relative-motion accumulator) */
 void android_touch_init(void) {
     const char *on = getenv("SS2PORT_TOUCH");      /* the launcher sets 0 for runs without touch controls (--ez touch false) */
     if (on && *on == '0') { tlog("touch controls off"); return; }
     SDL_SetHintWithPriority(SDL_HINT_TOUCH_MOUSE_EVENTS, "0", SDL_HINT_OVERRIDE);
     SDL_SetHintWithPriority(SDL_HINT_MOUSE_TOUCH_EVENTS, "0", SDL_HINT_OVERRIDE);
+    touch_settings_game = &ss2_settings;            /* before ss2t_init: its defaults include the game's */
     ss2t_init(&touch);
     touch.save_settings = save_settings; touch.haptic = haptic; touch.keyboard = keyboard;
+    touch.game_refresh = game_refresh; touch.game_wheel = game_wheel; touch.game_select = game_select; touch.game_message = game_message;
     if (user32_cursor_pos) touch.cursor_pos = cursor_pos;
     debug = getenv("SS2PORT_TOUCH_DEBUG") != NULL;
     initialized = 1;
@@ -100,6 +139,9 @@ static void late_init(void) {                /* once SDL runs: the event type an
              r == TOUCH_LOAD_MIGRATED ? "migrated" : r == TOUCH_LOAD_FUTURE ? "newer version: defaults, not saved" : "invalid: defaults",
              upgraded ? "; layout never moved: current default positions (file unchanged)" : "",
              touch.t.settings.cursor_relative ? "relative" : "direct", touch.t.settings.cursor_speed);
+        tlog("radial menus: weapon wheel %s, ITEM %s, system wheel %s, quickload confirm %s%s", touch.t.settings.wheel_enabled[0] ? "on" : "off",
+             touch.t.settings.wheel_enabled[1] ? "on" : "off", touch.t.settings.wheel_enabled[2] ? "on" : "off", touch.t.settings.quickload_confirm ? "on" : "off",
+             touch.t.settings.game_radials ? "" : " (defaults: the file predates them)");
     } else settings_path[0] = 0;
 }
 
@@ -173,6 +215,7 @@ void android_touch_poll(void (*sink)(const PlatEvent *, void *), void *user, int
     late_init();
     surf_w = dw; surf_h = dh;
     keyboard_poll();
+    touch.game_on = ss2g_available() != 0;
     TouchMode before = touch.t.mode;
     ss2t_frame(&touch, now_ns(), (float)dw, (float)dh, focused && !background && !unfocused, (float)bx, (float)by, (float)bw, (float)bh,
                game_w, game_h, user32_cursor_recentred_ns ? user32_cursor_recentred_ns() : 0);
@@ -204,5 +247,6 @@ void android_touch_poll(void (*sink)(const PlatEvent *, void *), void *user, int
 void android_touch_draw(int w, int h) {
     if (!initialized) return;
     static int failed;
-    if (touch_draw_gles(&touch.t, w, h, SDL_GL_GetProcAddress) < 0 && !failed) { failed = 1; tlog("overlay: GL setup failed; controls work, nothing drawn"); }
+    Ss2Overlay o; ss2t_overlay(&touch, &o);
+    if (touch_draw_gles(&touch.t, &o, w, h, SDL_GL_GetProcAddress) < 0 && !failed) { failed = 1; tlog("overlay: GL setup failed; controls work, nothing drawn"); }
 }

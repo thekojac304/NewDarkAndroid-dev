@@ -4,9 +4,10 @@
  * file's: the same shapes, colours, layout and 3x5 bitmap font. Only its primitives changed: rectangles, lines and
  * circles become triangles in one vertex batch, drawn after the game's picture and before the buffer swap
  * (plat_sdl2.c gl_swap), in surface pixels including the letterbox bars. The GL state it changes is put back.
- * Visual-compare and QA panels are left out (System Shock QA tools).
+ * Visual-compare and QA panels are left out (System Shock QA tools). Phase 3F: the radial wheel (touch_render.c's
+ * radial(), same colours and layout) with a title line, and the bridge's notices and quickload question.
  * SPDX-License-Identifier: GPL-3.0-or-later */
-#include "touch_controls.h"
+#include "touch_ss2.h"
 #include <GLES2/gl2.h>
 #include <math.h>
 #include <stdio.h>
@@ -33,6 +34,18 @@ static void disc(float x, float y, float r) {
     for (int i = 0; i < seg; i++) {
         float a = i * 6.2831853f / seg, b = (i + 1) * 6.2831853f / seg;
         tri(x, y, x + cosf(a) * r, y + sinf(a) * r, x + cosf(b) * r, y + sinf(b) * r);
+    }
+}
+static void line(float x0, float y0, float x1, float y1, float width) {   /* a segment as a thin quad */
+    float dx = x1 - x0, dy = y1 - y0, l = sqrtf(dx * dx + dy * dy); if (l <= 0) return;
+    float nx = -dy / l * width / 2, ny = dx / l * width / 2;
+    quad4(x0 + nx, y0 + ny, x1 + nx, y1 + ny, x1 - nx, y1 - ny, x0 - nx, y0 - ny);
+}
+static void sector(float x, float y, float r0, float r1, float a0, float a1) {   /* part of an annulus */
+    int seg = (int)ceilf((a1 - a0) / .05f); if (seg < 1) seg = 1;
+    for (int i = 0; i < seg; i++) {
+        float a = a0 + (a1 - a0) * i / seg, b = a0 + (a1 - a0) * (i + 1) / seg;
+        quad4(x + cosf(a) * r0, y + sinf(a) * r0, x + cosf(a) * r1, y + sinf(a) * r1, x + cosf(b) * r1, y + sinf(b) * r1, x + cosf(b) * r0, y + sinf(b) * r0);
     }
 }
 static void ring(float x, float y, float r, float width) {
@@ -86,11 +99,12 @@ static bool held(const TouchControls *t,int id) {
     if (id==TC_FIRE) return t->fire_count>0;
     if (id==TC_USE) return t->use_count>0;
     if (id==TC_STICK) return t->move_owner>=0;
-    if (id==TC_AMMO) {
+    if (id==TC_AMMO || (id>=TC_JUMP && id<=TC_PAUSE)) {      /* NewDarkAndroid: any button whose wheel is pending or open */
+        TouchAction a=id==TC_AMMO ? TOUCH_AMMO : (TouchAction)(id-TC_JUMP);
         for (int i=0;i<TOUCH_MAX_FINGERS;++i)
-            if (t->fingers[i].active && t->fingers[i].action==TOUCH_AMMO &&
+            if (t->fingers[i].active && t->fingers[i].role==TOUCH_ACTION && t->fingers[i].action==a &&
                 (t->fingers[i].radial_pending || t->fingers[i].radial_opened)) return true;
-        return false;
+        if (id==TC_AMMO) return false;
     }
     if (id==TC_SPRINT) return t->sprint_latched;
     return id>=TC_JUMP && id<=TC_PAUSE && t->action_count[id-TC_JUMP]>0;
@@ -107,6 +121,7 @@ static void controls(const TouchControls *t) {
                 t->effective_mode!=TOUCH_GAMEPLAY) continue;
         }
         TouchRect b=touch_control_bounds(t,id);
+        if (b.w<=0) continue;                                            /* NewDarkAndroid: hidden for now (ITEM without its wheel) */
         bool selected=t->panel==TOUCH_UI_EDITOR && t->selected==id;
         float opacity=selected ? fmaxf(.85f,t->settings.opacity) : t->settings.opacity;
         bool down=!preview && (held(t,id) || (id==TC_TARGET && touch_keyboard_shown));   /* lit while the keyboard is up */
@@ -138,7 +153,7 @@ static const char *ui_label(const TouchControls *t,int action) {
         "INVERT Y OFF","-","+","RESET TOUCH SETTINGS","CANCEL","SAVE / DONE",
         "<",">","SIZE -","SIZE +","SETTINGS","MOVE TOOLBAR","MORE >",
         "HAPTICS OFF","HAPTIC STRENGTH 1","WEAPON WHEEL OFF",
-        "CONSUMABLE WHEEL OFF","EXPLOSIVE WHEEL OFF","CURSOR DIRECT","-","+"};
+        "CONSUMABLE WHEEL OFF","EXPLOSIVE WHEEL OFF","CURSOR DIRECT","-","+","QUICKLOAD CONFIRM ON"};
     if (action>=TU_QA) return "";
     if (action==TU_INVERT && t->settings.invert_y) return "INVERT Y ON";
     if (action==TU_PAGE) return t->settings_page ? "< BACK" : "MORE >";
@@ -147,10 +162,12 @@ static const char *ui_label(const TouchControls *t,int action) {
         static const char *levels[]={"HAPTIC STRENGTH 1","HAPTIC STRENGTH 2","HAPTIC STRENGTH 3"};
         return levels[t->settings.haptic_strength-1];
     }
-    if (action==TU_WHEEL_WEAPON) return t->settings.wheel_enabled[0] ? "WEAPON WHEEL ON" : "WEAPON WHEEL OFF";
-    if (action==TU_WHEEL_CONSUMABLE) return t->settings.wheel_enabled[1] ? "CONSUMABLE WHEEL ON" : "CONSUMABLE WHEEL OFF";
+    /* NewDarkAndroid: System Shock 2's wheels (touch_ss2.c): < > held, ITEM, II held */
+    if (action==TU_WHEEL_WEAPON) return t->settings.wheel_enabled[0] ? "WEAPON WHEEL ON - HOLD < >" : "WEAPON WHEEL OFF";
+    if (action==TU_WHEEL_CONSUMABLE) return t->settings.wheel_enabled[1] ? "ITEM BUTTON ON - HYPOS" : "ITEM BUTTON OFF";
+    if (action==TU_QUICKLOAD_CONFIRM) return t->settings.quickload_confirm ? "QUICKLOAD CONFIRM ON" : "QUICKLOAD CONFIRM OFF";
     if (action==TU_CURSOR_STYLE) return t->settings.cursor_relative ? "CURSOR RELATIVE - TRACKPAD" : "CURSOR DIRECT";
-    if (action==TU_WHEEL_EXPLOSIVE) return t->settings.wheel_enabled[2] ? "EXPLOSIVE WHEEL ON" : "EXPLOSIVE WHEEL OFF";
+    if (action==TU_WHEEL_EXPLOSIVE) return t->settings.wheel_enabled[2] ? "SYSTEM WHEEL ON - HOLD II" : "SYSTEM WHEEL OFF";
     if (t->panel==TOUCH_UI_EDITOR) {
         if (action==TU_OPACITY_DOWN) return "OPACITY -";
         if (action==TU_OPACITY_UP) return "OPACITY +";
@@ -206,6 +223,79 @@ static void panel(const TouchControls *t) {
     }
 }
 
+/* NewDarkAndroid: touch_render.c's radial(), with the GLES primitives; a title line above it (the highlighted entry in
+   full, else what the wheel is about), counts only where they mean something, and more than 7 segments */
+static void radial(const TouchControls *t, const char *title) {
+    const TouchRadialSelector *wheel=&t->radial;
+    if (!wheel->open) return;
+    float R=wheel->outer_radius,inner=wheel->inner_radius,h=t->layout.height,op=fmaxf(.7f,t->settings.opacity);
+    color(8,22,30,205,fmaxf(.65f,t->settings.opacity));
+    disc(wheel->cx,wheel->cy,R);
+    for (int i=0;i<wheel->count;++i) {
+        float angle=6.2831853f*i/wheel->count-1.5707963f;
+        float half=3.14159265f/wheel->count;
+        const TouchRadialEntry *entry=&wheel->entries[i];
+        if (i==wheel->highlighted || entry->current) {
+            bool chosen=i==wheel->highlighted;
+            color(chosen ? 39 : 54,chosen ? 100 : 81,chosen ? 116 : 85,chosen ? 225 : 170,op);
+            sector(wheel->cx,wheel->cy,inner,R-2,angle-half+.008f,angle+half-.008f);
+        }
+        color(entry->available ? 188 : 95,entry->available ? 231 : 115,entry->available ? 235 : 120,220,op);
+        float edge=angle-half;
+        line(wheel->cx+cosf(edge)*inner,wheel->cy+sinf(edge)*inner,wheel->cx+cosf(edge)*R,wheel->cy+sinf(edge)*R,fmaxf(1,R/180));
+        char label[sizeof(entry->label)];
+        snprintf(label,sizeof(label),"%s",entry->label);
+        for (char *p=label;*p;++p) if (*p>='a' && *p<='z') *p=(char)(*p-'a'+'A');
+        float x=wheel->cx+cosf(angle)*R*.68f,y=wheel->cy+sinf(angle)*R*.68f;
+        float room=fminf(R*.64f,6.2831853f*R*.62f/wheel->count);     /* a label never runs into the next segment */
+        color(entry->available ? 237 : 132,entry->available ? 249 : 145,entry->available ? 247 : 150,255,op);
+        text(label,x,y,h/270,room);
+        if (entry->current) {
+            color(255,213,110,255,op);
+            text("ACTIVE",x,y-R*.11f,h/410,room*.8f);
+        }
+        if (!entry->no_count) {
+            char count[16];
+            snprintf(count,sizeof(count),"X%u",entry->count);
+            color(217,232,232,245,op);
+            text(count,x,y+R*.11f,h/390,room*.7f);
+        }
+    }
+    color(179,220,224,245,op);
+    ring(wheel->cx,wheel->cy,R,fmaxf(1,R/150));
+    circle((TouchCircle){wheel->cx,wheel->cy,inner},false,false,1,fmaxf(1,R/110));
+    color(241,243,228,255,1);
+    text("CANCEL",wheel->cx,wheel->cy,h/290,inner*1.6f);
+    /* the title: the highlighted entry in full, else the wheel's subject */
+    const char *head=wheel->highlighted>=0 && wheel->entries[wheel->highlighted].name[0] ? wheel->entries[wheel->highlighted].name : title;
+    if (head && *head) {
+        float y=fmaxf(h*.045f,wheel->cy-R-h*.05f), tw=fminf(t->layout.width*.8f,(float)strlen(head)*4*h/200);
+        color(8,22,30,215,1); fill_rect(wheel->cx-tw/2-h*.02f,y-h*.03f,tw+h*.04f,h*.06f);
+        color(255,224,135,255,1); text(head,wheel->cx,y,h/200,tw);
+    }
+}
+static void overlay(const TouchControls *t, const Ss2Overlay *o) {
+    float w=t->layout.width,h=t->layout.height,stroke=fmaxf(1,roundf(h/384));
+    if (o->toast && *o->toast) {                                       /* a notice under the top edge */
+        float tw=fminf(w*.7f,(float)strlen(o->toast)*4*h/230);
+        color(8,22,30,220,1); fill_rect(w*.5f-tw/2-h*.02f,h*.12f,tw+h*.04f,h*.06f);
+        color(179,220,224,255,1); rect((TouchRect){w*.5f-tw/2-h*.02f,h*.12f,tw+h*.04f,h*.06f},false,stroke);
+        color(237,249,247,255,1); text(o->toast,w*.5f,h*.15f,h/230,tw);
+    }
+    if (o->confirm) {                                                  /* the quickload question */
+        TouchRect box=ss2t_confirm_rect(t,0),yes=ss2t_confirm_rect(t,1),no=ss2t_confirm_rect(t,2);
+        color(4,10,17,150,1); fill_rect(0,0,w,h);
+        color(15,28,40,250,1); rect(box,true,stroke);
+        color(179,220,224,255,1); rect(box,false,stroke);
+        color(255,224,135,255,1); text("QUICKLOAD?",box.x+box.w/2,box.y+box.h*.17f,h/170,box.w*.8f);
+        color(213,239,241,255,1); text("PROGRESS SINCE THE QUICKSAVE IS LOST",box.x+box.w/2,box.y+box.h*.36f,h/330,box.w*.9f);
+        color(66,24,24,255,1); rect(yes,true,stroke); color(255,153,132,255,1); rect(yes,false,stroke);
+        color(255,220,210,255,1); text("LOAD",yes.x+yes.w/2,yes.y+yes.h/2,h/240,yes.w*.8f);
+        color(26,51,65,255,1); rect(no,true,stroke); color(105,222,190,255,1); rect(no,false,stroke);
+        color(227,244,245,255,1); text("CANCEL",no.x+no.w/2,no.y+no.h/2,h/240,no.w*.8f);
+    }
+}
+
 /* ---------------------------------------------------------------- GL submission */
 #define GLFN(ret, name, args) static ret (GL_APIENTRY *p_##name) args;
 #define GLFNS \
@@ -244,13 +334,15 @@ static int gl_setup(void *(*get)(const char *)) {
 }
 
 /* Called on the GL thread with the window's framebuffer bound, w x h = the drawable (= touch surface) size. */
-int touch_draw_gles(const TouchControls *t, int w, int h, void *(*get_proc)(const char *)) {
+int touch_draw_gles(const TouchControls *t, const Ss2Overlay *o, int w, int h, void *(*get_proc)(const char *)) {
     if (!t->enabled || (!t->gameplay_available && !t->pause_available) || t->controller || w <= 0 || h <= 0) return 0;
     if (!gl_state) gl_state = gl_setup(get_proc);
     if (gl_state < 0) return -1;
     vn = 0;
     controls(t);
+    if (t->panel==TOUCH_UI_CLOSED) radial(t,o ? o->wheel_title : "");
     if (t->panel!=TOUCH_UI_CLOSED) panel(t);
+    else if (o) overlay(t,o);
     if (!vn) return 0;
     GLint old_prog = 0, old_buf = 0, old_vp[4]; GLboolean blend = p_glIsEnabled(GL_BLEND), scissor = p_glIsEnabled(GL_SCISSOR_TEST),
         depth = p_glIsEnabled(GL_DEPTH_TEST), cull = p_glIsEnabled(GL_CULL_FACE);

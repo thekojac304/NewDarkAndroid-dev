@@ -58,14 +58,23 @@ keys are the same in every installation checked.
 | FIRE | Left button held (`+fire_weapon`). The finger also aims. |
 | USE | Right click (`frob_object`) |
 | JUMP / CROUCH | Space held (`+jump`) / the installation's own crouch key: the key `user.bnd` binds to `crouch` (a toggle), else to `+crouchhold` (held while the finger is down); Shift (the stock binding) when it is one of them or when nothing is bound. Read through the profile overlay (the copy the game reads and writes) each time touch enters LOOK mode; logged as `[touch] CROUCH key from ...` (`touch_binds.c`) |
-| `<` / `>` | Mouse wheel down / up (`cycle_weapon -1` / `1`) |
-| RELOAD / AMMO | R (`reload_gun`) / B (`cycle_ammo`). In cursor mode the AMMO button is a right click at the cursor, labelled USE. |
-| II | Esc (`sim_menu`; also skips cutscenes) |
+| `<` / `>` | Tap: mouse wheel down / up (`cycle_weapon -1` / `1`). **Hold 400 ms** (Phase 3F): the weapon wheel, the weapons actually carried (`equip_weapon <archetype>`) |
+| RELOAD / AMMO | R (`reload_gun`) / B (`cycle_ammo`). **Hold AMMO 400 ms**: the gun's ammunition types and its two settings (cycle_ammo's load, `wpn_setting_toggle`); with the psi amp, the known psi powers (`ShockGame.SetSelectedPsiPower`: selects, never activates). In cursor mode the AMMO button is a right click at the cursor, labelled USE. |
+| ITEM (Phase 3F) | Hold 400 ms: hypos and patches carried, with counts (`use_obj <archetype>`). A tap only says so. Shown while the ITEM wheel is on (SET, MORE) |
+| II | Esc (`sim_menu`; also skips cutscenes). **Hold 400 ms in look mode**: the system wheel: QUICKSAVE, PLAY LOG (`play_unread_log`, offered only when the player has unread logs), STOP LOG, QUICKLOAD (asks first unless QUICKLOAD CONFIRM is off; offered only when the quicksave slot holds a save), PSI PANEL |
 | KBD | Shows or hides Android's keyboard (SDL text input), in look and cursor mode. What it types reaches the game as key presses and characters, as from a physical keyboard: save names, the console (`:`), Backspace, Enter. Android's Back closes it; Esc is II. While it is up in look mode, only II, KBD, MODE and SET take a new touch, so typing cannot walk, turn or fire. |
 | MODE (LOOK / CURSOR) | Tab (`toggle_mouse`): the game switches between shoot and interface mode |
 | Cursor mode, **Direct** (default) | A tap places the game's cursor and clicks. A drag presses at the start point, moves and releases. |
 | Cursor mode, **Relative** (trackpad; SET, MORE, CURSOR) | The touch moves nothing. A drag past the slop moves the cursor from where it is by the finger's motion times CURSOR SPEED (1 = as far on screen as the finger, also on 4:3 menus), with no button. A tap clicks where the cursor is. A finger held still for 0.5 s presses the left button there (a haptic if haptics are on); the drag that follows carries it, and lifting releases it. A gesture starts from the game's own cursor (`user32_cursor_pos`), so it goes on from where a mouse, the game or a direct tap left it. USE (right click) and mouse look are unchanged |
 
+- **Radial menus** (Phase 3F): the Shockolate wheel, in look mode only. Releasing on a segment selects it, in the centre
+  or outside cancels; the finger that held the button owns the wheel, other fingers never select, the stick keeps walking,
+  and focus loss, Home, MODE or the game leaving shoot mode close it with nothing selected. A segment that is not available
+  (a weapon the character cannot equip, no unread log) is dimmed and cannot be chosen; the open wheel is refreshed every
+  250 ms. The entries and the actions come from the game itself, through `port/core/ss2game.c`, which runs them at the
+  engine's per-frame event pump; without it (another executable) the buttons keep their plain actions. Settings, MORE:
+  WEAPON WHEEL, ITEM BUTTON, SYSTEM WHEEL, QUICKLOAD CONFIRM (all on by default; a settings file from before Phase 3F keeps
+  everything else and gets these defaults).
 - Every press lasts at least 60 ms, so a 100 fps game sees it.
 - A key or button a physical keyboard or mouse holds is never released by touch, and the other way round.
 - **Mode:** the game recentres its cursor every frame in shoot mode and never in interface mode or menus. The touch mode
@@ -74,9 +83,12 @@ keys are the same in every installation checked.
 
 ## Tests
 
-`tests/run.sh` builds `tests/touch_ss2_test.c` with the bridge and the core and runs it on the PC, for example with
+`tests/run.sh` builds `tests/touch_ss2_test.c` with the bridge and the core and runs it on the PC (Phase 3F adds the
+radial menus over a fake game: hold time, short taps unchanged, centre/outside/slide cancels, multitouch, focus loss and
+mode changes, empty and unavailable entries, live refresh, haptics, the system wheel and the quickload question, ITEM,
+16 entries, settings migration), for example with
 `CC="python -m ziglang cc"`. It checks press/release order and minimum hold, several fingers, stick ownership and
 hysteresis, a modifier held across frames, relative look scaling, cursor placement before a click (corners, centre,
 bars), placement through a 4:3 menu in a 16:9 game, drags, focus-loss release, mode following, weapon wheel, physical/touch aggregation, the KBD button and its typing lock-out, the default positions at 16:9, and the layout upgrade; and the relative cursor (Phase 3D): no jump on touch, delta accumulation and sub-pixel steps, speed, taps and double and rapid taps at the cursor, the hold press and its drag ordering, cancellation on focus loss and picture change, finger ownership with USE, LOOK/CURSOR changes, following the game's cursor, 4:3 menu mapping and edges, settings migration, persistence and the panel. Shockolate's own core
 suites (`touch_controls`, `alpha11`, `alpha2`, `alpha3`, `alpha4`, `ammo` from 7502370) also pass against this
-directory's core.
+directory's core: `docs/android-audit/phase3f/run_shockolate_suites.sh` (asserts on, Shockolate's layout table).

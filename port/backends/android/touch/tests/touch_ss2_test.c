@@ -659,6 +659,319 @@ static void test_crouch_key(void) {
     finger(&s, TOUCH_UP, 1, c.x, c.y); finger(&s, TOUCH_UP, 2, 400, 900 - r); finger(&s, TOUCH_UP, 3, 1444, 400); advance(&s, 100, shooting());
 }
 
+/* ---------------------------------------------------------------- Phase 3F: radial menus over a fake game (core/ss2game.c's role) */
+static int fg_refreshes, fg_selects, fg_cat, fg_id, fg_haptic1, fg_haptic2; static bool fg_refuse;
+static TouchRadialEntry fg_e[TOUCH_RADIAL_CATEGORY_COUNT][TOUCH_RADIAL_MAX_ENTRIES]; static int fg_n[TOUCH_RADIAL_CATEGORY_COUNT];
+static char fg_why[64], fg_msg[64];
+static void fg_refresh(Ss2Touch *s) { (void)s; fg_refreshes++; }
+static int fg_wheel(Ss2Touch *s, int cat, TouchRadialEntry *e, int max, char *title, size_t tn, char *why, size_t wn) {
+    (void)s; int n = fg_n[cat] < max ? fg_n[cat] : max;
+    memcpy(e, fg_e[cat], (size_t)n * sizeof *e); snprintf(title, tn, "WHEEL %d", cat); snprintf(why, wn, "%s", n ? "" : fg_why);
+    return n;
+}
+static bool fg_select(Ss2Touch *s, int cat, int id) { (void)s; fg_selects++; fg_cat = cat; fg_id = id; return !fg_refuse; }
+static bool fg_message(Ss2Touch *s, char *out, size_t n) { (void)s; if (!fg_msg[0]) return false; snprintf(out, n, "%s", fg_msg); fg_msg[0] = 0; return true; }
+static void fg_haptic(Ss2Touch *s, int level) { (void)s; if (level == 1) fg_haptic1++; else fg_haptic2++; }
+static void fg_entries(int cat, int n, int first_id) {
+    fg_n[cat] = n;
+    for (int i = 0; i < n; i++) { TouchRadialEntry *e = &fg_e[cat][i]; memset(e, 0, sizeof *e);
+        e->id = first_id + i; snprintf(e->label, sizeof e->label, "E%d", i); snprintf(e->name, sizeof e->name, "ENTRY %d", i); e->available = true; e->count = 1; }
+}
+/* a game in shoot mode with the radial services, SS2's wheel preferences on, a 2340x1080 surface (800x600 game at x = 450) */
+static void game_init(Ss2Touch *s) {
+    ss2t_init(s); s->game_on = true; s->game_refresh = fg_refresh; s->game_wheel = fg_wheel; s->game_select = fg_select; s->game_message = fg_message;
+    s->haptic = fg_haptic;
+    s->t.settings.wheel_enabled[0] = s->t.settings.wheel_enabled[1] = s->t.settings.wheel_enabled[2] = true;
+    fg_refreshes = fg_selects = fg_haptic1 = fg_haptic2 = 0; fg_cat = fg_id = -1; fg_refuse = false; fg_why[0] = fg_msg[0] = 0;
+    fg_entries(TOUCH_RADIAL_WEAPON, 4, 100); fg_entries(TOUCH_RADIAL_AMMO, 3, 200); fg_entries(TOUCH_RADIAL_CONSUMABLE, 5, 300);
+    fg_entries(TOUCH_RADIAL_SYSTEM, 4, 1);
+    now = 1000000000ull; enter_gameplay(s);
+}
+static void segment(const Ss2Touch *s, int i, float *x, float *y) {       /* the middle of segment i of the open wheel */
+    const TouchRadialSelector *r = &s->t.radial; float a = 6.2831853f * (float)i / (float)r->count - 1.5707963f, d = (r->inner_radius + r->outer_radius) / 2;
+    *x = r->cx + cosf(a) * d; *y = r->cy + sinf(a) * d;
+}
+static int game_input;                       /* keys, buttons and wheel notches sent to the game, over several frames */
+static void count_input(void) { for (int i = 0; i < nout; i++) if (out[i].type == PLAT_EV_KEY || out[i].type == PLAT_EV_MOUSE_BUTTON || out[i].type == PLAT_EV_MOUSE_WHEEL) game_input++; }
+static void run_ms(Ss2Touch *s, int ms) { for (int t = 0; t < ms; t += 10) { advance(s, 10, shooting()); count_input(); } }
+static void hold(Ss2Touch *s, int id, TouchCircle c, int ms) { finger(s, TOUCH_DOWN, id, c.x, c.y); count_input(); run_ms(s, ms); }
+
+static void test_radial_weapon_hold_select(void) {
+    Ss2Touch s; game_init(&s); game_input = 0;
+    TouchCircle n = ctl(&s, TC_NEXT), p = ctl(&s, TC_PREV);
+    finger(&s, TOUCH_DOWN, 1, n.x, n.y);
+    CHECK(fg_refreshes == 1);                              /* the game is read as the finger lands, long before the wheel opens */
+    run_ms(&s, 380); CHECK(!s.t.radial.open);              /* not at 380 ms (Shockolate's 320 is too short here) */
+    run_ms(&s, 30); CHECK(s.t.radial.open && s.t.radial.category == TOUCH_RADIAL_WEAPON && s.t.radial.count == 4);
+    Ss2Overlay o; ss2t_overlay(&s, &o); CHECK(!strcmp(o.wheel_title, "WHEEL 0"));
+    float x, y; segment(&s, 2, &x, &y);
+    finger(&s, TOUCH_MOTION, 1, x, y); run_ms(&s, 20); CHECK(s.t.radial.highlighted == 2);
+    finger(&s, TOUCH_UP, 1, x, y); run_ms(&s, 100);
+    CHECK(!s.t.radial.open && fg_selects == 1 && fg_cat == TOUCH_RADIAL_WEAPON && fg_id == 102);
+    CHECK(game_input == 0);                                /* no wheel notch, no key, no button: the selection is the game's command */
+    /* < opens the same wheel */
+    hold(&s, 2, p, 450); CHECK(s.t.radial.open && s.t.radial.category == TOUCH_RADIAL_WEAPON);
+    segment(&s, 0, &x, &y); finger(&s, TOUCH_MOTION, 2, x, y); finger(&s, TOUCH_UP, 2, x, y); run_ms(&s, 100);
+    CHECK(fg_selects == 2 && fg_id == 100 && game_input == 0);
+}
+
+static void tap_frames(Ss2Touch *s, TouchCircle c, int ms) {   /* a tap lasting ms, the game running its frames meanwhile */
+    finger(s, TOUCH_DOWN, 1, c.x, c.y); for (int t = 0; t < ms; t += 10) advance(s, 10, shooting());
+    finger(s, TOUCH_UP, 1, c.x, c.y); frame(s, shooting());
+}
+static int notch_sum(void) { int w = 0; for (int i = 0; i < nout; i++) if (out[i].type == PLAT_EV_MOUSE_WHEEL) w += out[i].dy; return w; }
+static void test_radial_short_tap_unchanged(void) {
+    Ss2Touch s; game_init(&s);
+    TouchCircle n = ctl(&s, TC_NEXT), p = ctl(&s, TC_PREV), a = ctl(&s, TC_AMMO), ii = ctl(&s, TC_PAUSE);
+    tap_frames(&s, n, 120); CHECK(notch_sum() == 120);    /* > : one notch up, on release */
+    advance(&s, 10, shooting()); CHECK(notch_sum() == 0); /* exactly once */
+    tap_frames(&s, p, 120); CHECK(notch_sum() == -120);   /* < : one notch down */
+    advance(&s, 100, shooting());
+    tap_frames(&s, a, 120); CHECK(find(PLAT_EV_KEY, SS2_DIK_B, 1) >= 0);   /* AMMO: B (cycle_ammo) */
+    advance(&s, 100, shooting()); CHECK(!s.touch_key[SS2_DIK_B]);
+    tap_frames(&s, ii, 120); CHECK(find(PLAT_EV_KEY, SS2_DIK_ESC, 1) >= 0); /* II: Esc */
+    advance(&s, 100, shooting());
+    tap_frames(&s, n, 390); CHECK(notch_sum() == 120 && !s.t.radial.open);  /* just under the hold time: still a tap */
+    advance(&s, 100, shooting());
+    CHECK(fg_selects == 0 && !s.t.radial.open);
+    /* without the game's state (another executable, no game yet) a hold is a plain press, as before Phase 3F */
+    s.game_on = false;
+    finger(&s, TOUCH_DOWN, 1, n.x, n.y); frame(&s, shooting());
+    CHECK(notch_sum() == 120);                             /* on the press, as Phase 2A */
+    run_ms(&s, 600); CHECK(!s.t.radial.open); finger(&s, TOUCH_UP, 1, n.x, n.y); advance(&s, 100, shooting());
+}
+
+static void test_radial_cancel(void) {
+    Ss2Touch s; game_init(&s); game_input = 0;
+    TouchCircle n = ctl(&s, TC_NEXT);
+    hold(&s, 1, n, 450); CHECK(s.t.radial.open);
+    float cx = s.t.radial.cx, cy = s.t.radial.cy;
+    finger(&s, TOUCH_MOTION, 1, cx, cy); finger(&s, TOUCH_UP, 1, cx, cy); run_ms(&s, 100);   /* released in the centre */
+    CHECK(!s.t.radial.open && fg_selects == 0);
+    hold(&s, 2, n, 450); CHECK(s.t.radial.open);
+    float far = s.t.radial.outer_radius * 1.4f;
+    finger(&s, TOUCH_MOTION, 2, cx, cy - far); finger(&s, TOUCH_UP, 2, cx, cy - far); run_ms(&s, 100);   /* outside the wheel */
+    CHECK(!s.t.radial.open && fg_selects == 0);
+    /* a finger that slides off the button before the wheel opens: neither a wheel nor the tap action */
+    finger(&s, TOUCH_DOWN, 3, n.x, n.y); run_ms(&s, 100);
+    finger(&s, TOUCH_MOTION, 3, n.x + n.radius * 3, n.y); run_ms(&s, 500);
+    CHECK(!s.t.radial.open);
+    finger(&s, TOUCH_UP, 3, n.x + n.radius * 3, n.y); run_ms(&s, 100);
+    CHECK(fg_selects == 0 && game_input == 0);
+}
+
+static void test_radial_multitouch(void) {
+    Ss2Touch s; game_init(&s);
+    float r = s.t.layout.move_radius; TouchCircle a = ctl(&s, TC_AMMO), f = ctl(&s, TC_FIRE);
+    finger(&s, TOUCH_DOWN, 1, 400, 900); finger(&s, TOUCH_MOTION, 1, 400, 900 - r); advance(&s, 10, shooting());
+    CHECK(s.stick_key[0] && find(PLAT_EV_KEY, SS2_DIK_W, 1) >= 0);
+    finger(&s, TOUCH_DOWN, 2, 1300, 400);                  /* a look finger */
+    finger(&s, TOUCH_DOWN, 3, a.x, a.y); for (int i = 0; i < 45; i++) advance(&s, 10, shooting());
+    CHECK(s.t.radial.open && s.t.radial.category == TOUCH_RADIAL_AMMO && s.t.radial.owner >= 0);
+    CHECK(s.stick_key[0] && s.t.move_owner >= 0);          /* still walking */
+    CHECK(s.t.look_owner < 0);                             /* look ownership ends when the wheel opens */
+    float x, y; segment(&s, 1, &x, &y);
+    finger(&s, TOUCH_DOWN, 4, x, y); finger(&s, TOUCH_UP, 4, x, y); advance(&s, 10, shooting());   /* another finger on a segment */
+    CHECK(s.t.radial.open && fg_selects == 0 && s.t.radial.highlighted != 1);
+    finger(&s, TOUCH_DOWN, 5, f.x, f.y); advance(&s, 10, shooting());
+    CHECK(find(PLAT_EV_MOUSE_BUTTON, 0, 1) < 0);           /* FIRE does not fire while a wheel is open */
+    finger(&s, TOUCH_MOTION, 2, 1500, 400); advance(&s, 10, shooting());
+    int moved = 0; for (int i = 0; i < nout; i++) if (out[i].type == PLAT_EV_MOUSE_MOVE) moved = 1;
+    CHECK(!moved);                                         /* the old look finger does not turn the view */
+    finger(&s, TOUCH_MOTION, 3, x, y); finger(&s, TOUCH_UP, 3, x, y); advance(&s, 10, shooting());
+    CHECK(fg_selects == 1 && fg_cat == TOUCH_RADIAL_AMMO && fg_id == 201 && s.stick_key[0]);
+    finger(&s, TOUCH_UP, 5, f.x, f.y); finger(&s, TOUCH_UP, 2, 1500, 400); finger(&s, TOUCH_UP, 1, 400, 900 - r);
+    advance(&s, 100, shooting()); CHECK(!s.stick_key[0] && !s.touch_key[SS2_DIK_W] && !s.touch_btn[0]);
+}
+
+static void test_radial_cancel_by_lifecycle(void) {
+    Ss2Touch s; game_init(&s); game_input = 0;
+    TouchCircle n = ctl(&s, TC_NEXT); float r = s.t.layout.move_radius, x, y;
+    finger(&s, TOUCH_DOWN, 1, 400, 900); finger(&s, TOUCH_MOTION, 1, 400, 900 - r);
+    hold(&s, 2, n, 450); CHECK(s.t.radial.open && s.touch_key[SS2_DIK_W]);
+    ss2t_cancel(&s); nout = ss2t_flush(&s, out, 512);     /* focus lost, Home */
+    CHECK(!s.t.radial.open && find(PLAT_EV_KEY, SS2_DIK_W, 0) >= 0 && !s.touch_key[SS2_DIK_W]);
+    segment(&s, 1, &x, &y); finger(&s, TOUCH_MOTION, 2, x, y); finger(&s, TOUCH_UP, 2, x, y); finger(&s, TOUCH_UP, 1, 400, 900);
+    advance(&s, 100, shooting()); CHECK(fg_selects == 0 && nout == 0);   /* the stale fingers do nothing */
+    /* the game leaves shoot mode (a menu, the Tab key): the wheel closes */
+    hold(&s, 3, n, 450); CHECK(s.t.radial.open);
+    uint64_t last = now; for (int i = 0; i < 40; i++) advance(&s, 10, last);
+    CHECK(s.t.mode == TOUCH_CURSOR && !s.t.radial.open);
+    finger(&s, TOUCH_UP, 3, x, y); advance(&s, 100, last); CHECK(fg_selects == 0);
+    /* MODE pressed by another finger while a wheel is open */
+    enter_gameplay(&s); hold(&s, 4, n, 450); CHECK(s.t.radial.open);
+    TouchRect m = touch_control_bounds(&s.t, TC_MODE);
+    finger(&s, TOUCH_DOWN, 5, m.x + m.w / 2, m.y + m.h / 2); finger(&s, TOUCH_UP, 5, m.x + m.w / 2, m.y + m.h / 2);
+    CHECK(!s.t.radial.open); finger(&s, TOUCH_UP, 4, x, y); advance(&s, 100, shooting()); CHECK(fg_selects == 0);
+}
+
+static void test_radial_cursor_mode_ammo(void) {
+    Ss2Touch s; game_init(&s);
+    uint64_t last = now; for (int i = 0; i < 40; i++) advance(&s, 10, last);   /* interface mode */
+    CHECK(s.t.mode == TOUCH_CURSOR);
+    TouchCircle a = ctl(&s, TC_AMMO);
+    finger(&s, TOUCH_DOWN, 1, a.x, a.y); frame(&s, last);
+    CHECK(find(PLAT_EV_MOUSE_BUTTON, 1, 1) >= 0);          /* AMMO is USE (right click) at once in cursor mode, as before */
+    for (int i = 0; i < 60; i++) advance(&s, 10, last);
+    CHECK(!s.t.radial.open); finger(&s, TOUCH_UP, 1, a.x, a.y); advance(&s, 100, last); CHECK(fg_selects == 0);
+}
+
+static void test_radial_empty_and_unavailable(void) {
+    Ss2Touch s; game_init(&s); game_input = 0;
+    TouchCircle n = ctl(&s, TC_NEXT); float x, y; Ss2Overlay o;
+    fg_n[TOUCH_RADIAL_WEAPON] = 0; snprintf(fg_why, sizeof fg_why, "NO WEAPONS CARRIED");
+    hold(&s, 1, n, 450); CHECK(!s.t.radial.open);          /* nothing to offer: no wheel ... */
+    ss2t_overlay(&s, &o); CHECK(!strcmp(o.toast, "NO WEAPONS CARRIED"));   /* ... but the reason */
+    finger(&s, TOUCH_UP, 1, n.x, n.y); run_ms(&s, 100); CHECK(fg_selects == 0 && game_input == 0);   /* and no notch either */
+    run_ms(&s, 2000); ss2t_overlay(&s, &o); CHECK(!o.toast[0]);                                       /* the notice goes */
+    fg_entries(TOUCH_RADIAL_WEAPON, 4, 100); fg_e[TOUCH_RADIAL_WEAPON][1].available = false;
+    hold(&s, 2, n, 450); CHECK(s.t.radial.open);
+    segment(&s, 1, &x, &y); finger(&s, TOUCH_MOTION, 2, x, y); run_ms(&s, 20); CHECK(s.t.radial.highlighted == -1);
+    finger(&s, TOUCH_UP, 2, x, y); run_ms(&s, 100); CHECK(fg_selects == 0);            /* an unavailable entry is never chosen */
+    /* the game changes while the wheel is open: the entry is refreshed and becomes unavailable */
+    hold(&s, 3, n, 450); CHECK(s.t.radial.open); int before = fg_refreshes;
+    fg_e[TOUCH_RADIAL_WEAPON][2].available = false;
+    run_ms(&s, 300); CHECK(fg_refreshes > before && !s.t.radial.entries[2].available);
+    segment(&s, 2, &x, &y); finger(&s, TOUCH_MOTION, 3, x, y); finger(&s, TOUCH_UP, 3, x, y); run_ms(&s, 100);
+    CHECK(fg_selects == 0);
+    /* a refused selection and the game's result both show as a notice */
+    fg_refuse = true; hold(&s, 4, n, 450); segment(&s, 3, &x, &y); finger(&s, TOUCH_MOTION, 4, x, y); finger(&s, TOUCH_UP, 4, x, y); run_ms(&s, 20);
+    ss2t_overlay(&s, &o); CHECK(fg_selects == 1 && !strcmp(o.toast, "NOT AVAILABLE NOW"));
+    snprintf(fg_msg, sizeof fg_msg, "PISTOL"); run_ms(&s, 20); ss2t_overlay(&s, &o); CHECK(!strcmp(o.toast, "PISTOL"));
+}
+
+static void test_radial_haptics(void) {
+    Ss2Touch s; game_init(&s); s.t.settings.haptics_enabled = true;
+    TouchCircle n = ctl(&s, TC_NEXT); float x, y;
+    hold(&s, 1, n, 450); CHECK(s.t.radial.open && fg_haptic2 == 1);   /* the wheel opens: one strong tick */
+    for (int i = 0; i < 4; i++) { segment(&s, i, &x, &y); finger(&s, TOUCH_MOTION, 1, x, y); run_ms(&s, 20); }
+    CHECK(fg_haptic1 == 4);                                /* one light tick per segment entered */
+    finger(&s, TOUCH_MOTION, 1, x, y); run_ms(&s, 20); CHECK(fg_haptic1 == 4);   /* staying on one: no more */
+    finger(&s, TOUCH_UP, 1, x, y); run_ms(&s, 100); CHECK(fg_selects == 1);
+    s.t.settings.haptics_enabled = false; fg_haptic1 = fg_haptic2 = 0;
+    hold(&s, 2, n, 450); segment(&s, 1, &x, &y); finger(&s, TOUCH_MOTION, 2, x, y); run_ms(&s, 20);
+    CHECK(fg_haptic1 == 0 && fg_haptic2 == 0);             /* haptics off: none */
+    finger(&s, TOUCH_UP, 2, x, y); run_ms(&s, 100);
+}
+
+static void test_system_wheel_quickload(void) {
+    Ss2Touch s; game_init(&s); game_input = 0; Ss2Overlay o;
+    TouchCircle ii = ctl(&s, TC_PAUSE); float x, y;
+    hold(&s, 1, ii, 450); CHECK(s.t.radial.open && s.t.radial.category == TOUCH_RADIAL_SYSTEM);
+    segment(&s, 0, &x, &y); finger(&s, TOUCH_MOTION, 1, x, y); finger(&s, TOUCH_UP, 1, x, y); run_ms(&s, 100);
+    CHECK(fg_selects == 1 && fg_cat == TOUCH_RADIAL_SYSTEM && fg_id == 1 && game_input == 0);   /* no Esc */
+    /* quickload (id 4, segment 3): a question first */
+    hold(&s, 2, ii, 450); segment(&s, 3, &x, &y); finger(&s, TOUCH_MOTION, 2, x, y); finger(&s, TOUCH_UP, 2, x, y); run_ms(&s, 50);
+    ss2t_overlay(&s, &o); CHECK(fg_selects == 1 && o.confirm);
+    TouchRect no = ss2t_confirm_rect(&s.t, 2), yes = ss2t_confirm_rect(&s.t, 1);
+    finger(&s, TOUCH_DOWN, 3, no.x + no.w / 2, no.y + no.h / 2); finger(&s, TOUCH_UP, 3, no.x + no.w / 2, no.y + no.h / 2); run_ms(&s, 50);
+    ss2t_overlay(&s, &o); CHECK(!o.confirm && fg_selects == 1 && !strcmp(o.toast, "QUICKLOAD CANCELLED") && game_input == 0);
+    hold(&s, 4, ii, 450); segment(&s, 3, &x, &y); finger(&s, TOUCH_MOTION, 4, x, y); finger(&s, TOUCH_UP, 4, x, y); run_ms(&s, 50);
+    finger(&s, TOUCH_DOWN, 5, 100, 100); finger(&s, TOUCH_UP, 5, 100, 100); run_ms(&s, 50);   /* a touch anywhere else: no */
+    ss2t_overlay(&s, &o); CHECK(!o.confirm && fg_selects == 1);
+    hold(&s, 6, ii, 450); segment(&s, 3, &x, &y); finger(&s, TOUCH_MOTION, 6, x, y); finger(&s, TOUCH_UP, 6, x, y); run_ms(&s, 50);
+    finger(&s, TOUCH_DOWN, 7, yes.x + yes.w / 2, yes.y + yes.h / 2); finger(&s, TOUCH_UP, 7, yes.x + yes.w / 2, yes.y + yes.h / 2); run_ms(&s, 50);
+    CHECK(fg_selects == 2 && fg_id == SS2T_SYS_QUICKLOAD && game_input == 0);   /* LOAD: the quickload, once */
+    /* the question goes by itself after 6 s, and with focus loss; neither loads */
+    hold(&s, 8, ii, 450); segment(&s, 3, &x, &y); finger(&s, TOUCH_MOTION, 8, x, y); finger(&s, TOUCH_UP, 8, x, y); run_ms(&s, 6100);
+    ss2t_overlay(&s, &o); CHECK(!o.confirm && fg_selects == 2);
+    hold(&s, 9, ii, 450); segment(&s, 3, &x, &y); finger(&s, TOUCH_MOTION, 9, x, y); finger(&s, TOUCH_UP, 9, x, y); run_ms(&s, 50);
+    ss2t_cancel(&s); ss2t_overlay(&s, &o); CHECK(!o.confirm);
+    finger(&s, TOUCH_DOWN, 10, yes.x + yes.w / 2, yes.y + yes.h / 2); finger(&s, TOUCH_UP, 10, yes.x + yes.w / 2, yes.y + yes.h / 2); run_ms(&s, 50);
+    CHECK(fg_selects == 2);
+    /* QUICKLOAD CONFIRM off: at once */
+    s.t.settings.quickload_confirm = false;
+    hold(&s, 11, ii, 450); segment(&s, 3, &x, &y); finger(&s, TOUCH_MOTION, 11, x, y); finger(&s, TOUCH_UP, 11, x, y); run_ms(&s, 50);
+    CHECK(fg_selects == 3 && fg_id == SS2T_SYS_QUICKLOAD);
+    /* the system wheel switched off: II is Esc on the press again */
+    s.t.settings.wheel_enabled[2] = false;
+    finger(&s, TOUCH_DOWN, 12, ii.x, ii.y); frame(&s, shooting()); CHECK(find(PLAT_EV_KEY, SS2_DIK_ESC, 1) >= 0);
+    finger(&s, TOUCH_UP, 12, ii.x, ii.y); advance(&s, 100, shooting());
+}
+
+static void test_item_button(void) {
+    Ss2Touch s; game_init(&s); Ss2Overlay o;
+    ss2t_frame(&s, now, W, H, true, 210, 0, 1920, 1080, 1280, 720, now);   /* 16:9: the bars are 210 px wide */
+    TouchRect it = touch_control_bounds(&s.t, TC_EXPLOSIVE);
+    CHECK(it.w > 0 && it.x >= 0 && it.x + it.w <= 210);   /* ITEM in the left bar, off the game's picture */
+    for (int id = 0; id < TC_COUNT; id++) {
+        if (id == TC_EXPLOSIVE || id == TC_STICK || touch_defaults[id].radius <= 0) continue;
+        TouchRect b = touch_control_bounds(&s.t, id);
+        CHECK(it.x + it.w <= b.x || b.x + b.w <= it.x || it.y + it.h <= b.y || b.y + b.h <= it.y);   /* overlaps nothing */
+    }
+    enter_gameplay(&s); game_input = 0;
+    TouchCircle c = ctl(&s, TC_EXPLOSIVE);
+    finger(&s, TOUCH_DOWN, 1, c.x, c.y); now += 100000000ull; finger(&s, TOUCH_UP, 1, c.x, c.y); run_ms(&s, 50);
+    ss2t_overlay(&s, &o); CHECK(!strncmp(o.toast, "HOLD ITEM", 9) && game_input == 0);   /* a tap only explains */
+    hold(&s, 2, c, 450); CHECK(s.t.radial.open && s.t.radial.category == TOUCH_RADIAL_CONSUMABLE && s.t.radial.count == 5);
+    float x, y; segment(&s, 4, &x, &y); finger(&s, TOUCH_MOTION, 2, x, y); finger(&s, TOUCH_UP, 2, x, y); run_ms(&s, 50);
+    CHECK(fg_selects == 1 && fg_id == 304 && game_input == 0);
+    s.t.settings.wheel_enabled[1] = false; run_ms(&s, 20);   /* ITEM WHEEL off: the button goes */
+    CHECK(touch_control_bounds(&s.t, TC_EXPLOSIVE).w == 0 && !touch_control_hit(&s.t, TC_EXPLOSIVE, c.x, c.y));
+    s.t.settings.wheel_enabled[1] = true; run_ms(&s, 20); CHECK(touch_control_bounds(&s.t, TC_EXPLOSIVE).w > 0);
+    s.game_on = false; run_ms(&s, 20); CHECK(touch_control_bounds(&s.t, TC_EXPLOSIVE).w == 0);   /* no game state: hidden too */
+}
+
+static void test_many_entries(void) {
+    Ss2Touch s; game_init(&s);
+    fg_entries(TOUCH_RADIAL_CONSUMABLE, 14, 300);
+    TouchCircle c = ctl(&s, TC_EXPLOSIVE); hold(&s, 1, c, 450);
+    CHECK(s.t.radial.open && s.t.radial.count == 14 && s.t.radial.outer_radius > H * .3f);   /* a larger wheel */
+    CHECK(s.t.radial.cy - s.t.radial.outer_radius > 0 && s.t.radial.cy + s.t.radial.outer_radius < H);   /* on the screen */
+    for (int i = 0; i < 14; i += 3) { float x, y; segment(&s, i, &x, &y); finger(&s, TOUCH_MOTION, 1, x, y); run_ms(&s, 10); CHECK(s.t.radial.highlighted == i); }
+    float x, y; segment(&s, 13, &x, &y); finger(&s, TOUCH_MOTION, 1, x, y); finger(&s, TOUCH_UP, 1, x, y); run_ms(&s, 50);
+    CHECK(fg_selects == 1 && fg_id == 313);
+}
+
+/* the SS2 settings: Shockolate's file and defaults unless touch_settings_game is set; then a file from before Phase 3F gets
+   the wheels on (its wheel keys did nothing in System Shock 2) and ITEM at its default, and everything else stays */
+static void ss2_defaults_for_test(TouchSettings *t) { t->wheel_enabled[0] = t->wheel_enabled[1] = t->wheel_enabled[2] = true; }
+static const TouchSettingsGame ss2_game_for_test = { ss2_defaults_for_test, TC_EXPLOSIVE };
+static void test_settings_3f(void) {
+    const char *path = "touch_settings_3f_test.cfg"; TouchSettings l, r;
+    /* Shockolate (no game hook): defaults off, no new keys written */
+    touch_settings_game = NULL;
+    touch_settings_defaults(&l); CHECK(!l.wheel_enabled[0] && !l.wheel_enabled[1] && !l.wheel_enabled[2] && l.quickload_confirm);
+    CHECK(touch_settings_save(&l, path));
+    { FILE *f = fopen(path, "rb"); char b[4096] = ""; size_t n = f ? fread(b, 1, sizeof b - 1, f) : 0; if (f) fclose(f); b[n] = 0;
+      CHECK(!strstr(b, "game_radials") && !strstr(b, "quickload_confirm")); }
+    /* System Shock 2: a Phase 3E file (the player's layout moved, relative cursor, wheels stored off, ITEM never shown) */
+    touch_settings_game = &ss2_game_for_test;
+    write_file(path, "version=3\nopacity=0.6\ncursor_relative=1\ncursor_speed=1.5\nweapon_wheel=0\nconsumable_wheel=0\nexplosive_wheel=0\n"
+                     "fire.x=0.81\nfire.y=0.7\nexplosive.x=0.63\nexplosive.y=0.1\nstick_size=1.2\n");
+    CHECK(touch_settings_load(&l, path) == TOUCH_LOAD_OK);
+    CHECK(l.wheel_enabled[0] && l.wheel_enabled[1] && l.wheel_enabled[2] && l.quickload_confirm && !l.game_radials);
+    CHECK(fabsf(l.control[TC_EXPLOSIVE].x - touch_defaults[TC_EXPLOSIVE].x) < 1e-6f && fabsf(l.control[TC_EXPLOSIVE].y - touch_defaults[TC_EXPLOSIVE].y) < 1e-6f);
+    CHECK(fabsf(l.opacity - .6f) < 1e-6f && l.cursor_relative && l.cursor_speed == 1.5f && fabsf(l.control[TC_FIRE].x - .81f) < 1e-6f &&
+          fabsf(l.control[TC_STICK].scale - 1.2f) < 1e-6f);                  /* the player's own settings, all kept */
+    CHECK(!touch_settings_upgrade_layout(&l));            /* a moved layout is never replaced */
+    /* saved by this build: from now on the wheel preferences are the player's */
+    l.wheel_enabled[0] = false; l.quickload_confirm = false; l.control[TC_EXPLOSIVE].y = .6f; CHECK(touch_settings_save(&l, path));
+    CHECK(touch_settings_load(&r, path) == TOUCH_LOAD_OK && r.game_radials && !r.wheel_enabled[0] && r.wheel_enabled[1] && !r.quickload_confirm &&
+          fabsf(r.control[TC_EXPLOSIVE].y - .6f) < 1e-6f && r.cursor_relative);
+    /* an older build reads the new file: the new keys are ignored, everything else as before */
+    touch_settings_game = NULL;
+    CHECK(touch_settings_load(&r, path) == TOUCH_LOAD_OK && r.cursor_relative && fabsf(r.opacity - .6f) < 1e-6f && !r.wheel_enabled[0]);
+    touch_settings_game = &ss2_game_for_test;
+    /* no file: SS2's defaults */
+    remove(path); CHECK(touch_settings_load(&r, path) == TOUCH_LOAD_DEFAULTS && r.wheel_enabled[0] && r.wheel_enabled[2] && r.quickload_confirm);
+    /* the panel: page 2 has QUICKLOAD CONFIRM, every box on screen, none overlapping; RESET gives SS2's defaults */
+    Ss2Touch s; ss2t_init(&s); s.save_settings = save_to_file; now = 1000000000ull; frame(&s, 0);
+    touch_ui_open(&s.t); ui_tap(&s, TU_PAGE);
+    static const TouchUiAction page2[] = { TU_PAGE, TU_CURSOR_STYLE, TU_CURSOR_SPEED_DOWN, TU_CURSOR_SPEED_UP, TU_HAPTICS, TU_HAPTIC_STRENGTH,
+                                           TU_WHEEL_WEAPON, TU_WHEEL_CONSUMABLE, TU_WHEEL_EXPLOSIVE, TU_QUICKLOAD_CONFIRM, TU_RESET, TU_CANCEL, TU_SAVE };
+    int n2 = (int)(sizeof page2 / sizeof page2[0]);
+    for (int a = 0; a < n2; a++) { TouchRect ra = touch_ui_bounds(&s.t, page2[a]); CHECK(ra.w > 0 && ra.y >= 0 && ra.y + ra.h <= H);
+        for (int b = a + 1; b < n2; b++) { TouchRect rb = touch_ui_bounds(&s.t, page2[b]);
+            CHECK(ra.x + ra.w <= rb.x || rb.x + rb.w <= ra.x || ra.y + ra.h <= rb.y || rb.y + rb.h <= ra.y); } }
+    CHECK(s.t.settings.quickload_confirm); ui_tap(&s, TU_QUICKLOAD_CONFIRM); CHECK(!s.t.settings.quickload_confirm);
+    ui_tap(&s, TU_WHEEL_WEAPON); CHECK(!s.t.settings.wheel_enabled[0]);
+    touch_ui_action(&s.t, TU_RESET); CHECK(s.t.settings.wheel_enabled[0] && s.t.settings.quickload_confirm);
+    touch_ui_action(&s.t, TU_CANCEL);
+    remove(path); remove(panel_path);
+    touch_settings_game = NULL;
+}
+
 int main(void) {
     test_tap_min_hold(); test_move_look_fire(); test_ownership_and_hysteresis(); test_modifier_spans_frames();
     test_cursor_mapping_and_click(); test_focus_cleanup(); test_mode_follow_and_toggle(); test_weapon_wheel_and_actions();
@@ -666,6 +979,9 @@ int main(void) {
     test_rel_no_jump_and_motion(); test_rel_speed(); test_rel_tap_and_double_tap(); test_rel_hold_drag(); test_rel_cancel();
     test_rel_fingers_and_use(); test_rel_modes(); test_rel_follows_game_cursor(); test_rel_menu_mapping(); test_cursor_settings();
     test_bind_parse(); test_crouch_key();
+    test_radial_weapon_hold_select(); test_radial_short_tap_unchanged(); test_radial_cancel(); test_radial_multitouch();
+    test_radial_cancel_by_lifecycle(); test_radial_cursor_mode_ammo(); test_radial_empty_and_unavailable(); test_radial_haptics();
+    test_system_wheel_quickload(); test_item_button(); test_many_entries(); test_settings_3f();
     printf("touch_ss2_test: %d of %d checks failed\n", fails, checks);
     return fails != 0;
 }

@@ -21,6 +21,12 @@ enum {
 #define SS2T_STICK_ON .30f                 /* stick deflection that presses a movement key ... */
 #define SS2T_STICK_OFF .20f                /* ... and that releases it again (hysteresis) */
 #define SS2T_HOLD_MS 500u                  /* relative cursor: a finger held still this long presses the left button (a drag) */
+/* Phase 3F radial menus */
+#define SS2T_RADIAL_HOLD_MS 400u           /* holding < > AMMO ITEM or II this long opens its wheel */
+#define SS2T_WHEEL_REFRESH_NS 250000000ull /* an open wheel reads the game again this often (entries can become unavailable) */
+#define SS2T_TOAST_NS 1800000000ull        /* a notice stays up this long */
+#define SS2T_CONFIRM_NS 6000000000ull      /* the quickload question goes away by itself after this long (no quickload) */
+#define SS2T_SYS_QUICKLOAD 4               /* the system wheel's quickload id (core/ss2game.h SS2G_SYS_QUICKLOAD) */
 
 typedef struct { uint64_t due; PlatEvent ev; } Ss2Pending;
 typedef struct Ss2Touch {
@@ -53,7 +59,26 @@ typedef struct Ss2Touch {
     /* where the game's cursor is now, in the pixels of the bridge's placements (user32_cursor_pos): a relative gesture
        starts there, so it follows a physical mouse too. NULL: from where the bridge last put it (the picture centre at first) */
     void (*cursor_pos)(struct Ss2Touch *s, int *x, int *y);
+    /* Phase 3F: the game's state for the radial menus (core/ss2game.c through touch_ss2_android.c). NULL, or game_on false
+       (no game state: another executable, or not in a game yet): the buttons keep their plain actions, ITEM is hidden. */
+    bool game_on;
+    void (*game_refresh)(struct Ss2Touch *s);          /* read the game soon: a wheel may open */
+    /* a wheel's entries: count (0: none, why says why), title: what the wheel is about */
+    int  (*game_wheel)(struct Ss2Touch *s, int category, TouchRadialEntry *e, int max, char *title, size_t tn, char *why, size_t wn);
+    bool (*game_select)(struct Ss2Touch *s, int category, int id);   /* queue the entry's action; false: refused */
+    bool (*game_message)(struct Ss2Touch *s, char *out, size_t n);   /* the outcome of the last action, once */
+    char wheel_title[64];                  /* what the open wheel is about */
+    int last_highlight;                    /* the segment highlighted last frame (a light haptic when it changes) */
+    uint64_t next_wheel_refresh;
+    char toast[64]; uint64_t toast_until;  /* a short notice drawn over the game */
+    uint64_t confirm_until;                /* the quickload question is up until then; 0: not */
 } Ss2Touch;
+
+/* Phase 3F: what the overlay draws besides the controls (touch_render_gles.c) */
+typedef struct { const char *wheel_title; const char *toast; bool confirm; } Ss2Overlay;
+void ss2t_overlay(const Ss2Touch *s, Ss2Overlay *o);
+/* the quickload question's box (0), its LOAD button (1) and its CANCEL button (2), in surface pixels */
+TouchRect ss2t_confirm_rect(const TouchControls *t, int which);
 
 void ss2t_init(Ss2Touch *s);
 /* Once per poll: surface size, whether touch is usable (window focused, foreground), the game picture rectangle in
