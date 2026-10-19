@@ -245,7 +245,7 @@ static void on_event(const PlatEvent *e, void *user) {
  *   <ms> move DX DY | btn N down|up | click N    relative mouse motion, mouse button (1 left, 2 right, 3 middle)
  *   <ms> place X Y                           put the game's cursor at pixel X, Y of the drawing surface (touch placement)
  *   <ms> shot                                frame capture (SS2PORT_SHOT_DIR, backends/sdl2/plat_sdl2.c), taken within 15 frames
- *   <ms> game ACTION                         a radial-menu action or state check (core/ss2game.c: dump, select WHEEL ID, string; test-only: cmd, give, grant_psi)
+ *   <ms> game ACTION                         a radial-menu action or state check (core/ss2game.c: dump, select WHEEL ID, string; test-only: cmd, give, take, grant_psi)
  *   <ms> quit                                ends the process with exit code 0
  * '#' starts a comment. Each command is logged. */
 typedef struct { uint32_t ms; char cmd[8]; char arg[64]; int a, b; } ScriptLine;

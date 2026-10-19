@@ -503,6 +503,19 @@ static void script_line(const char *l) {
         }
         ifs_put(&f); port_log("[ss2game] test: gave %s (object %d)", name, (int)o); return;
     }
+    if (!strcmp(verb, "take")) {                                   /* "take ARCHETYPE": ShockGame.DestroyInvObj on each one carried */
+        char name[64] = ""; sscanf(l, "%*s %63[^\n]", name); Ifs f; int n = 0;
+        if (ifs_get(&f)) {
+            uint32_t arch = named(&f, name), pl = RD32(PLAYER_OBJ), objs[32]; int k = 0;
+            uint32_t it = arch && pl ? vcall(f.contain, S_CONTAIN_ITER_START, 1, pl) : 0;
+            while (it && !RD32(it) && k < 32) { uint32_t o = RD32(it + 12); if (inherits(&f, o, arch)) objs[k++] = o; vcall(f.contain, S_CONTAIN_ITER_NEXT, 1, it); }
+            if (it) vcall(f.contain, S_CONTAIN_ITER_END, 1, it);
+            uint32_t sg = service(IID_SRV_SHOCKGAME, VT_SHOCKGAME);
+            for (int i = 0; sg && i < k; i++) { WR32(scratch + SC_OUT, objs[i]); vcall(sg, 6, 1, scratch + SC_OUT); n++; }
+            release(sg);
+        }
+        ifs_put(&f); port_log("[ss2game] test: removed %d %s", n, name); return;
+    }
     if (!strcmp(verb, "grant_psi")) {                              /* "grant_psi POWER" */
         int p = atoi(wn); uint32_t sg = service(IID_SRV_SHOCKGAME, VT_SHOCKGAME), pl = RD32(PLAYER_OBJ);
         if (sg && pl && p >= 0 && p < PSI_NONE) { WR32(scratch + SC_OUT, pl); vcall(sg, S_SG_GRANT_PSI, 2, scratch + SC_OUT, (uint32_t)p); }

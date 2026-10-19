@@ -19,7 +19,7 @@ void ss2g_script_man(uint32_t script_man);
 struct CPU;
 void ss2g_message_pump(struct CPU *c);
 /* win32/user32.c: "game ..." lines of SS2PORT_INPUT_SCRIPT (tests): "dump", "select WHEEL ID", "string TABLE KEY [N]"; for
-   disposable test saves only: "cmd COMMAND [ARGS]", "give ARCHETYPE", "grant_psi POWER" (never reached from touch) */
+   disposable test saves only: "cmd COMMAND [ARGS]", "give ARCHETYPE", "take ARCHETYPE", "grant_psi POWER" (never reached from touch) */
 void ss2g_script(const char *line);
 
 /* ---------------------------------------------------------------- for the touch radials */
