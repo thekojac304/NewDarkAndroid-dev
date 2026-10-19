@@ -38,6 +38,7 @@ def lines():
     return [l for l in log if ("[touch]" in l or "[ss2game]" in l) and l[:18] >= st.get("since", "")]
 def button(name):
     name = ALIAS.get(name, name); cfg = state().get("cfg", "")
+    if name == "explosive" and "game_radials=1" not in cfg: return round(DEFAULTS[name][0] * W_), round(DEFAULTS[name][1] * H_)   # as the app migrates it
     x = re.search(rf"^{name}\.x=([\d.]+)", cfg, re.M); y = re.search(rf"^{name}\.y=([\d.]+)", cfg, re.M)
     fx, fy = (float(x.group(1)), float(y.group(1))) if x and y else DEFAULTS[name]
     return round(fx * W_), round(fy * H_)
@@ -48,9 +49,10 @@ def start(game, slot, name, res=None, script=()):
     if res: ras(f"grep -v ^game_screen_size {W}/cam.cfg > {W}/c.tmp; echo game_screen_size {res.replace('x', ' ')} >> {W}/c.tmp; mv {W}/c.tmp {W}/cam.cfg")
     print("write folder", W, ras(f"ls {W}").split(), ras(f"grep game_screen_size {W}/cam.cfg").strip())
     run = os.path.join(OUT, name); os.makedirs(run, exist_ok=True); scr = os.path.join(run, "s.txt")
-    args = [PY, GEN, scr] + ([f"res:{res}"] if res else []) + ["wait:5000", "esc", "wait:1500", "esc", "wait:1500", "esc", "wait:2000", "loadgame", "wait:1500",
+    args = [PY, GEN, scr] + ([f"res:{res}"] if res else []) + ["wait:5000", "esc", "wait:1500", "esc", "wait:1500", "esc", "wait:2000"] + (["loadgame", "wait:1500"] if not res or res == "1280x720" else
+        ["click:%d:%d" % (544 * int(res.split("x")[0]) // 640, 127 * int(res.split("x")[1]) // 480), "wait:2500"]) + [
                     f"menu:600:{68 + 20.3 * int(slot):.1f}", "wait:500", "menu:870:216"]
-    r = subprocess.run(args, check=True, capture_output=True, text=True); t = int(r.stdout.split()[-2]) + 25000
+    r = subprocess.run(args, check=True, capture_output=True, text=True); t = int(r.stdout.split()[-2]) + 40000
     with open(scr, "a") as f:
         for i, g in enumerate(script): f.write(f"{t + 300 * i} game {g}\n")
         f.write("900000 quit\n")                                   # a backstop: the game ends itself after 15 minutes
@@ -81,7 +83,7 @@ def touch(cmds, quiet=False, settle=.8):
 
 def wheel(btn, where, hold=500):
     x, y = button(btn)
-    out = touch([f"touch 5 down {x} {y}", f"sleep {hold}"], quiet=True, settle=.6)
+    out = touch([f"touch 3 down {x} {y}", f"sleep {hold}"], quiet=True, settle=.6)
     n = None
     for l in out:
         m = re.search(r"wheel \d+: (\d+) entries", l)
@@ -94,10 +96,10 @@ def wheel(btn, where, hold=500):
         R = min(W_, H_) * (.36 if n > 8 else .28); seg = int(where) % n
         a = 2 * math.pi * seg / n - math.pi / 2; d = R * .64
         tx, ty = cx + math.cos(a) * d, cy + math.sin(a) * d
-    steps = [f"touch 5 move {round(x + (tx - x) * k / 6)} {round(y + (ty - y) * k / 6)}" for k in range(1, 7)]
+    steps = [f"touch 3 move {round(x + (tx - x) * k / 6)} {round(y + (ty - y) * k / 6)}" for k in range(1, 7)]
     touch([s for st_ in steps for s in (st_, "sleep 30")] + ["sleep 300"], quiet=True, settle=.2)
     shot(f"wheel-{btn}-{where}")
-    for l in touch(["touch 5 up", "sleep 1500"], quiet=True): print(" ", l)
+    for l in touch(["touch 3 up", "sleep 1500"], quiet=True): print(" ", l)
 
 def shot(name):
     st = state(); png = os.path.join(st["run"], name + ".png")
@@ -122,7 +124,7 @@ if __name__ == "__main__":
     elif c == "touch": touch(sys.argv[2:])
     elif c == "tap":
         x, y = button(sys.argv[2]); ms = int(sys.argv[3]) if len(sys.argv) > 3 else 100
-        touch([f"touch 5 down {x} {y}", f"sleep {ms}", "touch 5 up", "sleep 600"])
+        touch([f"touch 3 down {x} {y}", f"sleep {ms}", "touch 3 up", "sleep 600"])
     elif c == "wheel": wheel(sys.argv[2], sys.argv[3], int(sys.argv[4]) if len(sys.argv) > 4 else 500)
     elif c == "stick":
         x, y = button("stick"); r = .11 * H_; dx, dy, ms = float(sys.argv[2]), float(sys.argv[3]), int(sys.argv[4])

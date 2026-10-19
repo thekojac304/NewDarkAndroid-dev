@@ -2,7 +2,8 @@
 
 2026-10-19. Branch `android-port`, from `4e4c482` (Phase 3E, clean). Commits: `4b6dba2` (game state and commands),
 `1f5666e` (touch core hooks, settings), `00a4851` (radial menus, renderer, tests), `e75fbd3` (unread logs, a fix, test
-tools), and this report. Evidence: `phase3f/`.
+tools), `09a1c7a` (this report, desktop results), and the device results with two renderer fixes (the commit after it).
+Evidence: `phase3f/` (`desk-*` desktop, `device-*` phone).
 
 Labels used below: **Verified (desktop)** = run against real save data in the desktop build of the same code, with the
 game's own results read back and captured; **Verified (device)** = on the Galaxy S26 Ultra through the real touchscreen
@@ -21,7 +22,7 @@ comfort, which only a person can judge.
 | Quicksave / quickload | **Implemented, verified (desktop)**: the game's `quicksave`/`quickload` (its quicksave slot 13 per `cam_ext.cfg`); quickload asks first (on by default, configurable) and is offered only when the quicksave slot exists. Quicksave → changes → quickload restored the saved state |
 | Lean | **Not implemented** (§9): a held action; a release-to-select wheel cannot hold it, and a permanent button was not wanted |
 | One APK, both SCP versions | Same build; Beta 4 and Beta 8 both verified on desktop (each with its own NVScript) |
-| Device | **§12** |
+| Device (S26 Ultra, HID touchscreen) | **Verified (device)**: weapon, AMMO (ammo, settings, psi), ITEM and system wheels on Beta 4 and Beta 8, at 1280×720, 800×600 and 1024×768; taps unchanged; stick + wheel; Home with a wheel open; cursor modes; settings and layout editor. Saves, game folders and your settings byte-identical afterwards (§12) |
 
 ## 1. Audit (Milestone A)
 
@@ -204,7 +205,8 @@ labelled "Quicksave" in the load list; it never writes another slot.
   that adds an unread log, and the count is never written. The command and the count follow the engine's own handler.
 - **Beta 8 psi, ammo types and settings** were not repeated on Beta 8 (same engine paths; Beta 8 covered weapons,
   ammo listing, items, quicksave/quickload).
-- Icons: entries are text (the game's short names); no weapon icons.
+- Icons: entries are text (the game's short names); no weapon icons. Long names (ANTI-RADIATION HYPO) are drawn smaller
+  to fit their segment; the full name is the title while highlighted.
 
 ## 10. Defects found and fixed
 
@@ -239,16 +241,51 @@ Binding resolution is unchanged (CROUCH, Phase 3E); the new actions do not use b
 
 ## 12. On the phone
 
-(pending: the phone was not connected to the PC when the APK was built; see below)
+Galaxy S26 Ultra (SM-S948U1), app `local.newdarkandroid.ss2` updated in place from 0.9.1-unified-play (`19aacb27…`,
+pulled and kept in `build/android/phase3f-preserve/`) to 0.9.2-radials-play. Driver `phase3f/radial_dev.py`:
+`uhid_input -t` makes Android see an external HID touchscreen, so contacts go Android → `TouchSurface` → the bridge as a
+finger does; each run used a **disposable write folder** (`files/radialtest/NAME`, a copy of one save slot and the
+profile's configuration) that was removed afterwards. Logs: `phase3f/device-*.log`.
+
+**Before** (and compared **after**): installed APK sha256, a tar of the app's internal profiles and settings (399 files),
+sha256 manifests of all internal files and of the three game folders (8,207 files). Free space 19 GB.
+
+| Check | Result |
+| --- | --- |
+| Settings migration | Your file (`d2102308…`, Phase 3E, wheels stored off, relative cursor) loaded as "weapon wheel on, ITEM on, system wheel on, quickload confirm on (defaults: the file predates them)"; cursor relative kept; ITEM shown in the left bar |
+| Weapon wheel (Beta 4, 1280×720) | 4 carried weapons, PISTOL active (`device-b4-weapon-wheel.jpg`); laser pistol selected → `equip_weapon Laser Pistol`; back to the pistol from `<` |
+| AMMO: settings | laser: NORM/OVER only (`device-b4-laser-settings.jpg`); NORM → "Setting changed" |
+| AMMO: ammunition | pistol → ANTI-PERS., HUD "Anti-Pers." (`device-b4-pistol-antipers.jpg`); 1024×768 shotgun SLUG ×76 / PELLET ×41 / NORM / TRIPLE, PELLET loaded (`device-1024x768-shotgun-ammo.jpg`); Beta 8 pistol → ANTI-ARMOR (`device-b8-pistol-antiarmor.jpg`) |
+| Psi (800×600, disposable test character) | amp equipped from the weapon wheel; AMMO → 4 known powers, title "PROJECTED CRYOKINESIS" from the game's strings (`device-800x600-psi-wheel.jpg`); selected with psi 15 → 15; one FIRE tap → 14 |
+| ITEM | 5 consumables with counts (`device-b4-item-wheel.jpg`), MEDICAL HYPO used; Beta 8 with none: no wheel, "NO HYPOS OR PATCHES CARRIED"; Beta 8 at full health: the game refused the hypo |
+| System | QUICKSAVE wrote `save_13` in the disposable folder only; QUICKLOAD question (`device-final-glyph-and-label-fixes.png`): a touch elsewhere cancelled, LOAD loaded; QUICKLOAD dimmed and unselectable with no quicksave (Beta 8) |
+| Taps unchanged | `>` tap: pistol → shotgun (`device-b4-tap-next-shotgun.jpg`); AMMO tap: key B; II tap: Esc (menu), again: back |
+| Stick + wheel | W held from stick down to stick up, across a `<` wheel that equipped the pistol; no other input |
+| Home with a wheel open and the stick held | W released at once, nothing selected, the lifted fingers did nothing; the same game came back in LOOK |
+| Cursor mode | MODE → interface (inventory), AMMO drawn as USE, ITEM hidden (`device-b8-cursor-mode-ammo-is-use.jpg`); AMMO tap and a 0.7 s hold both a right click on press, no wheel |
+| Cursor styles | relative (yours): drag moved the cursor, tap clicked there; Direct (switched for the test): a tap at 1170,400 placed the cursor at game pixel 640,266 exactly, then clicked |
+| Settings panel | page 2 with the four new rows, all on screen (`device-settings-page2.jpg`); CANCEL left the file byte-identical |
+| Layout editor | ITEM selected and dragged like the other controls (`device-editor-item-drag.jpg`); CANCEL restored it |
+| Beta 8 | NVScript identified as version `nv` (Beta 8) in the same app; weapons, ammo, items, quicksave as above |
+| Native crashes, stuck inputs | none in any run; every key and button down had its up |
+| Afterwards | 399 internal files (your 15 Beta 4 saves, the Beta 8 saves, settings) and 8,207 game files **byte-identical** to before; the legacy test app untouched |
+
+Your touch settings were saved twice during the Direct-cursor test and then restored to their exact original bytes
+(`d2102308…`) from the tar backup.
+
+**Found on the phone and fixed** (final APK): the 3×5 font had no `:` or `?` ("QUICKLOAD?", "SETTING: BURST"), and the
+layout editor named ITEM by its file key ("EXPLOSIVE"); it now shows each button's label.
+
+Not done on the phone: PDA screens (the cursor path is unchanged since Phase 3D), a real finger's comfort (§14).
 
 ## 13. Build
 
 | | |
 | --- | --- |
 | Version | **0.9.2-radials** (code 15), `local.newdarkandroid.ss2` (no new app) |
-| Play APK | 47,521,394 bytes, sha256 `9ea82c8a187ff084708accd14fd1b6694c23485d3318d0c41c1a17ef63105905` |
-| Dev APK | 96,348,872 bytes, sha256 `38b65f23581fd16248f9b1a4dd3f7259b0c077109da570c4cb95ce92aab6989d` |
-| `libss2game.so` in the play APK | 45,991,704 bytes, sha256 `3a217f222eca3d009c6914e11b8723000c2b1c25dd8830236756fa60d2ba6ae7` |
+| Play APK (**installed**) | 47,521,394 bytes, sha256 `390c597d1b0fa116e1b407bb125fe4cb40cc5a3bf3ab3bdd10fc16375c9def09` |
+| Dev APK | 96,348,872 bytes, sha256 `8d611442cfcb5509d46453124ac13a11e1b21aa39e87d44a44acc329af3c33c5` |
+| `libss2game.so` in the play APK | 45,991,704 bytes, sha256 `fc11ddb4b1ebf75dca29b7d1344c8f757fec8428d3a69499dcd8236939d686af` |
 | Where | `build/android/baseline/phase3f-radials/` (`SHA256SUMS`); Phase 3E's `19aacb27…` stays in `baseline/phase3e-unified/` |
 | Built with | Phase 3E's command (same lifts, same NVScript identities); clean Gradle build |
 

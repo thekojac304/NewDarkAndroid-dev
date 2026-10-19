@@ -57,7 +57,7 @@ static void ring(float x, float y, float r, float width) {
 
 /* ---------------------------------------------------------------- drawing (touch_render.c, unchanged logic) */
 static void text(const char *s, float cx, float cy, float size, float max_width) {
-    static const char letters[]="ABCDEFGHIJKLMNOPQRSTUVWXYZ<>0123456789.-+%/";
+    static const char letters[]="ABCDEFGHIJKLMNOPQRSTUVWXYZ<>0123456789.-+%/:?";   /* NewDarkAndroid: : and ? (wheel titles, the quickload question) */
     static const unsigned char glyph[][5]={
         {2,5,7,5,5},{6,5,6,5,6},{3,4,4,4,3},{6,5,5,5,6},
         {7,4,6,4,7},{7,4,6,4,4},{3,4,5,5,3},{5,5,7,5,5},
@@ -69,7 +69,7 @@ static void text(const char *s, float cx, float cy, float size, float max_width)
         {7,5,5,5,7},{2,6,2,2,7},{6,1,2,4,7},{6,1,2,1,6},
         {5,5,7,1,1},{7,4,6,1,6},{3,4,7,5,7},{7,1,2,2,2},
         {7,5,7,5,7},{7,5,7,1,6},{0,0,0,0,2},{0,0,7,0,0},
-        {0,2,7,2,0},{5,1,2,4,5},{1,1,2,4,4}
+        {0,2,7,2,0},{5,1,2,4,5},{1,1,2,4,4},{0,2,0,2,0},{6,1,2,0,2}
     };
     size=fminf(size,max_width/fmaxf(1,(float)strlen(s)*4));
     float x=cx-(float)strlen(s)*4*size/2;
@@ -201,7 +201,8 @@ static void panel(const TouchControls *t) {
         float y=t->toolbar_top ? 0 : h*.28f;
         color(11,23,34,248,1); rect((TouchRect){0,y,w,h*.17f},true,stroke);
         color(240,231,190,255,1);
-        snprintf(value,sizeof(value),"%s %.1f",touch_defaults[t->selected].key,t->settings.control[t->selected].scale);
+        snprintf(value,sizeof(value),"%s %.1f",touch_defaults[t->selected].label[0] ? touch_defaults[t->selected].label : touch_defaults[t->selected].key,   /* NewDarkAndroid: the button as shown (ITEM, not "explosive") */
+                 t->settings.control[t->selected].scale);
         for (char *p=value;*p;++p) if (*p>='a' && *p<='z') *p=(char)(*p-'a'+'A');
         text(value,w*.175f,y+h*.0445f,h/290,w*.19f);
         color(213,239,241,220,1);
