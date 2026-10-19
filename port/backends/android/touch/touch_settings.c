@@ -16,17 +16,33 @@
    CONS is RELOAD, AMMO cycles ammunition (or right-clicks in cursor mode), "target" is KBD (the Android keyboard, for
    save names and the console), and the actions System Shock 2 has no equivalent for (explosive, sprint) have radius 0,
    which hides them. Phase 2B-2: SET, AMMO and KBD sit in the letterbox bars and MODE right of the game's EQUIP panel,
-   off the 640x480 interface at 16:9 (Phase 2B-1 found SET over the PDA, AMMO/USE beside its arrow, MODE over EQUIP). */
+   off the 640x480 interface at 16:9 (Phase 2B-1 found SET over the PDA, AMMO/USE beside its arrow, MODE over EQUIP).
+   Phase 3F: "explosive" becomes ITEM (hold: the hypo/patch wheel), in the left bar below AMMO; sprint stays hidden. */
+#ifdef TOUCH_SHOCKOLATE_LAYOUT
+/* Shockolate's own table (7502370), only for building its accepted suites against this core
+   (docs/android-audit/phase3f/run_shockolate_suites.sh): they test that layout, SPRINT and all. */
 const TouchDefault touch_defaults[TC_COUNT] = {
     {"fire", "FIRE", .86f,.73f,.095f}, {"use", "USE", .69f,.85f,.065f},
     {"jump", "JUMP", .95f,.52f,.05f}, {"crouch", "CROUCH", .79f,.54f,.05f},
     {"previous", "<", .55f,.78f,.045f}, {"next", ">", .55f,.90f,.045f},
-    {"consumable", "RELOAD", .52f,.10f,.045f}, {"explosive", "", .63f,.10f,0},
+    {"consumable", "CONS", .52f,.10f,.045f}, {"explosive", "BOOM", .63f,.10f,.045f},
+    {"sprint", "RUN", .22f,.54f,.05f}, {"target", "ID", .73f,.10f,.045f},
+    {"pause", "II", .05f,.06f,.045f}, {"mode", "MODE", .88f,.0825f,0},
+    {"settings", "SET", .16f,.06f,.035f}, {"stick", "MOVE", .20f,.77f,.11f},
+    {"ammo", "AMMO", .43f,.10f,.045f}
+};
+#else
+const TouchDefault touch_defaults[TC_COUNT] = {
+    {"fire", "FIRE", .86f,.73f,.095f}, {"use", "USE", .69f,.85f,.065f},
+    {"jump", "JUMP", .95f,.52f,.05f}, {"crouch", "CROUCH", .79f,.54f,.05f},
+    {"previous", "<", .55f,.78f,.045f}, {"next", ">", .55f,.90f,.045f},
+    {"consumable", "RELOAD", .52f,.10f,.045f}, {"explosive", "ITEM", .045f,.47f,.045f},
     {"sprint", "", .22f,.54f,0}, {"target", "KBD", .955f,.25f,.04f},
     {"pause", "II", .05f,.06f,.045f}, {"mode", "MODE", .905f,.0825f,0},
     {"settings", "SET", .045f,.19f,.035f}, {"stick", "MOVE", .20f,.77f,.11f},
     {"ammo", "AMMO", .045f,.33f,.045f}
 };
+#endif
 /* The Phase 2A/2B-1 default positions. A stored layout that still has every control exactly there was never moved. */
 static const float previous_defaults[TC_COUNT][2] = {
     {.86f,.73f}, {.69f,.85f}, {.95f,.52f}, {.79f,.54f}, {.55f,.78f}, {.55f,.90f}, {.52f,.10f}, {.63f,.10f},
@@ -44,6 +60,7 @@ bool touch_settings_upgrade_layout(TouchSettings *s) {
 static float bounded(float v, float low, float high, float fallback) {
     return !isfinite(v) ? fallback : fmaxf(low, fminf(high, v));
 }
+const TouchSettingsGame *touch_settings_game;
 void touch_settings_defaults(TouchSettings *s) {
     memset(s, 0, sizeof(*s));
     s->version=TOUCH_SETTINGS_VERSION;
@@ -51,8 +68,10 @@ void touch_settings_defaults(TouchSettings *s) {
     /* First introduction defaults off: no unexpected vibration or hold delay. */
     s->haptics_enabled=false; s->haptic_strength=1;
     s->cursor_relative=false; s->cursor_speed=1;
+    s->quickload_confirm=true;
     for (int i=0; i<TC_COUNT; ++i)
         s->control[i]=(TouchPlacement){touch_defaults[i].x,touch_defaults[i].y,1};
+    if (touch_settings_game && touch_settings_game->defaults) touch_settings_game->defaults(s);
 }
 void touch_settings_validate(TouchSettings *s) {
     s->version=TOUCH_SETTINGS_VERSION;
@@ -77,6 +96,8 @@ TouchLoadResult touch_settings_load(TouchSettings *s, const char *path) {
     unsigned version=0;
     size_t bytes=0;
     bool bad=false;
+    bool wheel[3]={s->wheel_enabled[0],s->wheel_enabled[1],s->wheel_enabled[2]};   /* NewDarkAndroid: see game_radials */
+    TouchPlacement item=touch_settings_game ? s->control[touch_settings_game->item_control] : (TouchPlacement){0};
     while (fgets(line,sizeof(line),f)) {
         bytes+=strlen(line);
         if (bytes>16384 || (!strchr(line,'\n') && !feof(f))) { bad=true; break; }
@@ -92,9 +113,11 @@ TouchLoadResult touch_settings_load(TouchSettings *s, const char *path) {
         else if (!strcmp(key,"haptics_enabled")) s->haptics_enabled=value==1;
         else if (!strcmp(key,"haptic_strength"))
             s->haptic_strength=isfinite(value) && value>=1 && value<=3 && value==floorf(value) ? (unsigned)value : 1;
-        else if (!strcmp(key,"weapon_wheel")) s->wheel_enabled[0]=value==1;
-        else if (!strcmp(key,"consumable_wheel")) s->wheel_enabled[1]=value==1;
-        else if (!strcmp(key,"explosive_wheel")) s->wheel_enabled[2]=value==1;
+        else if (!strcmp(key,"weapon_wheel")) wheel[0]=value==1;
+        else if (!strcmp(key,"consumable_wheel")) wheel[1]=value==1;
+        else if (!strcmp(key,"explosive_wheel")) wheel[2]=value==1;
+        else if (!strcmp(key,"quickload_confirm")) s->quickload_confirm=value==1;
+        else if (!strcmp(key,"game_radials")) s->game_radials=value==1;
         else if (!strcmp(key,"stick_size")) s->control[TC_STICK].scale=value;
         else if (!strcmp(key,"cursor_relative")) s->cursor_relative=value==1;
         else if (!strcmp(key,"cursor_speed")) s->cursor_speed=value;
@@ -109,6 +132,8 @@ TouchLoadResult touch_settings_load(TouchSettings *s, const char *path) {
         }
     }
     bad=bad || ferror(f); fclose(f);
+    if (!touch_settings_game || s->game_radials) memcpy(s->wheel_enabled,wheel,sizeof(wheel));
+    else s->control[touch_settings_game->item_control]=item;  /* never shown before: the stored place is not the player's */
     if (bad || !version || version>TOUCH_SETTINGS_VERSION) {
         touch_settings_defaults(s);
         return version>TOUCH_SETTINGS_VERSION ? TOUCH_LOAD_FUTURE : TOUCH_LOAD_INVALID;
@@ -130,6 +155,7 @@ bool touch_settings_save(const TouchSettings *settings, const char *path) {
     fprintf(f,"haptics_enabled=%d\nhaptic_strength=%u\nweapon_wheel=%d\nconsumable_wheel=%d\nexplosive_wheel=%d\n",
             s.haptics_enabled,s.haptic_strength,s.wheel_enabled[0],s.wheel_enabled[1],s.wheel_enabled[2]);
     fprintf(f,"cursor_relative=%d\ncursor_speed=%.9g\n",s.cursor_relative,s.cursor_speed);
+    if (touch_settings_game) fprintf(f,"quickload_confirm=%d\ngame_radials=1\n",s.quickload_confirm);
     for (int i=0; i<TC_COUNT; ++i) {
         const TouchPlacement *p=&s.control[i];
         fprintf(f,"%s.x=%.9g\n%s.y=%.9g\n%s.scale=%.9g\n",touch_defaults[i].key,p->x,

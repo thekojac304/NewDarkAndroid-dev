@@ -30,6 +30,12 @@ typedef struct {
        version: older files load as Direct at speed 1, and older builds ignore the keys. */
     bool cursor_relative;
     float cursor_speed;
+    /* NewDarkAndroid Phase 3F (System Shock 2's radial menus; only with touch_settings_game set): ask before a quickload
+       from the system wheel (default on). game_radials: the file has been saved by a build with the radials, so its wheel
+       preferences are the player's own (before, they did nothing in System Shock 2: a file without the key keeps the
+       game's defaults for them, and the ITEM button, never shown before, its default position). */
+    bool quickload_confirm;
+    bool game_radials;
     /* TC_STICK.scale is the single stick-size value used by both UIs. */
     TouchPlacement control[TC_COUNT];
 } TouchSettings;
@@ -41,6 +47,12 @@ extern const TouchDefault touch_defaults[TC_COUNT];
 typedef enum { TOUCH_LOAD_DEFAULTS, TOUCH_LOAD_OK, TOUCH_LOAD_MIGRATED,
                TOUCH_LOAD_INVALID, TOUCH_LOAD_FUTURE } TouchLoadResult;
 void touch_settings_defaults(TouchSettings *s);
+/* NewDarkAndroid: a game's own defaults on top of Shockolate's (NULL: none, the files and defaults Shockolate has) */
+typedef struct {
+    void (*defaults)(TouchSettings *s);   /* called at the end of touch_settings_defaults */
+    int item_control;                     /* the control first shown by Phase 3F (its stored position is not the player's) */
+} TouchSettingsGame;
+extern const TouchSettingsGame *touch_settings_game;
 void touch_settings_validate(TouchSettings *s);
 TouchLoadResult touch_settings_load(TouchSettings *s, const char *path);
 bool touch_settings_save(const TouchSettings *s, const char *path);

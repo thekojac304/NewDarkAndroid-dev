@@ -28,6 +28,15 @@ static bool radial_enabled(const TouchControls *t, int category) {
     return category==TOUCH_RADIAL_AMMO ||
            (category>=0 && category<3 && t->settings.wheel_enabled[category]);
 }
+/* NewDarkAndroid: the wheel an action opens when held (-1: none), from the host's mapping when it gives one */
+static int action_radial(const TouchControls *t, TouchAction action) {
+    if (t->radial_for_action) {
+        int category=t->radial_for_action(t->user,action);
+        return category>=0 && category<TOUCH_RADIAL_CATEGORY_COUNT ? category : -1;
+    }
+    int category=radial_category(action);
+    return radial_enabled(t,category) ? category : -1;
+}
 
 void touch_init(TouchControls *t, TouchEmit callback, void *user) {
     memset(t, 0, sizeof(*t));
@@ -133,8 +142,9 @@ void touch_tick(TouchControls *t, uint32_t now_ms) {
     for (int i=0;i<TOUCH_MAX_FINGERS;++i) {
         TouchFinger *f=&t->fingers[i];
         if (!f->active || !f->radial_pending || f->radial_cancelled ||
-            (uint32_t)(now_ms-f->down_ms)<TOUCH_RADIAL_HOLD_MS) continue;
-        int category=radial_category(f->action);
+            (uint32_t)(now_ms-f->down_ms)<(t->radial_hold_ms ? t->radial_hold_ms : TOUCH_RADIAL_HOLD_MS)) continue;
+        int category=t->radial_for_action ? action_radial(t,f->action) : radial_category(f->action);
+        if (category<0) { f->radial_pending=false; f->radial_cancelled=true; continue; }
         if (t->effective_mode!=TOUCH_GAMEPLAY && category!=TOUCH_RADIAL_AMMO) continue;
         /* Refuse a wheel during a held attack/use; require a fresh gesture. */
         f->radial_pending=false;
@@ -144,7 +154,7 @@ void touch_tick(TouchControls *t, uint32_t now_ms) {
         TouchRadialEntry entries[TOUCH_RADIAL_MAX_ENTRIES]={{0}};
         int count=t->radial_populate ? t->radial_populate(t->user,(TouchRadialCategory)category,entries) : 0;
         if (count<0 || count>TOUCH_RADIAL_MAX_ENTRIES ||
-            (category==TOUCH_RADIAL_AMMO && !count) ||
+            ((category==TOUCH_RADIAL_AMMO || t->radial_for_action) && !count) ||
             !touch_radial_open(&t->radial,i,(TouchRadialCategory)category,
                                t->layout.width,t->layout.height,entries,count)) {
             f->radial_cancelled=true;
@@ -233,8 +243,7 @@ void touch_finger(TouchControls *t, TouchPhase phase, int64_t device, int64_t id
                 if (in_circle(x, y, t->layout.action[action])) {
                     f->action = (TouchAction)action; break;
                 }
-            int category=radial_category(f->action);
-            if (radial_enabled(t,category)) {
+            if (action_radial(t,f->action)>=0) {
                 /* A pending wheel owns this tap until release or hold. */
                 if (t->radial.open) f->radial_cancelled=true;
                 else f->radial_pending=true;

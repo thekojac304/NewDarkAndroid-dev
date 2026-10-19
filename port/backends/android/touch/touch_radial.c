@@ -16,7 +16,8 @@ bool touch_radial_open(TouchRadialSelector *r, int owner, TouchRadialCategory ca
         (count && !entries)) return false;
     r->open=true; r->owner=owner; r->category=category;
     r->cx=width*.5f; r->cy=height*.51f;
-    r->outer_radius=fminf(width*.28f,height*.28f);
+    /* NewDarkAndroid: more than 8 segments get a larger wheel, so each stays wide enough for a finger */
+    r->outer_radius=fminf(width,height)*(count>8 ? .36f : .28f);
     r->inner_radius=r->outer_radius*.28f;
     r->count=count; r->highlighted=-1;
     if (count) memcpy(r->entries,entries,(size_t)count*sizeof(*entries));
@@ -50,6 +51,7 @@ void touch_radial_refresh(TouchRadialSelector *r, const TouchRadialEntry *entrie
             old->available=entries[j].available;
             old->current=entries[j].current;
             old->count=entries[j].count;
+            old->no_count=entries[j].no_count;
             break;
         }
     }

@@ -4,10 +4,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define TOUCH_RADIAL_MAX_ENTRIES 7
+/* NewDarkAndroid: 16 entries (System Shock's wheels never filled more than 7); a wheel of more than 8 is drawn larger */
+#define TOUCH_RADIAL_MAX_ENTRIES 16
 #define TOUCH_RADIAL_HOLD_MS 320u
 typedef enum { TOUCH_RADIAL_WEAPON, TOUCH_RADIAL_CONSUMABLE,
                TOUCH_RADIAL_EXPLOSIVE, TOUCH_RADIAL_AMMO,
+               TOUCH_RADIAL_SYSTEM,     /* NewDarkAndroid: System Shock 2's system wheel (quicksave, logs) */
                TOUCH_RADIAL_CATEGORY_COUNT } TouchRadialCategory;
 /* Bind ammo choices to the equipped slot AND gun definition. A live refresh
    disables stale sectors if the weapon changes while a finger is held. */
@@ -20,6 +22,8 @@ typedef struct {
     char label[24];
     bool available, current;
     unsigned count;
+    bool no_count;             /* NewDarkAndroid: draw no count (weapons, settings, system entries) */
+    char name[64];             /* NewDarkAndroid: the entry in full, shown above the wheel while it is highlighted */
 } TouchRadialEntry;
 typedef struct {
     bool open;

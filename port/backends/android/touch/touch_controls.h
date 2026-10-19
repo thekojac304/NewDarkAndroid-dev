@@ -58,11 +58,15 @@ typedef enum {
     TU_HAPTIC_STRENGTH, TU_WHEEL_WEAPON, TU_WHEEL_CONSUMABLE,
     TU_WHEEL_EXPLOSIVE,
     TU_CURSOR_STYLE, TU_CURSOR_SPEED_DOWN, TU_CURSOR_SPEED_UP,   /* NewDarkAndroid: cursor style and relative speed */
+    TU_QUICKLOAD_CONFIRM,                                          /* NewDarkAndroid: ask before a quickload from the system wheel */
     TU_QA, TU_QA_GOD, TU_QA_HEAL, TU_QA_LOADOUT, TU_QA_CLOSE,
     TU_QA_DECK_FIRST, TU_QA_DECK_LAST=TU_QA_DECK_FIRST+12, TU_COUNT
 } TouchUiAction;
 typedef int (*TouchRadialPopulate)(void *user, TouchRadialCategory category,
                                     TouchRadialEntry entries[TOUCH_RADIAL_MAX_ENTRIES]);
+/* NewDarkAndroid: which wheel an action button opens when held, -1 for none (its plain action on press). NULL: the
+   Shockolate mapping and its wheel preferences. When set, an empty wheel never opens (as AMMO's never did). */
+typedef int (*TouchRadialForAction)(void *user, TouchAction action);
 typedef struct {
     TouchMode mode, effective_mode;
     bool enabled, gameplay_available, pause_available, controller;
@@ -80,6 +84,8 @@ typedef struct {
     const char *qa_status;
     TouchRadialSelector radial;
     TouchRadialPopulate radial_populate;
+    TouchRadialForAction radial_for_action;   /* NewDarkAndroid: see above */
+    uint32_t radial_hold_ms;                  /* NewDarkAndroid: 0 = TOUCH_RADIAL_HOLD_MS */
     float anchor_x, anchor_y, movement_x, movement_y, look_x, look_y;
     float cursor_slop, look_scale;
     float stick_reference_height;
