@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "core.h"
+#include "ss2game.h"
 
 InputState g_input;
 extern void kwait_set_msg_check(int (*fn)(void));
@@ -244,6 +245,7 @@ static void on_event(const PlatEvent *e, void *user) {
  *   <ms> move DX DY | btn N down|up | click N    relative mouse motion, mouse button (1 left, 2 right, 3 middle)
  *   <ms> place X Y                           put the game's cursor at pixel X, Y of the drawing surface (touch placement)
  *   <ms> shot                                frame capture (SS2PORT_SHOT_DIR, backends/sdl2/plat_sdl2.c), taken within 15 frames
+ *   <ms> game ACTION                         a radial-menu action or state check (core/ss2game.c: dump, select WHEEL ID, string; test-only: cmd, give, grant_psi)
  *   <ms> quit                                ends the process with exit code 0
  * '#' starts a comment. Each command is logged. */
 typedef struct { uint32_t ms; char cmd[8]; char arg[64]; int a, b; } ScriptLine;
@@ -309,7 +311,8 @@ static void script_run(const ScriptLine *s) {
         const char *d = getenv("SS2PORT_SHOT_DIR"); char p[1100]; FILE *f;
         if (!d) port_warn("input script: shot needs SS2PORT_SHOT_DIR");
         else { snprintf(p, sizeof p, "%s/shot.req", d); if ((f = fopen(p, "wb"))) fclose(f); }
-    } else if (!strcmp(s->cmd, "quit")) port_exit(0);
+    } else if (!strcmp(s->cmd, "game")) ss2g_script(s->arg);      /* core/ss2game.c: radial menu actions and state checks */
+    else if (!strcmp(s->cmd, "quit")) port_exit(0);
     else port_warn("input script: unknown command %s", s->cmd);
 }
 static void script_pump(void) {
@@ -334,7 +337,7 @@ static int peek(uint32_t p, uint32_t h, uint32_t lo, uint32_t hi, int remove) {
     return 0;
 }
 static void ensure_hook(void) { static int done; if (!done) { done = 1; kwait_set_msg_check(msg_waiting); } }
-SHIM(PeekMessageA) { ensure_hook(); input_pump(); RET(peek(A(0), A(1), A(2), A(3), A(4) & 1)); }
+SHIM(PeekMessageA) { ensure_hook(); input_pump(); ss2g_message_pump(c); RET(peek(A(0), A(1), A(2), A(3), A(4) & 1)); }
 SHIM(GetMessageA) {
     ensure_hook();
     for (;;) {

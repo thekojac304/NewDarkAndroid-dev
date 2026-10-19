@@ -18,6 +18,7 @@
 #include <ctype.h>
 #include "core.h"
 #include "recomp_mod.h"
+#include "ss2game.h"
 
 typedef struct { int refs, reserved, unloading; } ModSt;
 static ModSt st[16];
@@ -201,11 +202,21 @@ const char *mod_describe(uint32_t t, char *buf, size_t n) {   /* for error messa
     }
     return "";
 }
+/* A script module's ScriptModuleInit(name, IScriptMan *, MPrintfProc, IMalloc *, IScriptModule **): the engine's script
+ * manager is noted (core/ss2game.c finds the documented script services through it), then the module's own runs. */
+static void sh_script_module_init(CPU *c) {
+    uint32_t real = g_targ, a[5] = { A(0), A(1), A(2), A(3), A(4) };
+    ss2g_script_man(A(1)); RET(g_callv(c, real, 5, a));
+}
 uint32_t mod_export(uint32_t h, const char *name, int *is_mod) {
     int k = find_by_handle(h); *is_mod = k >= 0; if (k < 0) return 0;
     uint32_t b = recomp_mods[k]->base, nt = b + RD32(b + 0x3c), erva = RD32(nt + 24 + 96); if (!erva || !name) return 0;
     uint32_t ex = b + erva, nfn = RD32(ex + 20), nnm = RD32(ex + 24), fn = b + RD32(ex + 28), nm = b + RD32(ex + 32), ord = b + RD32(ex + 36);
-    for (uint32_t i = 0; i < nnm; i++) if (!strcmp((const char *)GP(b + RD32(nm + 4 * i)), name)) { uint32_t o = RD16(ord + 2 * i); return o < nfn ? b + RD32(fn + 4 * o) : 0; }
+    for (uint32_t i = 0; i < nnm; i++) if (!strcmp((const char *)GP(b + RD32(nm + 4 * i)), name)) {
+        uint32_t o = RD16(ord + 2 * i), a = o < nfn ? b + RD32(fn + 4 * o) : 0;
+        if (a && !strcmp(name, "_ScriptModuleInit@20")) return g_thunk_arg(sh_script_module_init, STD(5), "ScriptModuleInit (notes the script manager)", a);
+        return a;
+    }
     return 0;
 }
 /* Calls into a module from outside it (the engine calling a script's methods): the first one is logged, so a log shows
