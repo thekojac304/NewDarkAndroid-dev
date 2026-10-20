@@ -1,0 +1,24 @@
+[touch] touch controls on; settings /data/data/local.newdarkandroid.ss2/files/touch-settings.cfg (loaded); cursor relative, speed 1.00
+[touch] radial menus: weapon wheel on, ITEM on, system wheel on, quickload confirm on (defaults: the file predates them)
+[touch] mode CURSOR (game interface/menu)
+[port] C:\DMM\SCP_beta8\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2scp/DMM/SCP_beta8/NVScript.osm): identified as recompiled version nv (SizeOfImage 0xb2000, ImageBase 10000000, code CRC 7426e52a at 30400000), one of 2 built in
+[touch] CROUCH key from /storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2scp/user.bnd: 'shift' (crouch, toggle), DIK 0x2a
+[touch] mode LOOK (game shoot)
+[touch] finger 49/0 down at 1287,973
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] finger 49/0 move at 1287,941
+[touch] finger 49/0 move at 1287,908
+[touch] finger 49/0 move at 1287,876
+[touch] finger 49/0 move at 1287,844
+[touch] finger 49/0 move at 1287,812
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] finger 49/0 move at 1287,779
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] finger 49/0 up at 1287,779
+[touch] wheel 0: selected 928

@@ -1,0 +1,29 @@
+[touch] touch controls on; settings /data/data/local.newdarkandroid.ss2/files/touch-settings.cfg (loaded); cursor relative, speed 1.00
+[touch] radial menus: weapon wheel on, ITEM on, system wheel on, quickload confirm on (defaults: the file predates them)
+[touch] mode CURSOR (game interface/menu)
+[touch] game 2D picture 160,0 960x720 of 1280x720
+[port] C:\DMM\SCP_beta8\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2scp/DMM/SCP_beta8/NVScript.osm): identified as recompiled version nv (SizeOfImage 0xb2000, ImageBase 10000000, code CRC 7426e52a at 30400000), one of 2 built in
+[touch] game 2D picture 0,0 1280x720 of 1280x720 (whole picture)
+[touch] CROUCH key from /storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/ss2scp/user.bnd: 'shift' (crouch, toggle), DIK 0x2a
+[touch] mode LOOK (game shoot)
+[touch] finger 48/0 down at 105,356
+[touch] wheel 3: 0 entries '': NO AMMO FOR THIS WEAPON
+[touch] finger 48/0 up at 105,356
+[touch] finger 48/0 down at 1287,973
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] finger 48/0 move at 1287,928
+[touch] finger 48/0 move at 1287,883
+[touch] finger 48/0 move at 1287,838
+[touch] finger 48/0 move at 1287,794
+[touch] finger 48/0 move at 1287,749
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] finger 48/0 move at 1287,704
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] wheel 0: 1 entries 'WEAPONS'
+[touch] finger 48/0 up at 1287,704
+[touch] wheel 0: selected 928

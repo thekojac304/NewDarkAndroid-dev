@@ -50,6 +50,8 @@ especially SCP.
 | [PHASE3E_UNIFIED_APK_RESULTS.md](PHASE3E_UNIFIED_APK_RESULTS.md) | Phase 3E: one APK (`local.newdarkandroid.ss2`) for SCP Beta 4 (legacy) and SCP Beta 8; NVScript chosen by the file's identity; CROUCH fixed for the legacy bindings; legacy game and saves migrated with every file verified; APK hashes and the player's checklist |
 | [PHASE3E_CROUCH_FIX.md](PHASE3E_CROUCH_FIX.md) | Phase 3E-A: why CROUCH only made the legacy player creep (Shift is `+creepon` in that `user.bnd`), and the bind-aware fix |
 | [PHASE3E_MODULE_SELECTION.md](PHASE3E_MODULE_SELECTION.md) | Phase 3E-B: several NVScript versions in one build (`port/nvscript_versions.json`), selection by size, base, entry point and code CRC, refusal cases |
+| [PHASE3F_ADVANCED_TOUCH_RESULTS.md](PHASE3F_ADVANCED_TOUCH_RESULTS.md) | Phase 3F: radial menus from the game's own state: weapons, ammunition and settings, psi powers, hypos and patches (new ITEM button), quicksave/quickload and logs; verified on desktop and the phone |
+| [PHASE3G_FINAL_UX_POLISH.md](PHASE3G_FINAL_UX_POLISH.md) | Phase 3G: radial menus open around the held button (fanned at screen edges), the launcher redesigned as a game launcher (diagnostics behind Advanced), an original adaptive wrench icon; 0.9.3-polish |
 
 ## Overall feasibility
 

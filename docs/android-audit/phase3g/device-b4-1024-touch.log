@@ -1,0 +1,30 @@
+[touch] touch controls on; settings /data/data/local.newdarkandroid.ss2/files/touch-settings.cfg (loaded); cursor relative, speed 1.00
+[touch] radial menus: weapon wheel on, ITEM on, system wheel on, quickload confirm on (defaults: the file predates them)
+[touch] mode CURSOR (game interface/menu)
+[port] C:\osm\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/scp4/osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[touch] CROUCH key from /data/user/0/local.newdarkandroid.ss2/files/radialtest/b4-1024/user.bnd: 'c' (crouch, toggle), DIK 0x2e
+[touch] mode LOOK (game shoot)
+[touch] mode CURSOR (game interface/menu)
+[touch] mode LOOK (game shoot)
+[touch] finger 50/0 down at 105,356
+[touch] wheel 3: 0 entries '': NO AMMO FOR THIS WEAPON
+[touch] finger 50/0 up at 105,356
+[touch] finger 50/0 down at 117,65
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] finger 50/0 move at 138,104
+[touch] finger 50/0 move at 160,144
+[touch] finger 50/0 move at 181,183
+[touch] finger 50/0 move at 203,223
+[touch] finger 50/0 move at 224,262
+[touch] finger 50/0 move at 245,302
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] finger 50/0 up at 245,302
+[touch] wheel 4: selected 2
+[port] [ss2game] command: stop_email 

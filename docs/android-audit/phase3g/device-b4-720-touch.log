@@ -1,0 +1,138 @@
+[touch] touch controls on; settings /data/data/local.newdarkandroid.ss2/files/touch-settings.cfg (loaded); cursor relative, speed 1.00
+[touch] radial menus: weapon wheel on, ITEM on, system wheel on, quickload confirm on (defaults: the file predates them)
+[touch] mode CURSOR (game interface/menu)
+[touch] game 2D picture 160,0 960x720 of 1280x720
+[port] C:\osm\nvscript.osm (/storage/emulated/0/Android/data/local.newdarkandroid.ss2/files/games/scp4/osm/NVScript.osm): identified as recompiled version nv124 (SizeOfImage 0xa8000, ImageBase 10000000, code CRC 273bab35 at 30500000), one of 2 built in
+[touch] game 2D picture 0,0 1280x720 of 1280x720 (whole picture)
+[touch] CROUCH key from /data/user/0/local.newdarkandroid.ss2/files/radialtest/b4-720/user.bnd: 'c' (crouch, toggle), DIK 0x2e
+[touch] mode LOOK (game shoot)
+[touch] mode CURSOR (game interface/menu)
+[touch] mode LOOK (game shoot)
+[touch] finger 47/0 down at 1287,973
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] finger 47/0 move at 1265,949
+[touch] finger 47/0 move at 1243,925
+[touch] finger 47/0 move at 1222,902
+[touch] finger 47/0 move at 1200,878
+[touch] finger 47/0 move at 1178,854
+[touch] finger 47/0 move at 1156,830
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] finger 47/0 up at 1156,830
+[touch] wheel 0: selected 17
+[port] [ss2game] command: equip_weapon Pistol
+[port] [ss2game] PISTOL
+[touch] finger 47/0 down at 105,356
+[touch] wheel 3: 5 entries 'PISTOL'
+[touch] wheel 3: 5 entries 'PISTOL'
+[touch] wheel 3: 5 entries 'PISTOL'
+[touch] wheel 3: 5 entries 'PISTOL'
+[touch] finger 47/0 move at 129,334
+[touch] finger 47/0 move at 153,312
+[touch] finger 47/0 move at 176,291
+[touch] finger 47/0 move at 200,269
+[touch] finger 47/0 move at 224,247
+[touch] finger 47/0 move at 248,225
+[touch] wheel 3: 5 entries 'PISTOL'
+[touch] wheel 3: 5 entries 'PISTOL'
+[touch] wheel 3: 5 entries 'PISTOL'
+[touch] wheel 3: 5 entries 'PISTOL'
+[touch] wheel 3: 5 entries 'PISTOL'
+[touch] finger 47/0 up at 248,225
+[touch] wheel 3: selected 65569
+[port] [ss2game] ANTI-PERS.
+[touch] finger 47/0 down at 117,65
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] finger 47/0 move at 222,79
+[touch] finger 47/0 move at 327,93
+[touch] finger 47/0 move at 432,106
+[touch] finger 47/0 move at 537,120
+[touch] finger 47/0 move at 642,134
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] finger 47/0 move at 747,148
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] finger 47/0 up at 747,148
+[touch] finger 47/0 down at 117,65
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] finger 47/0 move at 161,71
+[touch] finger 47/0 move at 206,77
+[touch] finger 47/0 move at 250,83
+[touch] finger 47/0 move at 295,88
+[touch] finger 47/0 move at 339,94
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] finger 47/0 move at 384,100
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] wheel 4: 4 entries 'SYSTEM'
+[touch] finger 47/0 up at 384,100
+[touch] wheel 4: selected 3
+[port] [ss2game] command: quicksave 
+[port] [ss2game] QUICKSAVE
+[touch] finger 47/0 down at 468,833
+[touch] finger 47/0 move at 468,714
+[touch] key 0x11 down
+[touch] finger 47/1 down at 1287,843
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] finger 47/0 move at 468,714
+[touch] finger 47/1 move at 1287,811
+[touch] finger 47/0 move at 468,714
+[touch] finger 47/1 move at 1287,778
+[touch] finger 47/0 move at 468,714
+[touch] finger 47/1 move at 1287,746
+[touch] finger 47/0 move at 468,714
+[touch] finger 47/1 move at 1287,714
+[touch] finger 47/0 move at 468,714
+[touch] finger 47/1 move at 1287,682
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] finger 47/0 move at 468,714
+[touch] finger 47/1 move at 1287,649
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] finger 47/1 up at 1287,649
+[touch] wheel 0: selected 19
+[port] [ss2game] command: equip_weapon Shotgun
+[port] [ss2game] SHOTGUN
+[touch] finger 47/0 up at 468,714
+[touch] key 0x11 up
+[touch] finger 47/0 down at 105,508
+[touch] wheel 1: 6 entries 'ITEMS'
+[touch] wheel 1: 6 entries 'ITEMS'
+[touch] wheel 1: 6 entries 'ITEMS'
+[touch] wheel 1: 6 entries 'ITEMS'
+[touch] wheel 1: 6 entries 'ITEMS'
+[touch] wheel 1: 6 entries 'ITEMS'
+[touch] wheel 1: 6 entries 'ITEMS'
+[touch] wheel 1: 6 entries 'ITEMS'
+[touch] wheel 1: 6 entries 'ITEMS'
+[touch] finger 47/0 up at 105,508
+[touch] finger 47/0 down at 1287,973
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] finger 47/0 move at 1200,801
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] wheel 0: 5 entries 'WEAPONS'
+[touch] mode CURSOR (game interface/menu)
+[touch] mode LOOK (game shoot)
