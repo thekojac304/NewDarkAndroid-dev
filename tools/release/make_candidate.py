@@ -89,7 +89,7 @@ def main():
         fp = os.path.join(out, f)
         if os.path.isdir(fp):
             for g in sorted(os.listdir(fp)): lines.append((os.path.join(f, g), os.path.join(fp, g)))
-        elif f != 'SHA256SUMS.txt': lines.append((f, fp))
+        elif f not in ('SHA256SUMS.txt', 'CANDIDATE.json'): lines.append((f, fp))
     with open(os.path.join(out, 'SHA256SUMS.txt'), 'w', newline='\n') as m:
         for rel, fp in lines: m.write('%s *%s\n' % (hashlib.sha256(open(fp, 'rb').read()).hexdigest(), rel.replace(os.sep, '/')))
     info = {'source_rev': rev, 'public_commit': commit, 'public_tree': tree, 'parent': base, 'branch': a.branch,
