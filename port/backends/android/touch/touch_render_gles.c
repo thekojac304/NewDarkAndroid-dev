@@ -230,11 +230,15 @@ static void radial(const TouchControls *t, const char *title) {
     const TouchRadialSelector *wheel=&t->radial;
     if (!wheel->open) return;
     float R=wheel->outer_radius,inner=wheel->inner_radius,h=t->layout.height,op=fmaxf(.7f,t->settings.opacity);
+    /* Phase 3G: a wheel anchored at a screen edge is a fan over the arc that is on the screen (touch_radial_open_at) */
+    bool fan=touch_radial_is_fan(wheel);
+    float arc=fan ? wheel->span : 6.2831853f, a0=wheel->start-1.5707963f;   /* screen angles */
     color(8,22,30,205,fmaxf(.65f,t->settings.opacity));
-    disc(wheel->cx,wheel->cy,R);
+    if (fan) { disc(wheel->cx,wheel->cy,inner); sector(wheel->cx,wheel->cy,inner,R,a0,a0+arc); }
+    else disc(wheel->cx,wheel->cy,R);
     for (int i=0;i<wheel->count;++i) {
-        float angle=6.2831853f*i/wheel->count-1.5707963f;
-        float half=3.14159265f/wheel->count;
+        float angle=touch_radial_segment_angle(wheel,i);
+        float half=arc/2/wheel->count;
         const TouchRadialEntry *entry=&wheel->entries[i];
         if (i==wheel->highlighted || entry->current) {
             bool chosen=i==wheel->highlighted;
@@ -242,13 +246,15 @@ static void radial(const TouchControls *t, const char *title) {
             sector(wheel->cx,wheel->cy,inner,R-2,angle-half+.008f,angle+half-.008f);
         }
         color(entry->available ? 188 : 95,entry->available ? 231 : 115,entry->available ? 235 : 120,220,op);
-        float edge=angle-half;
-        line(wheel->cx+cosf(edge)*inner,wheel->cy+sinf(edge)*inner,wheel->cx+cosf(edge)*R,wheel->cy+sinf(edge)*R,fmaxf(1,R/180));
+        for (int end=0;end<(fan && i==wheel->count-1 ? 2 : 1);++end) {   /* a fan's last segment closes it */
+            float edge=angle+(end ? half : -half);
+            line(wheel->cx+cosf(edge)*inner,wheel->cy+sinf(edge)*inner,wheel->cx+cosf(edge)*R,wheel->cy+sinf(edge)*R,fmaxf(1,R/180));
+        }
         char label[sizeof(entry->label)];
         snprintf(label,sizeof(label),"%s",entry->label);
         for (char *p=label;*p;++p) if (*p>='a' && *p<='z') *p=(char)(*p-'a'+'A');
         float x=wheel->cx+cosf(angle)*R*.68f,y=wheel->cy+sinf(angle)*R*.68f;
-        float room=fminf(R*.64f,6.2831853f*R*.62f/wheel->count);     /* a label never runs into the next segment */
+        float room=fminf(R*.64f,arc*R*.62f/wheel->count);           /* a label never runs into the next segment */
         color(entry->available ? 237 : 132,entry->available ? 249 : 145,entry->available ? 247 : 150,255,op);
         text(label,x,y,h/270,room);
         if (entry->current) {
@@ -263,16 +269,26 @@ static void radial(const TouchControls *t, const char *title) {
         }
     }
     color(179,220,224,245,op);
-    ring(wheel->cx,wheel->cy,R,fmaxf(1,R/150));
+    if (fan) sector(wheel->cx,wheel->cy,R-fmaxf(1,R/150),R,a0,a0+arc);   /* the rim, over the fan only */
+    else ring(wheel->cx,wheel->cy,R,fmaxf(1,R/150));
     circle((TouchCircle){wheel->cx,wheel->cy,inner},false,false,1,fmaxf(1,R/110));
     color(241,243,228,255,1);
-    text("CANCEL",wheel->cx,wheel->cy,h/290,inner*1.6f);
-    /* the title: the highlighted entry in full, else the wheel's subject */
+    {   /* kept on the screen when the held button touches its edge (Phase 3G) */
+        float tw=fminf(6*4*h/290,inner*1.6f), cw=t->layout.width;
+        text("CANCEL",fminf(fmaxf(wheel->cx,tw/2+h*.01f),cw-tw/2-h*.01f),fminf(fmaxf(wheel->cy,h*.02f),h-h*.02f),h/290,inner*1.6f);
+    }
+    /* the title: the highlighted entry in full, else the wheel's subject. Above a whole wheel; beyond a fan's middle
+       (to the right of a wheel at the left edge, above one at the bottom), always kept on the screen. */
     const char *head=wheel->highlighted>=0 && wheel->entries[wheel->highlighted].name[0] ? wheel->entries[wheel->highlighted].name : title;
     if (head && *head) {
-        float y=fmaxf(h*.045f,wheel->cy-R-h*.05f), tw=fminf(t->layout.width*.8f,(float)strlen(head)*4*h/200);
-        color(8,22,30,215,1); fill_rect(wheel->cx-tw/2-h*.02f,y-h*.03f,tw+h*.04f,h*.06f);
-        color(255,224,135,255,1); text(head,wheel->cx,y,h/200,tw);
+        float w=t->layout.width, tw=fminf(w*.8f,(float)strlen(head)*4*h/200), bw=tw+h*.04f, bh=h*.06f, x, y;
+        if (fan) {
+            float mid=a0+arc/2, dx=cosf(mid), dy=sinf(mid), reach=R+h*.025f+fabsf(dx)*bw/2+fabsf(dy)*bh/2;
+            x=wheel->cx+dx*reach; y=wheel->cy+dy*reach;
+        } else { x=wheel->cx; y=wheel->cy-R-h*.05f; }
+        x=fminf(fmaxf(x,bw/2+h*.01f),w-bw/2-h*.01f); y=fminf(fmaxf(y,h*.045f),h-h*.045f);
+        color(8,22,30,215,1); fill_rect(x-bw/2,y-bh/2,bw,bh);
+        color(255,224,135,255,1); text(head,x,y,h/200,tw);
     }
 }
 static void overlay(const TouchControls *t, const Ss2Overlay *o) {

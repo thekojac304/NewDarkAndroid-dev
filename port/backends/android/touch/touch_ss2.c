@@ -18,7 +18,9 @@
  * ammunition and settings, or the psi amp's powers), ITEM (hypos and patches) or II (quicksave, logs) for 400 ms opens a
  * wheel of what the game says is there (game_wheel, core/ss2game.c); releasing on an entry selects it (game_select runs
  * the game's own command), in the centre or outside cancels, and a short tap keeps the button's plain action. Quickload
- * asks first (settings.quickload_confirm).
+ * asks first (settings.quickload_confirm). Phase 3G: the wheel opens around the held button, so the same finger slides
+ * straight into an entry; at a screen edge its entries fan over the part of the circle that is on the screen
+ * (touch_radial_open_at).
  *
  * Gameplay or cursor: the game tells which mode it is in by recentring its cursor every frame in shoot (mouse look)
  * mode and never in interface mode or menus (user32_cursor_recentred_ns). The MODE button sends Tab (toggle_mouse) so
@@ -252,6 +254,7 @@ void ss2t_init(Ss2Touch *s) {
     s->rel_x = s->rel_y = -1; s->rel_placed_x = s->rel_placed_y = INT_MIN;     /* not known yet */
     s->t.radial_populate = populate;       /* the wheels come from the game (game_wheel); without it they never open */
     s->t.radial_for_action = radial_for_action; s->t.radial_hold_ms = SS2T_RADIAL_HOLD_MS;
+    s->t.radial_anchored = true;           /* Phase 3G: each wheel opens around the button being held */
     s->crouch_dik = SS2_DIK_LSHIFT;        /* the stock user.bnd: bind shift crouch */
 }
 

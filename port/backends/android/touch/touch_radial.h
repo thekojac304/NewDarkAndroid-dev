@@ -32,10 +32,25 @@ typedef struct {
     float cx, cy, inner_radius, outer_radius;
     int count, highlighted;
     TouchRadialEntry entries[TOUCH_RADIAL_MAX_ENTRIES];
+    /* NewDarkAndroid Phase 3G: the arc the segments share, in radians clockwise from straight up. A whole wheel has
+       span 2*pi (or 0, a selector set up without it) and starts half a segment left of the top, so segment zero is
+       centred at the top as before; a fan (an anchored wheel at a screen edge) covers only the arc that is on the screen. */
+    float start, span;
 } TouchRadialSelector;
 void touch_radial_close(TouchRadialSelector *r);
 bool touch_radial_open(TouchRadialSelector *r, int owner, TouchRadialCategory category,
                        float width, float height, const TouchRadialEntry *entries, int count);
+/* NewDarkAndroid Phase 3G: a wheel around the held button (anchor_x, anchor_y) instead of the screen centre. The holding
+   finger (finger_x, finger_y) is always inside the cancel circle when it opens. Where a whole wheel would leave the
+   screen, the segments are fanned over the widest arc that stays on it (at most a quarter turn each), and the wheel grows
+   a little when that keeps the segments wider. Same validation and result as touch_radial_open. */
+bool touch_radial_open_at(TouchRadialSelector *r, int owner, TouchRadialCategory category, float width, float height,
+                          float anchor_x, float anchor_y, float finger_x, float finger_y,
+                          const TouchRadialEntry *entries, int count);
+/* The middle of segment i, as an angle on the screen (radians, 0 = right, y down), and the point there at distance d. */
+float touch_radial_segment_angle(const TouchRadialSelector *r, int segment);
+void touch_radial_segment_point(const TouchRadialSelector *r, int segment, float distance, float *x, float *y);
+bool touch_radial_is_fan(const TouchRadialSelector *r);
 int touch_radial_highlight(TouchRadialSelector *r, int owner, float x, float y);
 int touch_radial_release(TouchRadialSelector *r, int owner, float x, float y);
 /* Preserve segment positions while updating live availability and counts. */

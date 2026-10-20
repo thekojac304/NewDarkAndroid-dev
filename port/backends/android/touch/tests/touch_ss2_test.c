@@ -687,9 +687,9 @@ static void game_init(Ss2Touch *s) {
     fg_entries(TOUCH_RADIAL_SYSTEM, 4, 1);
     now = 1000000000ull; enter_gameplay(s);
 }
-static void segment(const Ss2Touch *s, int i, float *x, float *y) {       /* the middle of segment i of the open wheel */
-    const TouchRadialSelector *r = &s->t.radial; float a = 6.2831853f * (float)i / (float)r->count - 1.5707963f, d = (r->inner_radius + r->outer_radius) / 2;
-    *x = r->cx + cosf(a) * d; *y = r->cy + sinf(a) * d;
+static void segment(const Ss2Touch *s, int i, float *x, float *y) {       /* the middle of segment i of the open wheel (or fan) */
+    const TouchRadialSelector *r = &s->t.radial;
+    touch_radial_segment_point(r, i, (r->inner_radius + r->outer_radius) / 2, x, y);
 }
 static int game_input;                       /* keys, buttons and wheel notches sent to the game, over several frames */
 static void count_input(void) { for (int i = 0; i < nout; i++) if (out[i].type == PLAT_EV_KEY || out[i].type == PLAT_EV_MOUSE_BUTTON || out[i].type == PLAT_EV_MOUSE_WHEEL) game_input++; }
@@ -912,12 +912,168 @@ static void test_item_button(void) {
     s.game_on = false; run_ms(&s, 20); CHECK(touch_control_bounds(&s.t, TC_EXPLOSIVE).w == 0);   /* no game state: hidden too */
 }
 
+/* ---------------------------------------------------------------- Phase 3G: wheels anchored at the held button */
+static void frame_at(Ss2Touch *s, int w, int h, int gw, int gh) {   /* a w x h screen, the game gw x gh fitted into it */
+    float sc = fminf((float)w / (float)gw, (float)h / (float)gh); int vw = (int)((float)gw * sc), vh = (int)((float)gh * sc);
+    ss2t_frame(s, now, w, h, true, (w - vw) / 2, (h - vh) / 2, vw, vh, gw, gh, now);
+    nout = ss2t_flush(s, out, 512); count_input();
+}
+static void run_at(Ss2Touch *s, int ms, int w, int h, int gw, int gh) { for (int t = 0; t < ms; t += 10) { now += 10000000ull; frame_at(s, w, h, gw, gh); } }
+static bool on_screen(float x, float y, int w, int h) { return x >= 0 && y >= 0 && x <= (float)w && y <= (float)h; }
+/* what an anchored wheel promises: it opens around the held button b, the finger starts in its cancel circle with
+   nothing highlighted, every segment (rim and label) is on the screen, and sweeping round from the first segment to the
+   last meets each segment once, in order, with no gap (no ambiguity) */
+static void check_anchored(Ss2Touch *s, TouchCircle b, int w, int h) {
+    const TouchRadialSelector *r = &s->t.radial;
+    CHECK(r->open && r->count > 0);
+    if (!r->open || r->count <= 0) return;
+    CHECK(r->cx == b.x && r->cy == b.y);                                                   /* around the button itself */
+    CHECK(hypotf(b.x - r->cx, b.y - r->cy) + (float)h * .02f < r->inner_radius);          /* the finger in the cancel circle */
+    CHECK(r->highlighted == -1);
+    float half = (touch_radial_is_fan(r) ? r->span : 6.2831853f) / 2 / (float)r->count;
+    for (int i = 0; i < r->count; i++) {
+        float x, y; TouchRadialSelector c = *r;
+        for (int e = -1; e <= 1; e++) {                     /* the segment's two edges and its middle, at the rim */
+            float a = touch_radial_segment_angle(r, i) + (float)e * half;
+            CHECK(on_screen(r->cx + cosf(a) * r->outer_radius, r->cy + sinf(a) * r->outer_radius, w, h));
+        }
+        touch_radial_segment_point(r, i, r->outer_radius * .68f, &x, &y); CHECK(on_screen(x, y, w, h));   /* its label */
+        segment(s, i, &x, &y); CHECK(touch_radial_highlight(&c, c.owner, x, y) == i);
+    }
+    TouchRadialSelector c = *r; int last = -1, seen = 0;
+    float a0 = touch_radial_segment_angle(r, 0), a1 = touch_radial_segment_angle(r, r->count - 1), d = (r->inner_radius + r->outer_radius) / 2;
+    for (float a = a0; a <= a1 + 1e-4f; a += .01f) {
+        int k = touch_radial_highlight(&c, c.owner, r->cx + cosf(a) * d, r->cy + sinf(a) * d);
+        CHECK(k >= 0 && k >= last && k <= last + 1);
+        if (k != last) seen++;
+        last = k;
+    }
+    CHECK(seen == r->count && last == r->count - 1);
+}
+/* hold b until its wheel opens; returns whether it did */
+static bool hold_at(Ss2Touch *s, int id, TouchCircle b, int w, int h, int gw, int gh) {
+    finger(s, TOUCH_DOWN, id, b.x, b.y); run_at(s, 450, w, h, gw, gh); return s->t.radial.open;
+}
+
+static void test_anchored_default_layout(void) {
+    /* the phone at the game resolutions in use (16:9 enlarged interface, 4:3 letterboxed), and other screen shapes */
+    static const int sizes[][4] = { {2340,1080,1280,720}, {2340,1080,800,600}, {2340,1080,1024,768}, {1920,1080,1280,720},
+                                    {1280,800,800,600}, {1024,768,1024,768}, {1080,1080,800,600} };
+    static const int buttons[] = { TC_NEXT, TC_PREV, TC_AMMO, TC_EXPLOSIVE, TC_PAUSE };
+    static const int wheels[] = { TOUCH_RADIAL_WEAPON, TOUCH_RADIAL_WEAPON, TOUCH_RADIAL_AMMO, TOUCH_RADIAL_CONSUMABLE, TOUCH_RADIAL_SYSTEM };
+    for (unsigned z = 0; z < sizeof sizes / sizeof sizes[0]; z++) {
+        int w = sizes[z][0], h = sizes[z][1], gw = sizes[z][2], gh = sizes[z][3];
+        for (int many = 0; many < 2; many++) for (unsigned k = 0; k < sizeof buttons / sizeof buttons[0]; k++) {
+            Ss2Touch s; game_init(&s); run_at(&s, 50, w, h, gw, gh); CHECK(s.t.mode == TOUCH_GAMEPLAY);
+            if (many) { fg_entries(TOUCH_RADIAL_WEAPON, 8, 100); fg_entries(TOUCH_RADIAL_AMMO, 6, 200); fg_entries(TOUCH_RADIAL_CONSUMABLE, 16, 300); fg_entries(TOUCH_RADIAL_SYSTEM, 5, 1); }
+            s.t.settings.quickload_confirm = false;            /* (QUICKLOAD, the system wheel's last entry, would ask first) */
+            TouchCircle b = ctl(&s, buttons[k]); game_input = 0;
+            CHECK(hold_at(&s, 1, b, w, h, gw, gh) && (int)s.t.radial.category == wheels[k]);
+            if (!s.t.radial.open) { printf("  (screen %dx%d, button %d)\n", w, h, buttons[k]); continue; }
+            check_anchored(&s, b, w, h);
+            int n = s.t.radial.count, before = fg_selects;
+            /* lifted where it was pressed (no slide): nothing, neither the wheel's entry nor the tap action */
+            finger(&s, TOUCH_UP, 1, b.x, b.y); run_at(&s, 50, w, h, gw, gh);
+            CHECK(!s.t.radial.open && fg_selects == before && game_input == 0);
+            /* the same finger slides from the button straight into the last entry */
+            hold_at(&s, 2, b, w, h, gw, gh); float x, y; segment(&s, n - 1, &x, &y);
+            finger(&s, TOUCH_MOTION, 2, (b.x + x) / 2, (b.y + y) / 2); finger(&s, TOUCH_MOTION, 2, x, y); run_at(&s, 20, w, h, gw, gh);
+            CHECK(s.t.radial.highlighted == n - 1);
+            finger(&s, TOUCH_UP, 2, x, y); run_at(&s, 50, w, h, gw, gh);
+            CHECK(fg_selects == before + 1 && fg_cat == wheels[k] && fg_id == fg_e[wheels[k]][n - 1].id && game_input == 0);
+            if (fg_selects != before + 1) printf("  (screen %dx%d game %dx%d, button %d, %d entries: fan %d, highlighted %d, open %d)\n", w, h, gw, gh, buttons[k], n, touch_radial_is_fan(&s.t.radial), s.t.radial.highlighted, s.t.radial.open);
+            /* out past the rim, then lifted: cancelled */
+            hold_at(&s, 3, b, w, h, gw, gh); segment(&s, 0, &x, &y);
+            float dx = x - s.t.radial.cx, dy = y - s.t.radial.cy, l = hypotf(dx, dy), far = s.t.radial.outer_radius * 1.3f;
+            float ox = s.t.radial.cx + dx / l * far, oy = s.t.radial.cy + dy / l * far;
+            finger(&s, TOUCH_MOTION, 3, x, y); finger(&s, TOUCH_MOTION, 3, ox, oy); finger(&s, TOUCH_UP, 3, ox, oy); run_at(&s, 50, w, h, gw, gh);
+            CHECK(!s.t.radial.open && fg_selects == before + 1);
+            /* onto an entry and back to the button: cancelled */
+            hold_at(&s, 4, b, w, h, gw, gh); segment(&s, 0, &x, &y);
+            finger(&s, TOUCH_MOTION, 4, x, y); run_at(&s, 20, w, h, gw, gh); CHECK(s.t.radial.highlighted == 0);
+            finger(&s, TOUCH_MOTION, 4, b.x, b.y); run_at(&s, 20, w, h, gw, gh); CHECK(s.t.radial.highlighted == -1);
+            finger(&s, TOUCH_UP, 4, b.x, b.y); run_at(&s, 50, w, h, gw, gh);
+            CHECK(!s.t.radial.open && fg_selects == before + 1 && game_input == 0);
+        }
+    }
+    /* the phone's own layout: < > fan upwards from the bottom edge, AMMO and ITEM rightwards from the left edge, II from
+       the top-left corner down and to the right */
+    Ss2Touch s; game_init(&s); TouchCircle b; float x, y;
+    static const int fans[][3] = { {TC_NEXT, 0, -1}, {TC_PREV, 0, -1}, {TC_AMMO, 1, 0}, {TC_EXPLOSIVE, 1, 0}, {TC_PAUSE, 1, 1} };
+    for (int k = 0; k < 5; k++) {
+        b = ctl(&s, fans[k][0]); hold(&s, 1, b, 450); CHECK(s.t.radial.open && touch_radial_is_fan(&s.t.radial));
+        float sx = 0, sy = 0; for (int i = 0; i < s.t.radial.count; i++) { segment(&s, i, &x, &y); sx += x - s.t.radial.cx; sy += y - s.t.radial.cy; }
+        if (fans[k][1]) CHECK(sx > 0); else CHECK(fabsf(sx) < fabsf(sy));   /* towards the inside of the screen */
+        if (fans[k][2] < 0) CHECK(sy < 0); else if (fans[k][2] > 0) CHECK(sy > 0);
+        finger(&s, TOUCH_UP, 1, b.x, b.y); run_ms(&s, 50);
+    }
+    CHECK(fg_selects == 0);
+}
+
+static void test_anchored_custom_layout(void) {
+    /* a layout the player moved: the weapon button in each corner, at each edge and in the middle */
+    static const float spots[][2] = { {0,0}, {1,0}, {0,1}, {1,1}, {.5f,0}, {.5f,1}, {0,.5f}, {1,.5f}, {.5f,.5f}, {.3f,.85f}, {.97f,.12f} };
+    for (unsigned p = 0; p < sizeof spots / sizeof spots[0]; p++) for (int n = 1; n <= 16; n += 5) {
+        Ss2Touch s; game_init(&s); fg_entries(TOUCH_RADIAL_WEAPON, n, 100);
+        for (int id = 0; id < TC_COUNT; id++)                   /* the other buttons out of the way */
+            if (id != TC_NEXT && id != TC_STICK && id != TC_FIRE && id != TC_USE) touch_editor_position(&s.t, id, W * .62f, H * .4f);
+        touch_editor_position(&s.t, TC_NEXT, spots[p][0] * W, spots[p][1] * H);
+        TouchCircle b = ctl(&s, TC_NEXT); game_input = 0;
+        hold(&s, 1, b, 450); CHECK(s.t.radial.open && s.t.radial.category == TOUCH_RADIAL_WEAPON && s.t.radial.count == n);
+        if (!s.t.radial.open || s.t.radial.count != n) printf("  (spot %.2f %.2f, %d entries: open %d, count %d, button %.0f %.0f r %.0f)\n", spots[p][0], spots[p][1], n, s.t.radial.open, s.t.radial.count, b.x, b.y, b.radius);
+        if (!s.t.radial.open) continue;
+        check_anchored(&s, b, W, H);
+        if (spots[p][0] == .5f && spots[p][1] == .5f) {      /* room all round: a whole wheel, entry 0 at the top as before */
+            CHECK(!touch_radial_is_fan(&s.t.radial) && fabsf(touch_radial_segment_angle(&s.t.radial, 0) + 1.5707963f) < 1e-4f);
+            CHECK(s.t.radial.cx == b.x && s.t.radial.cy == b.y);
+        }
+        float x, y; segment(&s, n / 2, &x, &y); finger(&s, TOUCH_MOTION, 1, x, y); finger(&s, TOUCH_UP, 1, x, y); run_ms(&s, 50);
+        CHECK(fg_selects == 1 && fg_id == 100 + n / 2 && game_input == 0);
+    }
+}
+
+static void test_anchored_while_moving(void) {
+    Ss2Touch s; game_init(&s);
+    float r = s.t.layout.move_radius; TouchCircle n = ctl(&s, TC_NEXT), a = ctl(&s, TC_AMMO); float x, y;
+    /* walking, the stick finger moving all the time, while > opens its fan and a weapon is chosen from it */
+    finger(&s, TOUCH_DOWN, 1, 400, 900); finger(&s, TOUCH_MOTION, 1, 400, 900 - r); advance(&s, 10, shooting());
+    CHECK(s.stick_key[0]);
+    finger(&s, TOUCH_DOWN, 2, n.x, n.y);
+    for (int t = 0; t < 45; t++) { finger(&s, TOUCH_MOTION, 1, 400 + (t % 2 ? r * .2f : -r * .2f), 900 - r); advance(&s, 10, shooting()); }
+    CHECK(s.t.radial.open && s.t.radial.owner >= 0 && s.stick_key[0] && s.t.move_owner >= 0);
+    check_anchored(&s, n, W, H);
+    segment(&s, 1, &x, &y); finger(&s, TOUCH_MOTION, 2, x, y); finger(&s, TOUCH_MOTION, 1, 400 - r * .2f, 900 - r);
+    finger(&s, TOUCH_UP, 2, x, y); advance(&s, 10, shooting());
+    CHECK(fg_selects == 1 && fg_id == 101 && s.stick_key[0]);
+    /* AMMO's fan, with the stick still held; then Home with it open: everything released, nothing chosen */
+    hold(&s, 3, a, 450); CHECK(s.t.radial.open && s.stick_key[0]); check_anchored(&s, a, W, H);
+    segment(&s, 2, &x, &y); finger(&s, TOUCH_MOTION, 3, x, y); run_ms(&s, 20); CHECK(s.t.radial.highlighted == 2);
+    ss2t_cancel(&s); nout = ss2t_flush(&s, out, 512);
+    CHECK(!s.t.radial.open && !s.touch_key[SS2_DIK_W]);
+    finger(&s, TOUCH_UP, 3, x, y); finger(&s, TOUCH_UP, 1, 400, 900 - r); advance(&s, 100, shooting());
+    CHECK(fg_selects == 1 && !s.stick_key[0] && !s.touch_btn[0] && !s.touch_btn[1]);
+}
+
+static void test_anchored_off_is_centred(void) {
+    /* without the SS2 hook (Shockolate's own behaviour) a wheel still opens at the screen centre, unchanged */
+    Ss2Touch s; game_init(&s); s.t.radial_anchored = false;
+    TouchCircle n = ctl(&s, TC_NEXT); hold(&s, 1, n, 450);
+    CHECK(s.t.radial.open && !touch_radial_is_fan(&s.t.radial) && s.t.radial.cx == W * .5f && s.t.radial.cy == H * .51f);
+    CHECK(fabsf(s.t.radial.outer_radius - H * .28f) < .01f && fabsf(s.t.radial.inner_radius - H * .28f * .28f) < .01f);
+    float x, y; segment(&s, 0, &x, &y); CHECK(fabsf(x - W * .5f) < .5f && y < s.t.radial.cy);   /* entry 0 at the top */
+    finger(&s, TOUCH_MOTION, 1, x, y); finger(&s, TOUCH_UP, 1, x, y); run_ms(&s, 50); CHECK(fg_selects == 1 && fg_id == 100);
+    /* and a selector set up without the Phase 3G fields (span 0) behaves as a whole wheel */
+    TouchRadialSelector r; memset(&r, 0, sizeof r); r.open = true; r.owner = 0; r.cx = 100; r.cy = 100; r.inner_radius = 10; r.outer_radius = 50; r.count = 4;
+    for (int i = 0; i < 4; i++) r.entries[i].available = true;
+    CHECK(touch_radial_highlight(&r, 0, 100, 70) == 0 && touch_radial_highlight(&r, 0, 130, 100) == 1 && touch_radial_highlight(&r, 0, 100, 130) == 2);
+}
+
 static void test_many_entries(void) {
     Ss2Touch s; game_init(&s);
     fg_entries(TOUCH_RADIAL_CONSUMABLE, 14, 300);
     TouchCircle c = ctl(&s, TC_EXPLOSIVE); hold(&s, 1, c, 450);
     CHECK(s.t.radial.open && s.t.radial.count == 14 && s.t.radial.outer_radius > H * .3f);   /* a larger wheel */
-    CHECK(s.t.radial.cy - s.t.radial.outer_radius > 0 && s.t.radial.cy + s.t.radial.outer_radius < H);   /* on the screen */
+    check_anchored(&s, c, W, H);                           /* Phase 3G: at ITEM, a fan wholly on the screen */
     for (int i = 0; i < 14; i += 3) { float x, y; segment(&s, i, &x, &y); finger(&s, TOUCH_MOTION, 1, x, y); run_ms(&s, 10); CHECK(s.t.radial.highlighted == i); }
     float x, y; segment(&s, 13, &x, &y); finger(&s, TOUCH_MOTION, 1, x, y); finger(&s, TOUCH_UP, 1, x, y); run_ms(&s, 50);
     CHECK(fg_selects == 1 && fg_id == 313);
@@ -982,6 +1138,7 @@ int main(void) {
     test_radial_weapon_hold_select(); test_radial_short_tap_unchanged(); test_radial_cancel(); test_radial_multitouch();
     test_radial_cancel_by_lifecycle(); test_radial_cursor_mode_ammo(); test_radial_empty_and_unavailable(); test_radial_haptics();
     test_system_wheel_quickload(); test_item_button(); test_many_entries(); test_settings_3f();
+    test_anchored_default_layout(); test_anchored_custom_layout(); test_anchored_while_moving(); test_anchored_off_is_centred();
     printf("touch_ss2_test: %d of %d checks failed\n", fails, checks);
     return fails != 0;
 }

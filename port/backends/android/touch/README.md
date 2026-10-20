@@ -14,7 +14,7 @@ audit). It was taken with `git archive`; the working tree's uncommitted changes 
 | File | From 7502370 | Change |
 | --- | --- | --- |
 | `touch_controls.c/.h` | unchanged, except two lines and three settings actions | `in_circle` ignores radius-0 controls (hidden in the SS2 layout); KBD (the `target` action) takes a touch in cursor mode too, like AMMO (Phase 2B-2); `TU_CURSOR_STYLE`, `TU_CURSOR_SPEED_DOWN/UP` (Phase 3D) |
-| `touch_radial.c/.h` | unchanged | |
+| `touch_radial.c/.h` | unchanged, plus Phase 3G additions | `touch_radial_open_at` (a wheel around the held button, a fan at a screen edge), `start`/`span` on the selector, segment helpers; `touch_radial_open` and its geometry unchanged |
 | `touch_editor.c` | the three cursor actions; the settings panel's second page has the cursor rows first and its five rows a little tighter (Phase 3D) | |
 | `touch_settings.c/.h` | defaults table, plus one function; `cursor_relative` and `cursor_speed` (Phase 3D) | SS2 labels: CONS → RELOAD, target → KBD; explosive and sprint hidden. Phase 2B-2 defaults: SET, AMMO/USE and KBD in the letterbox bars, MODE right of the EQUIP panel. `touch_settings_upgrade_layout` gives a stored layout that still has every control at the Phase 2A/2B-1 positions the new defaults (in memory). Keys and schema (v3) kept. Phase 3D adds two keys to the same version: `cursor_relative` (0 Direct, the default; 1 Relative) and `cursor_speed` (0.25-4, default 1). A file without them loads as Direct at speed 1, and an older build ignores them |
 | `touch_surface.c/.h` | JNI name only | `Java_local_newdarkandroid_ss2_TouchSurface_onNativeSurfaceTouch` |
@@ -71,7 +71,17 @@ keys are the same in every installation checked.
   or outside cancels; the finger that held the button owns the wheel, other fingers never select, the stick keeps walking,
   and focus loss, Home, MODE or the game leaving shoot mode close it with nothing selected. A segment that is not available
   (a weapon the character cannot equip, no unread log) is dimmed and cannot be chosen; the open wheel is refreshed every
-  250 ms. The entries and the actions come from the game itself, through `port/core/ss2game.c`, which runs them at the
+  250 ms. **Phase 3G: the wheel opens around the held button** (`radial_anchored`, set by the SS2 glue; Shockolate's
+  own behaviour, the centred wheel, is unchanged without it). It is centred exactly on the button, so the same finger
+  slides straight out into an entry; the finger starts inside the cancel circle (at least 3 % of the screen height from
+  its edge), so lifting without sliding does nothing. Where a whole wheel would leave the screen (every default wheel
+  button sits at an edge), the entries fan over the widest arc whose rim stays on the screen, centred in it, at most a
+  quarter turn each: `<` `>` fan upwards from the bottom edge, AMMO and ITEM to the right of the left edge, II down and
+  right from the top-left corner. A fan whose entries would be narrow grows up to 1.5x (at most 45 % of the screen
+  height). Up to half an entry (20 degrees at most) past either end of a fan still selects that end's entry; behind it,
+  in the centre and beyond 1.25x the radius cancel. A button with room all round gets the whole wheel, entry 0 at the
+  top, as before. The title (the highlighted entry in full) sits beyond the fan's middle and is kept on the screen.
+  The entries and the actions come from the game itself, through `port/core/ss2game.c`, which runs them at the
   engine's per-frame event pump; without it (another executable) the buttons keep their plain actions. Settings, MORE:
   WEAPON WHEEL, ITEM BUTTON, SYSTEM WHEEL, QUICKLOAD CONFIRM (all on by default; a settings file from before Phase 3F keeps
   everything else and gets these defaults).

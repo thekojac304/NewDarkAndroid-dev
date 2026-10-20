@@ -86,6 +86,8 @@ typedef struct {
     TouchRadialPopulate radial_populate;
     TouchRadialForAction radial_for_action;   /* NewDarkAndroid: see above */
     uint32_t radial_hold_ms;                  /* NewDarkAndroid: 0 = TOUCH_RADIAL_HOLD_MS */
+    bool radial_anchored;                     /* NewDarkAndroid Phase 3G: wheels open around the held button
+                                                 (touch_radial_open_at); false: at the screen centre, as Shockolate */
     float anchor_x, anchor_y, movement_x, movement_y, look_x, look_y;
     float cursor_slop, look_scale;
     float stick_reference_height;

@@ -155,8 +155,11 @@ void touch_tick(TouchControls *t, uint32_t now_ms) {
         int count=t->radial_populate ? t->radial_populate(t->user,(TouchRadialCategory)category,entries) : 0;
         if (count<0 || count>TOUCH_RADIAL_MAX_ENTRIES ||
             ((category==TOUCH_RADIAL_AMMO || t->radial_for_action) && !count) ||
-            !touch_radial_open(&t->radial,i,(TouchRadialCategory)category,
-                               t->layout.width,t->layout.height,entries,count)) {
+            !(t->radial_anchored                 /* NewDarkAndroid Phase 3G: around the held button */
+              ? touch_radial_open_at(&t->radial,i,(TouchRadialCategory)category,t->layout.width,t->layout.height,
+                                     t->layout.action[f->action].x,t->layout.action[f->action].y,f->x,f->y,entries,count)
+              : touch_radial_open(&t->radial,i,(TouchRadialCategory)category,
+                                  t->layout.width,t->layout.height,entries,count))) {
             f->radial_cancelled=true;
             continue;
         }
