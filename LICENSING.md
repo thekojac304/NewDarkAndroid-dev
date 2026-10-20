@@ -9,11 +9,11 @@ engineering summary, not legal advice. Items marked **owner decision** need the 
 | Path | License | Origin |
 | --- | --- | --- |
 | `lift*.py`, `host/`, `runtime/`, `tools/`, `harness/`, `symbols/`, `build*.sh`, `triage.sh`, `docs/*.md` (non-Android), most of `port/` | **MIT** (`LICENSE`) | [Owloeb/NewDarkRecompiled](https://github.com/Owloeb/NewDarkRecompiled) and our modifications to it |
-| `port/backends/android/android_main.c`, `port/core/ss2game.*`, `port/nvscript_versions.json`, `android/` (app, `build_native.py`, tools), `docs/android/`, `docs/android-audit/`, `docs/release/` | **MIT**, same terms (**owner decision:** confirm contributions are offered under the upstream MIT license) | This project |
+| `port/backends/android/android_main.c`, `port/core/ss2game.*`, `port/nvscript_versions.json`, `android/` (app, `build_native.py`, tools), `docs/android/`, `docs/android-audit/`, `docs/release/` | **MIT**, same terms (contributions offered under the upstream MIT license: confirmed by the owner) | This project |
 | `port/backends/android/touch/` | **GPL-3.0-or-later** (`LICENSES/GPL-3.0.txt`) | Derived from the Shockolate Android touch controls ([Interrupt/systemshock](https://github.com/Interrupt/systemshock), GPL-3.0-or-later; Halo-derived design). Files new to this project in that directory (`touch_ss2*.c/h`, `touch_surface.*`, `touch_render_gles.c`, `tests/`) link to the GPL core and are offered under the same license |
 | `android/app/src/main/java/.../TouchSurface.java` | **GPL-3.0-or-later** | Derived from the Shockolate `SDLSurface` patch |
 | `video/ffmpeg/` | **LGPL-2.1-or-later** (`video/ffmpeg/COPYING.LGPLv2.1`) | Unmodified FFmpeg Indeo 5 decoder (commit in `video/ffmpeg/FFMPEG_COMMIT`); `video/lavshim.*` and `video/ffmpeg/compat/` are the project's own glue (MIT) |
-| App icon (`android/app/src/main/res/{drawable,mipmap-anydpi-v26}`, `android/tools/make_icon.py`), launcher look | Original artwork drawn in code for this project (wrench over a HUD reticle); contains no game art. **Owner decision:** license (suggested: MIT, or CC BY 4.0) | This project |
+| App icon (`android/app/src/main/res/{drawable,mipmap-anydpi-v26}`, `android/tools/make_icon.py`), launcher look | Original artwork drawn in code for this project (wrench over a HUD reticle); contains no game art. Licensed MIT (owner decision, 2026-10-19) | This project |
 | `docs/images/launcher.png` | Screenshot of the app's own launcher (no game content) | This project |
 
 ## What is NOT licensed by this repository, and is not in it
