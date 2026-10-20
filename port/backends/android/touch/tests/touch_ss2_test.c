@@ -1029,6 +1029,7 @@ static void test_anchored_custom_layout(void) {
         }
         float x, y; segment(&s, n / 2, &x, &y); finger(&s, TOUCH_MOTION, 1, x, y); finger(&s, TOUCH_UP, 1, x, y); run_ms(&s, 50);
         CHECK(fg_selects == 1 && fg_id == 100 + n / 2 && game_input == 0);
+        if (n == 1 && touch_radial_is_fan(&s.t.radial)) CHECK(s.t.radial.outer_radius < H * .29f);   /* one entry: no larger wheel */
     }
 }
 

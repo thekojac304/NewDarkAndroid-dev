@@ -63,8 +63,9 @@ bool touch_radial_open_at(TouchRadialSelector *r, int owner, TouchRadialCategory
        finger with room to spare, so lifting it at once never selects; at a button touching the screen edge, the part of
        that circle beyond the edge is simply not drawn (nothing can be touched there). */
     float inner=fmaxf(base*.28f,hypotf(finger_x-anchor_x,finger_y-anchor_y)+side*.03f);
-    /* the segment width (arc at the rim) a fan aims for: a little over half of the centred wheel's */
-    float target=.55f*TAU*base/(float)count, best=-1, bR=0, bstart=0, bspan=0;
+    /* the segment width (arc at the rim) a fan aims for: a little over half of the centred wheel's, but never more than
+       the quarter turn an entry may have (a fan of one or two entries does not grow) */
+    float target=base*fminf(.55f*TAU/(float)count,TAU/4), best=-1, bR=0, bstart=0, bspan=0;
     for (int k=0;k<=5;++k) {
         float R=fminf(base*(1+.1f*(float)k),cap), start;
         float span=visible_arc(anchor_x,anchor_y,R,width,height,m,&start);
