@@ -11,7 +11,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Button;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -28,7 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Phase 1B test screen (later the launcher). Runs the game-free conformance program in NewDarkActivity, one fresh
+ * The launcher (Phase 1B's test screen; Phase 3G made it a game launcher, see buildUi). Runs the game-free conformance program in NewDarkActivity, one fresh
  * ":game" process per run, and shows what each run reported. The run directory is files/runs/<mode>/ (conformance.exe,
  * run.log, status); results are kept in files/results/ and logged with the tag NewDarkLauncher.
  *
@@ -65,10 +66,10 @@ public class LauncherActivity extends Activity {
     // NewDark keeps the height and widens it to the screen's aspect; it ignores anything below 640x480, the size the SS2
     // interface was laid out for. Setting value (null: left to cam_ext.cfg or your own user.cfg), key, label.
     static final String[][] UI_SIZES = {
-        { "640 480", "640x480", "largest (640x480, the original layout)" },
-        { "720 540", "720x540", "large (720x540)" },
-        { "800 600", "800x600", "medium (800x600)" },
-        { null, "game", "game config (cam_ext.cfg, whole-number steps only)" },
+        { "640 480", "640x480", "Largest: 640 x 480, the original layout" },
+        { "720 540", "720x540", "Large: 720 x 540" },
+        { "800 600", "800x600", "Medium: 800 x 600" },
+        { null, "game", "The game's own setting (cam_ext.cfg, whole steps only)" },
     };
     static final String UI_MARK = "; NewDarkAndroid launcher, Interface size: it rewrites the next line on every game start";
     static final long START_GRACE_MS = 15000;
@@ -77,10 +78,10 @@ public class LauncherActivity extends Activity {
     private SharedPreferences state;            // queue (comma-separated modes), pending (mode), launched (ms)
     private boolean resumed;
     private TextView info, status, results, log;
-    private final List<Button> buttons = new ArrayList<>();
+    private final List<View> buttons = new ArrayList<>();
     private static final int REQUEST_IMPORT = 0x5353;
     private TextView importStatus;
-    private Button importButton;
+    private TextView importButton;                         // the Import row's title (Phase 3G)
     private GameFolders folders;
     private GameImport shownChoice;                     // the import whose choice dialog this activity shows
     private GameImport.Stage shownStage;
@@ -166,7 +167,7 @@ public class LauncherActivity extends Activity {
                 j.choose(true, saves.isChecked());
                 importPoll.run();
             });
-        b.show();
+        LauncherUi.style(b.show());
     }
 
     /** adb test settings for the importer (GAME_IMPORT_FIX.md), kept until cleared: --es import_test "free=BYTES,enospc=BYTES,kill=copy|commit" or "". */
@@ -226,62 +227,108 @@ public class LauncherActivity extends Activity {
         super.onPause();
     }
 
-    // ---------------------------------------------------------------- UI
-    private TextView text(float sp, boolean mono) {
-        TextView t = new TextView(this);
-        t.setTextSize(sp);
-        if (mono) t.setTypeface(Typeface.MONOSPACE);
+    // ---------------------------------------------------------------- UI (Phase 3G: a game launcher; the look is LauncherUi)
+    // Main screen: the title, the selected installation, one Play button, then Controls guide, Interface size, Import and
+    // Advanced. Advanced (closed at first) holds what the test screen used to show: version and folders, the dev build's
+    // diagnostics, the last run's verdict and log.
+    private TextView play, cardFamily, cardName, cardDetail, cardState, change;
+    private LinearLayout advanced;
+    private View sizeRow, advancedRow;
+    private boolean advancedOpen;
+
+    private int dp(float v) { return LauncherUi.dp(this, v); }
+
+    private TextView text(float sp, boolean mono) {                           // the Advanced section's report text
+        TextView t = LauncherUi.text(this, "", sp, LauncherUi.TEXT_2, mono ? LauncherUi.MONO : LauncherUi.BODY);
         t.setTextIsSelectable(true);
-        t.setPadding(0, 12, 0, 12);
+        t.setPadding(0, dp(6), 0, dp(6));
         return t;
     }
 
     private void buildUi() {
         buttons.clear();                                                      // rebuilt after an import
-        LinearLayout col = new LinearLayout(this);
-        col.setOrientation(LinearLayout.VERTICAL);
-        col.setPadding(40, 40, 40, 40);
-        TextView title = text(22, false);
-        title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setText("System Shock 2 (NewDark, recompiled)");
-        col.addView(title);
+        getWindow().setStatusBarColor(LauncherUi.BG_TOP);
+        getWindow().setNavigationBarColor(LauncherUi.BG_BOTTOM);
+        android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+        boolean wide = dm.widthPixels / dm.density >= 720;                    // a phone in landscape, a tablet: two columns
+        LinearLayout left = LauncherUi.column(this), right = wide ? LauncherUi.column(this) : left;
+
+        // -- title
+        LinearLayout head = LauncherUi.row(this);
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(R.mipmap.ic_launcher);
+        head.addView(icon, new LinearLayout.LayoutParams(dp(64), dp(64)));
+        LinearLayout words = LauncherUi.column(this);
+        words.setPadding(dp(14), 0, 0, 0);
+        TextView title = LauncherUi.text(this, "NEWDARK SS2", 30, LauncherUi.TEXT, LauncherUi.CONDENSED);
+        title.setLetterSpacing(.14f);
+        words.addView(title, LauncherUi.wrap());
+        TextView sub = LauncherUi.text(this, "System Shock 2  ·  NewDark 2.48 for Android", 13, LauncherUi.TEXT_2, LauncherUi.BODY);
+        sub.setPadding(0, dp(5), 0, 0);
+        words.addView(sub, LauncherUi.wrap());
+        TextView tag = LauncherUi.caption(this, "Unofficial fan port");
+        tag.setTextColor(LauncherUi.TEXT_3);
+        tag.setPadding(0, dp(7), 0, 0);
+        words.addView(tag, LauncherUi.wrap());
+        head.addView(words, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        left.addView(head, LauncherUi.fill());
         if (!BuildConfig.SIDE_LABEL.isEmpty()) {                               // a side-by-side build (build.gradle -Pside)
-            TextView side = text(16, false);
-            side.setTypeface(Typeface.DEFAULT_BOLD);
-            side.setText(BuildConfig.SIDE_LABEL + " build (" + getPackageName() + "): separate app, separate games and saves");
-            col.addView(side);
+            TextView side = LauncherUi.text(this, BuildConfig.SIDE_LABEL + " build (" + getPackageName() + "): a separate app with its own games and saves",
+                13, LauncherUi.WARN, LauncherUi.BODY);
+            left.addView(side, LauncherUi.top(this, 12));
         }
-        // Normal play: one obvious button. Touch controls on, no frame limit, the Interface size below.
-        Button play = new Button(this);
-        play.setAllCaps(false);
-        play.setTextSize(20);
-        play.setText("Play");
+
+        // -- the selected installation
+        LinearLayout card = LauncherUi.panel(this);
+        LinearLayout capRow = LauncherUi.row(this);
+        capRow.addView(LauncherUi.caption(this, "Installation"), new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        capRow.addView(cardState = LauncherUi.status(this, "", LauncherUi.OK), LauncherUi.wrap());
+        card.addView(capRow, LauncherUi.fill());
+        card.addView(cardFamily = LauncherUi.text(this, "", 13, LauncherUi.TEXT_2, LauncherUi.CONDENSED_LIGHT), LauncherUi.top(this, 12));
+        cardName = LauncherUi.text(this, "", 24, LauncherUi.TEXT, LauncherUi.CONDENSED);
+        LauncherUi.ellipsize(cardName, 2);
+        card.addView(cardName, LauncherUi.top(this, 3));
+        card.addView(cardDetail = LauncherUi.text(this, "", 13, LauncherUi.TEXT_2, LauncherUi.BODY), LauncherUi.top(this, 6));
+        LinearLayout acts = LauncherUi.row(this);
+        change = LauncherUi.outlineButton(this, "Change");
+        change.setOnClickListener(v -> chooseInstallation());
+        acts.addView(change, LauncherUi.wrap());
+        TextView rename = LauncherUi.outlineButton(this, "Rename");
+        rename.setOnClickListener(v -> editLabel());
+        LinearLayout.LayoutParams rp = LauncherUi.wrap(); rp.leftMargin = dp(10);
+        acts.addView(rename, rp);
+        card.addView(acts, LauncherUi.top(this, 14));
+        card.setOnLongClickListener(v -> { editLabel(); return true; });     // as the Game folder button: hold to name it
+        left.addView(card, LauncherUi.top(this, 24));
+
+        // -- Play: touch controls on, no frame limit, the Interface size below
+        play = LauncherUi.primaryButton(this, "PLAY");
         play.setOnClickListener(v -> { state.edit().putInt("frames", -1).putString("env", "").putString("portargs", "").putBoolean("touch", true).apply(); startQueue("game"); });
-        col.addView(play);
+        left.addView(play, LauncherUi.top(this, 16));
         buttons.add(play);
-        Button folder = new Button(this);
-        folder.setAllCaps(false);
-        folder.setText(gameLabel());
-        folder.setOnClickListener(v -> {                                      // cycles through the folders that have SS2.exe
-            List<String> g = folders.list(); if (g.isEmpty()) return;
-            int i = g.indexOf(game());
-            state.edit().putString("game", g.get((i + 1) % g.size())).apply();
-            folder.setText(gameLabel());
+        importStatus = LauncherUi.text(this, "", 13, LauncherUi.TEXT, LauncherUi.BODY);   // import progress, why a start failed
+        importStatus.setTextIsSelectable(true);
+        importStatus.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void onTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void afterTextChanged(android.text.Editable s) { importStatus.setVisibility(s.length() == 0 ? View.GONE : View.VISIBLE); }
         });
-        folder.setOnLongClickListener(v -> { editLabel(folder); return true; });   // a name for people; changes nothing else
-        col.addView(folder);
-        Button size = new Button(this);
-        size.setAllCaps(false);
-        size.setText("Interface size: " + uiSize()[2]);
-        size.setOnClickListener(v -> {                                        // cycles; applied at the next game start
-            int i = 0; while (i < UI_SIZES.length && UI_SIZES[i] != uiSize()) i++;
-            state.edit().putString("ui_size", UI_SIZES[(i + 1) % UI_SIZES.length][1]).apply();
-            size.setText("Interface size: " + uiSize()[2]);
-        });
-        col.addView(size);
-        Button imp = importButton = new Button(this);
-        imp.setAllCaps(false);
-        imp.setText("Import a game folder...");
+        importStatus.setVisibility(View.GONE);
+        left.addView(importStatus, LauncherUi.top(this, 12));
+
+        // -- controls, interface size, import, advanced
+        LinearLayout menu = LauncherUi.panel(this);
+        menu.setPadding(dp(14), dp(4), dp(14), dp(4));
+        View guide = LauncherUi.menuRow(this, "Controls guide", "Moving, looking, the radial menus and the two cursor styles");
+        guide.setOnClickListener(v -> controlsGuide());
+        menu.addView(guide, LauncherUi.fill());
+        menu.addView(LauncherUi.divider(this));
+        sizeRow = LauncherUi.menuRow(this, "Interface size", uiSize()[2]);
+        sizeRow.setOnClickListener(v -> chooseUiSize());
+        menu.addView(sizeRow, LauncherUi.fill());
+        menu.addView(LauncherUi.divider(this));
+        View imp = LauncherUi.menuRow(this, "Import a game folder...", "Copy a System Shock 2 installation from this phone's storage");
+        importButton = (TextView) imp.findViewWithTag("title");
         imp.setOnClickListener(v -> {                                          // Android's folder picker; no storage permission
             GameImport j = GameImport.current;
             if (j != null && j.stage == GameImport.Stage.COPYING) { j.cancel = true; Log.i(TAG, "import: cancel requested"); importPoll.run(); return; }
@@ -289,74 +336,181 @@ public class LauncherActivity extends Activity {
             try { startActivityForResult(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), REQUEST_IMPORT); }
             catch (android.content.ActivityNotFoundException e) { importStatus.setText("This device has no folder picker. Copy the game with adb push (android/README.md)."); }
         });
-        col.addView(imp);
-        col.addView(importStatus = text(13, false));
-        List<String> games = folders.list();
-        String recovered = state.getString("recovered", null);
-        importStatus.setText((recovered != null ? recovered + "\n" : "") + "Game folders: " + (games.isEmpty()
-            ? "none yet. Import your System Shock 2 folder (NewDark 2.48, modded or not), or copy it with adb push." : shownList(games))
-            + (games.size() > 1 ? "\nTap Game folder to switch, hold it to name the selected one. Each folder has its own saves and game configuration; the touch controls are shared." : ""));
-        if (recovered != null) state.edit().remove("recovered").apply();
-        TextView diag = text(14, false);
-        diag.setTypeface(Typeface.DEFAULT_BOLD);
-        diag.setText(BuildConfig.DIAGNOSTICS ? "Diagnostics" : "About");
-        col.addView(diag);
-        col.addView(info = text(12, true));
+        menu.addView(imp, LauncherUi.fill());
+        menu.addView(LauncherUi.divider(this));
+        advancedRow = LauncherUi.menuRow(this, "Advanced", BuildConfig.DIAGNOSTICS ? "Diagnostics, logs and version details" : "Logs and version details");
+        advancedRow.setOnClickListener(v -> showAdvanced(!advancedOpen));
+        menu.addView(advancedRow, LauncherUi.fill());
+        right.addView(menu, LauncherUi.top(this, wide ? 0 : 24));
+
+        // -- advanced: what the test screen showed, closed until asked for
+        advanced = LauncherUi.panel(this);
+        advanced.addView(LauncherUi.caption(this, BuildConfig.DIAGNOSTICS ? "Diagnostics" : "About this build"), LauncherUi.fill());
+        advanced.addView(info = text(11, true), LauncherUi.fill());
         if (BuildConfig.DIAGNOSTICS) {                                        // the dev build: conformance and the headless game
-            addButton(col, "Conformance: default lift", "default");
-            addButton(col, "Conformance: --cache-regs --abi-check", "cr");
-            addButton(col, "Conformance: both", "all");
-            addButton(col, "Game: headless, 600 frames", "game-null");
+            addButton(advanced, "Conformance: default lift", "default");
+            addButton(advanced, "Conformance: --cache-regs --abi-check", "cr");
+            addButton(advanced, "Conformance: both", "all");
+            addButton(advanced, "Game: headless, 600 frames", "game-null");
         }
-        col.addView(status = text(15, false));
-        status.setTypeface(Typeface.DEFAULT_BOLD);
-        col.addView(results = text(12, true));
-        TextView l = text(14, false);
-        l.setText("Log of the last run");
-        col.addView(l);
-        col.addView(log = text(10, true));
+        advanced.addView(LauncherUi.caption(this, "Last runs"), LauncherUi.top(this, 14));
+        advanced.addView(status = text(14, false), LauncherUi.fill());
+        status.setTextColor(LauncherUi.TEXT);
+        advanced.addView(results = text(11, true), LauncherUi.fill());
+        advanced.addView(LauncherUi.caption(this, "Log of the last run"), LauncherUi.top(this, 14));
+        advanced.addView(log = text(10, true), LauncherUi.fill());
+        right.addView(advanced, LauncherUi.top(this, 16));
+
+        TextView foot = LauncherUi.text(this, "An unofficial, non-commercial fan project. It runs your own copy of System Shock 2 (NewDark 2.48) and is "
+            + "not affiliated with or endorsed by the game's developers or publishers.\nVersion " + versionName() + ".", 11, LauncherUi.TEXT_3, LauncherUi.BODY);
+        right.addView(foot, LauncherUi.top(this, 20));
+
+        // -- layout: one centred column, or two side by side
+        int pad = dp(wide ? 28 : 20), width = Math.min(dm.widthPixels - 2 * pad, dp(wide ? 1040 : 560));
+        LinearLayout content = left;
+        if (wide) {
+            content = LauncherUi.row(this);
+            content.setGravity(android.view.Gravity.TOP);
+            content.addView(left, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+            LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+            p.leftMargin = dp(24);
+            content.addView(right, p);
+        }
+        android.widget.FrameLayout holder = new android.widget.FrameLayout(this);
+        holder.setPadding(0, dp(wide ? 24 : 36), 0, dp(32));
+        holder.addView(content, new android.widget.FrameLayout.LayoutParams(width, android.widget.FrameLayout.LayoutParams.WRAP_CONTENT, android.view.Gravity.CENTER_HORIZONTAL));
         ScrollView sv = new ScrollView(this);
-        sv.addView(col);
-        setContentView(sv);
+        sv.setFillViewport(true);
+        sv.setVerticalScrollBarEnabled(false);
+        sv.addView(holder);
+        android.widget.FrameLayout root = new android.widget.FrameLayout(this);
+        root.addView(new LauncherUi.Backdrop(this));
+        root.addView(sv);
+        setContentView(root);
+
         info.setText(String.format(Locale.US, "%s %s\n%s %s, Android %s (API %d), %s\nlauncher pid %d; runs in %s%s",
             getPackageName(), versionName(), Build.MANUFACTURER, Build.MODEL, Build.VERSION.RELEASE, Build.VERSION.SDK_INT,
             String.join(",", Build.SUPPORTED_ABIS), android.os.Process.myPid(), getPackageName(), GAME_PROCESS_SUFFIX)
             + "\ngame folders (adb push): " + folders.adb + "\nimported game folders: " + folders.imported + "\nwrite folders (saves, logs): " + folders.profiles);
+        String recovered = state.getString("recovered", null);
+        if (recovered != null) { importStatus.setText(recovered); state.edit().remove("recovered").apply(); }
+        showAdvanced(advancedOpen);
+        updateCard();
     }
 
     private void addButton(LinearLayout col, String label, String which) {
-        Button b = new Button(this);
-        b.setText(label);
-        b.setAllCaps(false);
+        TextView b = LauncherUi.outlineButton(this, label);
         b.setOnClickListener(v -> { state.edit().putInt("frames", -1).putString("env", "").putString("portargs", "").putBoolean("touch", true).apply(); startQueue(which); });
-        col.addView(b);
+        col.addView(b, LauncherUi.top(this, 8));
         buttons.add(b);
     }
 
+    private void showAdvanced(boolean open) {
+        advancedOpen = open;
+        if (advanced != null) advanced.setVisibility(open ? View.VISIBLE : View.GONE);
+        View chevron = advancedRow != null ? advancedRow.findViewWithTag("chevron") : null;
+        if (chevron != null) chevron.setRotation(open ? 90 : 0);
+    }
+
+    /** The installation card: its name (the label, without a leading "System Shock 2 —"), folder, saves and state. */
+    private void updateCard() {
+        if (cardName == null) return;
+        List<String> games = folders.list();
+        String g = game(), label = GameFolders.label(this, g), name = label.isEmpty() ? g : label, family = "";
+        for (String p : new String[] { "System Shock 2 — ", "System Shock 2 – ", "System Shock 2 - " })
+            if (name.startsWith(p) && name.length() > p.length()) { family = "System Shock 2"; name = name.substring(p.length()); break; }
+        change.setVisibility(games.size() > 1 ? View.VISIBLE : View.GONE);
+        if (games.isEmpty()) {
+            cardFamily.setVisibility(View.GONE);
+            cardName.setText("No game installed yet");
+            cardDetail.setText("Import your System Shock 2 folder (NewDark 2.48, with or without mods) with Import a game folder below, or copy it with adb push.");
+            cardState.setText("●  NOT INSTALLED");
+            cardState.setTextColor(LauncherUi.WARN);
+            return;
+        }
+        cardFamily.setText(family);
+        cardFamily.setVisibility(family.isEmpty() ? View.GONE : View.VISIBLE);
+        cardName.setText(name);
+        File exe = GameFolders.exe(folders.dir(g));
+        String problem = exe == null ? "No SS2.exe" : GameFolders.exeProblem(exe) != null ? "SS2.exe not supported" : null;
+        int saves = 0;
+        File[] slots = new File(folders.profiles, g).listFiles((d, n) -> n.matches("(?i)save_\\d+"));
+        if (slots != null) for (File s : slots) if (s.isDirectory()) saves++;
+        cardDetail.setText(String.format(Locale.US, "Folder %s  ·  %s", g,
+            saves == 0 ? "no saved games yet" : saves == 1 ? "1 saved game" : saves + " saved games")
+            + (problem == null ? "" : exe == null ? "\nThere is no SS2.exe in this folder." : "\nIts SS2.exe is not the NewDark 2.48 one this app was built for."));
+        cardState.setText("●  " + (problem == null ? "READY" : problem.toUpperCase(Locale.ROOT)));
+        cardState.setTextColor(problem == null ? LauncherUi.OK : LauncherUi.WARN);
+    }
+
+    /** Change: the installations, by name; picking one selects it (kept, as the Game folder button did). */
+    private void chooseInstallation() {
+        List<String> g = folders.list();
+        if (g.isEmpty()) return;
+        String[] items = new String[g.size()];
+        for (int i = 0; i < items.length; i++) items[i] = GameFolders.shown(this, g.get(i));
+        LauncherUi.style(new android.app.AlertDialog.Builder(this).setTitle("Choose an installation")
+            .setSingleChoiceItems(items, g.indexOf(game()), (d, which) -> {
+                state.edit().putString("game", g.get(which)).apply();
+                Log.i(TAG, "game folder: " + g.get(which));
+                updateCard();
+                d.dismiss();
+            })
+            .setNegativeButton("Cancel", null).show());
+    }
+
+    private void chooseUiSize() {
+        String[] items = new String[UI_SIZES.length];
+        int now = 0;
+        for (int i = 0; i < items.length; i++) { items[i] = UI_SIZES[i][2]; if (UI_SIZES[i] == uiSize()) now = i; }
+        LauncherUi.style(new android.app.AlertDialog.Builder(this).setTitle("Interface size (HUD, inventory, PDA, text)")
+            .setSingleChoiceItems(items, now, (d, which) -> {                   // applied at the next game start
+                state.edit().putString("ui_size", UI_SIZES[which][1]).apply();
+                LauncherUi.detail(sizeRow, uiSize()[2]);
+                d.dismiss();
+            })
+            .setNegativeButton("Cancel", null).show());
+    }
+
+    /** A short reference to the touch controls. */
+    private void controlsGuide() {
+        String[][] parts = {
+            { "Move and look", "Drag anywhere on the left half for the floating stick. Swipe the right half to look around. "
+                + "FIRE shoots while held and aims as you drag; USE opens doors and picks things up; JUMP, CROUCH and RELOAD do what they say." },
+            { "Tap or hold", "Tap < or > to switch weapons; hold either for the weapon wheel. Hold AMMO for ammunition and firing modes "
+                + "(psi powers with the psi amp). Hold ITEM for hypos and patches. Tap II for the menu; hold it for quicksave, quickload and logs." },
+            { "Radial menus", "A held button opens its wheel right where your finger is. Slide onto an entry and lift to choose it. "
+                + "Lift on the button itself, or slide well past the wheel, to cancel. At the edge of the screen the entries fan out towards the middle." },
+            { "Cursor", "MODE switches between LOOK and CURSOR (inventory, PDA, keypads). Direct cursor: tap what you want to click. "
+                + "Relative cursor: drag like a trackpad, tap to click, hold still to pick something up and drag it. Choose the style in SET, MORE." },
+            { "Settings in the game", "SET opens the touch settings: layout editor, button size and opacity, look speed, haptics, the cursor style and the wheels. "
+                + "KBD shows the keyboard (save names, the console). A physical keyboard and mouse also work." },
+        };
+        LinearLayout col = LauncherUi.column(this);
+        col.setPadding(dp(24), dp(8), dp(24), dp(8));
+        for (String[] p : parts) {
+            col.addView(LauncherUi.caption(this, p[0]), LauncherUi.top(this, 14));
+            col.addView(LauncherUi.text(this, p[1], 14, LauncherUi.TEXT, LauncherUi.BODY), LauncherUi.top(this, 6));
+        }
+        ScrollView sv = new ScrollView(this);
+        sv.addView(col);
+        LauncherUi.style(new android.app.AlertDialog.Builder(this).setTitle("Controls guide").setView(sv).setPositiveButton("Close", null).show());
+    }
+
     private String game() { return state.getString("game", DEFAULT_GAME); }
-    private String gameLabel() {
-        File exe = GameFolders.exe(folders.dir(game()));
-        return "Game folder: " + GameFolders.shown(this, game()) + (exe == null ? " (no SS2.exe there)" : GameFolders.exeProblem(exe) != null ? " (its SS2.exe is not supported)" : "");
-    }
-    private String shownList(List<String> games) {
-        List<String> s = new ArrayList<>(); for (String g : games) s.add(GameFolders.shown(this, g)); return String.join(", ", s);
-    }
-    /** Hold Game folder: name the selected folder (blank removes the name). */
-    private void editLabel(Button folder) {
+    /** Rename: a name for the selected installation, only shown here (blank removes it). */
+    private void editLabel() {
         String name = game();
         android.widget.EditText e = new android.widget.EditText(this);
         e.setSingleLine(true); e.setText(GameFolders.label(this, name)); e.setHint("for example: System Shock 2 - SCP Beta 4 (Legacy)");
-        new android.app.AlertDialog.Builder(this).setTitle("Name for game folder \"" + name + "\"")
-            .setMessage("Only shown here. The game, its saves and which script modules load do not depend on it.")
-            .setView(e)
-            .setPositiveButton("Save", (d, w) -> { GameFolders.setLabel(this, name, e.getText().toString()); folder.setText(gameLabel()); refreshGames(); })
-            .setNegativeButton("Cancel", null).show();
-    }
-    private void refreshGames() {
-        if (importStatus == null) return;
-        List<String> games = folders.list();
-        importStatus.setText("Game folders: " + shownList(games)
-            + (games.size() > 1 ? "\nTap Game folder to switch, hold it to name the selected one. Each folder has its own saves and game configuration; the touch controls are shared." : ""));
+        LinearLayout box = LauncherUi.column(this);
+        box.setPadding(dp(20), dp(4), dp(20), 0);
+        box.addView(e, LauncherUi.fill());
+        LauncherUi.style(new android.app.AlertDialog.Builder(this).setTitle("Name for \"" + name + "\"")
+            .setMessage("Only shown in this launcher. The game, its saves and which script modules load do not depend on it.")
+            .setView(box)
+            .setPositiveButton("Save", (d, w) -> { GameFolders.setLabel(this, name, e.getText().toString()); updateCard(); })
+            .setNegativeButton("Cancel", null).show());
     }
     /** adb: --es label_game NAME --es label TEXT names a game folder (a blank TEXT removes the name); kept. */
     private void labelIntent(Intent in) {
@@ -371,16 +525,19 @@ public class LauncherActivity extends Activity {
     private void refresh() {
         String pending = state.getString("pending", null), queue = state.getString("queue", "");
         boolean busy = pending != null || !queue.isEmpty();
-        for (Button b : buttons) b.setEnabled(!busy);
+        for (View b : buttons) { b.setEnabled(!busy); b.setAlpha(busy ? .45f : 1f); }
+        if (play != null) setText(play, busy ? "RUNNING..." : "PLAY");
         status.setText(pending != null ? "Running: " + title(pending) + (queue.isEmpty() ? "" : " (then " + queue + ")") : "Idle");
         StringBuilder r = new StringBuilder();
         for (String[] m : MODES) {
+            if (!BuildConfig.DIAGNOSTICS && !m[0].equals("game")) continue;   // the play build runs the game only
             String s = Files.read(resultFile(m[0]));
             r.append(s != null ? s : m[2] + ": not run yet\n").append('\n');
         }
         results.setText(r.toString().trim());
         String last = state.getString("last", null);
         log.setText(last != null ? Files.tail(new File(runDir(last), "run.log"), 300) : "");
+        updateCard();
     }
 
     // ---------------------------------------------------------------- runs
