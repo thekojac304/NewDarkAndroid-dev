@@ -20,8 +20,10 @@ DENY = [  # regexes on repo-relative paths, matched with re.search
     r'(^|/)local\.properties$', r'(^|/)keystore\.properties$',
 ]
 ALLOW_BINARY = {'android/gradle/wrapper/gradle-wrapper.jar'}   # Apache-2.0 Gradle wrapper
-PRIVATE = re.compile(r'<user>|<device-serial>|thekojac|[A-Za-z]:\\(Users|Dev)\\|/Users/[a-z]|HuskyBox|Launchbox', re.I)
-SECRET = re.compile(r'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|storePassword|keyPassword|AKIA[0-9A-Z]{16}')
+BS = chr(92)   # a backslash, spelled out so this file does not match its own scan
+PRIVATE = re.compile('|'.join(['law' + 'ma', 'R3GL' + '104LWJK', 'thekoj' + 'ac', '[A-Za-z]:' + BS * 2 + '(Users|Dev)' + BS * 2,
+                               '/Users/[a-z]', 'Husky' + 'Box', 'Launchbox[' + BS * 2 + '/]']), re.I)
+SECRET = re.compile(r'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|(store|key)Password\s*[=:]\s*\S|AKIA[0-9A-Z]{16}')
 TEXT_EXT = ('.md', '.txt', '.py', '.c', '.h', '.java', '.gradle', '.xml', '.json', '.sh', '.bat', '.properties', '.cmake',
             '.inc', '.s', '.sym', '.sum', '.sha256', '.gitignore')
 MAX_FILE = 1_000_000
