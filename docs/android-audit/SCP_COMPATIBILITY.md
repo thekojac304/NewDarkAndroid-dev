@@ -8,7 +8,7 @@ Phase 0 audit, 2026-10-17. Nothing here has been tested on the portable host. **
 | --- | --- | --- |
 | Beta 8 | **Reported, not verified.** Search-engine summaries of the official systemshock.org topic list "Beta 8 – December 2025" (`SCP_beta8.7z`, about 37 MB) and say it incorporates "Olfred's Fixed Objects v15". The official page (systemshock.org topic 7116) and ttlg.com sit behind a Cloudflare check that this audit did not try to get past. | Unverified |
 | Beta 7 | Released 2025-04-02 (confirmed). | Steam discussions, ModDB comments (`https://www.moddb.com/mods/system-shock2-community-patch`) |
-| **Beta 6** (2024-08-11) | **Examined in detail.** A local copy exists inside the 25th Anniversary Remaster's `mods\scp.kpf`, read-only (`modinfo.json` "Beta 6"; `doc/readme.txt` "Beta 6 - August 11, 2024"). This is the Remaster packaging; its game data should match the NewDark release, but its native-module packaging differs (see §2). | Local, `E:\Steam Games\steamapps\common\System Shock 2 Remastered\mods\scp.kpf` |
+| **Beta 6** (2024-08-11) | **Examined in detail.** A local copy exists inside the 25th Anniversary Remaster's `mods\scp.kpf`, read-only (`modinfo.json` "Beta 6"; `doc/readme.txt` "Beta 6 - August 11, 2024"). This is the Remaster packaging; its game data should match the NewDark release, but its native-module packaging differs (see §2). | Local, `<local path>` |
 | Beta 4 (2017-10-31) | Present but inactive in the local NewDark install (`DMM\SCP_beta4`, with readme PDF). | Local |
 
 **Action for the project owner:** download the current SCP release (Beta 7, or Beta 8 if it exists) from
@@ -34,7 +34,7 @@ re-checked against that release's readme. The structure has been stable from Bet
 
 ### Local PC prerequisites found
 
-- The only classic install (`E:\Launchbox\Games\PC Games\System Shock 2`, GOG + SS2Tool 6.1.1.x + Blue's Mod
+- The only classic install (`<LaunchBox install>`, GOG + SS2Tool 6.1.1.x + Blue's Mod
   Manager) runs **NewDark 2.47** (`ss2.log`: "System Shock 2 Patch Final 2.47"; `ss2.exe` SHA-256 `4199aac1…5a55`).
   NewDarkRecompiled is built and verified for **2.48** only, and SCP Beta 6+ requires 2.48. **A 2.48 install is a
   prerequisite for both the vanilla baseline and SCP.** Where to obtain an updated classic 2.48 build (GOG or Steam)

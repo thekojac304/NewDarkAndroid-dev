@@ -10,7 +10,7 @@ reached:** a level transition (Earth → Station), item pickup and use, and a me
 input on the phone was held by another app's overlay all night (PHASE2B2_RESULTS.md), so all of this was driven by
 the host's scripted input, with frame captures from the game itself. No crash, fault or guest error in any SCP run.
 
-| Version tested | **SCP Beta 8** ("Beta 8 - December 25, 2025"), `C:\Users\<user>\Downloads\SCP_beta8.7z`, 37,710,819 bytes, sha256 `bcf547c7bd3a38ccb26e6918d72d74e567dc69b138c1ffcb975ea6d165ddb3f6` |
+| Version tested | **SCP Beta 8** ("Beta 8 - December 25, 2025"), `<downloads>\SCP_beta8.7z`, 37,710,819 bytes, sha256 `bcf547c7bd3a38ccb26e6918d72d74e567dc69b138c1ffcb975ea6d165ddb3f6` |
 | --- | --- |
 | Base game | Steam System Shock 2, NewDark **2.48** ("System Shock 2 Patch Final 2.48"), `SS2.exe` sha256 `c7ff08c5…823e`, with the Steam release's community fixes (`patch_ext.crf`, `misdml\`) |
 | APK | `0.7.0-phase3a` (sha256 `a59d7f92…7578042`, `build/android/baseline/phase3a/`), built with `--nvscript` from this SCP's `NVScript.osm` |

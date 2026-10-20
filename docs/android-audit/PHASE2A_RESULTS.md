@@ -46,9 +46,9 @@ the test tool. The touchscreen itself has not been tried by a person (§8).
 | NewDarkAndroid | `android-port`, clean at the start, parent `6e22ea9` (Phase 1E). The Phase 2A commit adds this file. |
 | Phase 1E APK preserved | `build/android/baseline/phase1e/app-debug-phase1e.apk`, `504aeeb7…b5d35dd0` (unchanged) |
 | Phase 2A APK | `build/android/baseline/phase2a/app-debug-phase2a.apk`, 117,870,220 bytes, `1f6f1092…60e6d1e2`, with `libss2game.so` (`a66775c1…61cef2a9`) and the test tool `uhid_input` (`963a7b38…d20c8e`) |
-| Shockolate | `C:\Dev\system-shock-android`, branch `touch-controls`, HEAD `7502370` (2026-10-04, "DECKLIGHT-CLOSE2"), the same as the Phase 0 audit's accepted baseline. No newer commits exist on any branch. 64 uncommitted working-tree changes (the AUDIO5 / MOBILE-POLISH1 batch, "hardware retest pending") were **not used**. |
+| Shockolate | `<Shockolate Android checkout>`, branch `touch-controls`, HEAD `7502370` (2026-10-04, "DECKLIGHT-CLOSE2"), the same as the Phase 0 audit's accepted baseline. No newer commits exist on any branch. 64 uncommitted working-tree changes (the AUDIO5 / MOBILE-POLISH1 batch, "hardware retest pending") were **not used**. |
 | Shockolate untouched | It was read only with `git show` and `git archive 7502370`. HEAD is the same, and no file in its tree is newer than the start of this phase. |
-| Backup | `C:\Dev\_Archive\shockolate-touch-controls-backup-2026-10-17\touch-controls.bundle`: `git bundle verify` OK ("complete history"), head `touch-controls` = `7502370`. All four files match `BACKUP-SHA256.txt`. |
+| Backup | `<local path>`: `git bundle verify` OK ("complete history"), head `touch-controls` = `7502370`. All four files match `BACKUP-SHA256.txt`. |
 | Steam install | Read only: no file newer than the start of the phase |
 
 ## 2. What was reused, adapted and written

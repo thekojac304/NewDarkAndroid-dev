@@ -45,7 +45,7 @@ works: Earth (the tram station where character creation starts) and the MedSci d
 | Game inputs | The same Steam 2.48 files as Phase 1C. After the phase, `SS2.exe`, `allobjs.osm`, `squirrel.osm` and `lgvid.dll` hash as in PHASE1C_RESULTS.md §2, and no file in the install is newer than the start of the session. |
 | Lift | The default lift (no `--cache-regs`), unchanged from Phase 1C (`src.sha1` signatures matched, nothing re-lifted) |
 | Toolchain | Unchanged: NDK r29, SDK CMake 3.22.1 with Ninja, Gradle 8.7 offline, SDL 2.32.10 |
-| Device | Galaxy S26 Ultra `SM-S948U1` (serial `<device-serial>`), Android 17, Adreno 840, 2340×1080 at 120 Hz |
+| Device | Galaxy S26 Ultra `SM-S948U1` (serial `<serial>`), Android 17, Adreno 840, 2340×1080 at 120 Hz |
 
 ## 2. Input
 
@@ -129,7 +129,7 @@ From `phase1d/game-earth-run.log.txt` and `phase1d/game-medsci-run.log.txt` (thu
 
 - Squirrel's CRT start-up probes `FlsAlloc`, `EncodePointer` and similar through `GetProcAddress`. They are reported as
   not available and the CRT uses its fallbacks. This is not fatal, and init completes.
-- The many `not found (stat)` lines are the game's normal resource search-path probes (`C:\osm\`, `C:\patch\`, …).
+- The many `not found (stat)` lines are the game's normal resource search-path probes (`<local path>`, `<local path>`, …).
   The files are found in later search paths.
 - `lgvid.dll` decodes both cutscenes.
 

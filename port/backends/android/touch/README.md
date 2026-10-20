@@ -7,7 +7,7 @@ APK that contains this directory is GPL as a whole. Personal builds are not dist
 
 ## Where the code comes from
 
-Imported from `C:\Dev\system-shock-android`, branch `touch-controls`, commit
+Imported from `<Shockolate Android checkout>`, branch `touch-controls`, commit
 `750237049b2e9906f5e3345ff05522558b9a9f47` (`AndroidProject/app/jni/touch/`, the accepted baseline of the Phase 0
 audit). It was taken with `git archive`; the working tree's uncommitted changes were not used.
 

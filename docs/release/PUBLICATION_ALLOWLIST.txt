@@ -1,0 +1,25 @@
+# Publication allowlist for v0.1.0-beta.1 (source only). Anything not matched here or listed on the denylist
+# defaults to EXCLUDED until reviewed. Enforced by tools/release/make_candidate.py (denylist regexes + safety scans).
+#
+# path                                            license                 notes
+LICENSE                                           MIT                     upstream license (tools only)
+LICENSES/GPL-3.0.txt                              GPL-3.0                 text for port/backends/android/touch
+LICENSING.md, THIRD_PARTY_NOTICES.md              -                       attribution, redistribution rules
+README.md, requirements.txt, .gitignore           MIT
+NEWDARK.md, SESSION_LOG.md                        MIT                     upstream notes (no game data, no private data; scanned)
+lift.py, lift_*.py, lift_nd.sum, build*.sh, triage.sh, tr_list.txt, tri_*.txt   MIT   upstream recompiler + address lists (facts, no code)
+host/                                             MIT                     Windows host (upstream)
+runtime/                                          MIT
+harness/                                          MIT                     test harness, game-free
+tools/ (incl. tools/release/)                     MIT
+symbols/manual.sym                                MIT                     function names/addresses for SS2.exe 2.48 (upstream-published; no code, no bytes)
+port/ (all, incl. port/backends/android, port/tests)  MIT                 portable host; game-free tests
+port/nvscript_versions.json                       MIT                     sha256 identities only; no NVScript file
+port/backends/android/touch/                      GPL-3.0-or-later        Shockolate-derived touch controls
+video/ffmpeg/ (unmodified FFmpeg Indeo 5 + COPYING.LGPLv2.1), video/lavshim*, video/test   LGPL-2.1+ / MIT
+android/ (Gradle project, Java sources, res/ icon XML, build_native.py, tools/, gradle wrapper)   MIT (TouchSurface.java GPL-3.0+)
+android/gradle/wrapper/gradle-wrapper.jar         Apache-2.0              the only binary in the tree
+docs/*.md, docs/android/, docs/release/           MIT
+docs/UPSTREAM_README.md                           MIT
+docs/images/launcher.png                          -                       our own launcher UI; status bar cropped; no game art
+docs/android-audit/*.md (top level only)          MIT                     dev history; paths/serials scrubbed; see conditional list in the readiness report

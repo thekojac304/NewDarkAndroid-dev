@@ -31,7 +31,7 @@ includes reliable reporting of failures and crashes.
 
 | | |
 | --- | --- |
-| Device | Samsung Galaxy S26 Ultra `SM-S948U1`, serial `<device-serial>`, Snapdragon `SM8850`, 8 CPUs |
+| Device | Samsung Galaxy S26 Ultra `SM-S948U1`, serial `<serial>`, Snapdragon `SM8850`, 8 CPUs |
 | OS | Android 17 (API 37), build `S948U1UES4BZIG`, kernel `6.12.69-android16-6`, **4 KB pages**, SELinux enforcing |
 | NDK / clang | `29.0.14206865` (r29), clang 21.0.0; `ANDROID_PLATFORM=android-26` |
 | CMake / Ninja | SDK `3.22.1` / `1.10.2` |
@@ -181,7 +181,7 @@ Every run, both modes:
 The hidden-visibility preset changes compile flags for the Android executable too, so both modes were re-run:
 
 ```
-run_conformance.py --target android --serial <device-serial> --build build/conf-android --no-rebuild-guest
+run_conformance.py --target android --serial <serial> --build build/conf-android --no-rebuild-guest
     conformance: 0 of 511 checks failed / [port] ExitProcess(0) / conformance (null, android): PASS
 run_conformance.py … --cache-regs --abi-check --build build/conf-android-cr --no-rebuild-guest
     ABI check: 0 call site(s) broke the calling-convention contract / PASS
@@ -217,11 +217,11 @@ Read-only search of every local drive (`C:`, `D:`, `E:`, `Z:`; depth 6; version 
 
 | Path | ProductVersion | Size |
 | --- | --- | --- |
-| `E:\Launchbox\Games\PC Games\System Shock 2\ss2.exe` | **2.47** | 5,116,416 |
-| `E:\…\SS2ToolSyncBackup\2018-11-22-12-17-11\SS2.exe` | 2.47 | 5,116,416 |
-| `E:\…\SS2ToolSyncBackup\2017-10-07-1-06-56\SS2.exe` | 2.46 | 5,113,856 |
-| `Z:\Backups & Recovery\HuskyBox\Launchbox\…\ss2.exe` | 2.47 | 5,116,416 |
-| `Z:\Software\PC Games - No DRM\System Shock 2\ss2.exe` (+ the same 2 backups) | 2.47 / 2.46 | |
+| `<LaunchBox install>\ss2.exe` | **2.47** | 5,116,416 |
+| `<local path>` | 2.47 | 5,116,416 |
+| `<local path>` | 2.46 | 5,113,856 |
+| `<local path>` | 2.47 | 5,116,416 |
+| `<local path>` (+ the same 2 backups) | 2.47 / 2.46 | |
 
 No NewDark 2.48 archive or installer was found either. Nothing was modified.
 

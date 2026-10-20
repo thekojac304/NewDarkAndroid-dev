@@ -7,3 +7,34 @@ build/
 *.log
 *.bmp
 __pycache__/
+
+# Android build output, local config and anything that could carry signing keys or game data
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/keystore.properties
+*.apk
+*.aab
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+*.so
+*.a
+*.7z
+*.zip
+# game data and saves, in case a game folder is ever placed inside the checkout
+*.sav
+*.mis
+*.gam
+*.crf
+*.cr
+*.avi
+*.mpg
+build_local/
+.venv/
+venv/
+captures/
+release-candidate/

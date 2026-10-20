@@ -1,20 +1,20 @@
 # Reusing the Shockolate touch controls for System Shock 2
 
-Phase 0 audit, 2026-10-17. All inspection was read-only. Nothing in `C:\Dev\system-shock-android` was modified, built
-or run. Paths without a prefix are relative to `C:\Dev\system-shock-android`. Paths prefixed `ndr:` are relative to
-`C:\Dev\NewDarkAndroid`.
+Phase 0 audit, 2026-10-17. All inspection was read-only. Nothing in `<Shockolate Android checkout>` was modified, built
+or run. Paths without a prefix are relative to `<Shockolate Android checkout>`. Paths prefixed `ndr:` are relative to
+`<repo>`.
 
 ## 1. Which implementation is the accepted baseline
 
-**Use the committed HEAD of the local `touch-controls` branch (`7502370`) of `C:\Dev\system-shock-android`.**
+**Use the committed HEAD of the local `touch-controls` branch (`7502370`) of `<Shockolate Android checkout>`.**
 
 | Candidate | Verdict | Evidence |
 | --- | --- | --- |
 | `touch-controls` HEAD, files under `AndroidProject/app/jni/touch/` | **Accepted baseline** | Alpha 3 was validated by the user on hardware (`docs/TOUCH_ALPHA_3.md:4`, `:172`). For Alpha 4: "Hardware validation is complete… no known Alpha 4 regression" (`docs/TOUCH_ALPHA_4.md:35`). Menu taps, the AMMO radial and the QA loadout have "user-reported hardware acceptance" (`docs/QA2_COORDINATED_QA.txt:5`, `:13-18`), commit `fa57a8b`. The last commit touching the touch dir is `9a40568` (2026-10-04). |
 | Uncommitted working-tree changes in the touch dir (+451/−23, plus untracked `touch_assist.h` and two tests) | **Not accepted; do not import by default** | This is the AUDIO5 + MOBILE-POLISH1 batch: "hardware retest pending" (`docs/AUDIO5_MOBILE_POLISH1.md:3`), and its device checklist is unchecked. It adds an audio settings page, tap "assist" snapping, a hitbox overlay and radial polish. |
 | Alpha 1.1 / 2.x | Superseded | These versions evolved in place in the same files. HEAD contains their final form. |
-| `C:\Dev\system-shock-baseline` (detached `0d71a89`, v1.0.0) | Not a touch baseline | It has no `jni/touch` directory and is controller-focused. Its docs still describe touch as "an optional pointer" (`docs/CONTROLS.md`). |
-| `C:\Dev\_Archive\Halo-Mobile` | Design ancestor only | Its touch layer is a JavaScript DOM overlay (`port/web/site/input.js`, `buildTouchControls` ≈ line 388) that drives a virtual gamepad for a WASM build. It shares no C code with Shockolate. Design traits match, e.g. the 45% left stick zone (`input.js:486` vs `touch_editor.c:53`). |
+| `<local path>` (detached `0d71a89`, v1.0.0) | Not a touch baseline | It has no `jni/touch` directory and is controller-focused. Its docs still describe touch as "an optional pointer" (`docs/CONTROLS.md`). |
+| `<local path>` | Design ancestor only | Its touch layer is a JavaScript DOM overlay (`port/web/site/input.js`, `buildTouchControls` ≈ line 388) that drives a virtual gamepad for a WASM build. It shares no C code with Shockolate. Design traits match, e.g. the 45% left stick zone (`input.js:486` vs `touch_editor.c:53`). |
 | QA-only modules (`touch_visual_compare.h`, `qa_tools.c/h`, `qa_spawn.h`) | Exclude | SS1 horror-visual and teleport QA tooling. |
 
 **Risk:** the 38 commits that hold the accepted touch work exist **only locally**. `origin/touch-controls` is still

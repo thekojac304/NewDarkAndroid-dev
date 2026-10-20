@@ -1,0 +1,4 @@
+pefile==2024.8.26
+capstone==5.0.9
+ziglang==0.16.0
+Pillow>=10    # only for android/tools/make_icon.py

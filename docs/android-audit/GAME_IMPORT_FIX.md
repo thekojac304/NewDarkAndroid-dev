@@ -1,6 +1,6 @@
 # Game import fix: "cannot create …/games/system-shock-2.importing"
 
-2026-10-18. The user tested `0.8.0-phase4-play` on the Galaxy S26 Ultra (serial <device-serial>, Android 17, API 37).
+2026-10-18. The user tested `0.8.0-phase4-play` on the Galaxy S26 Ultra (serial <serial>, Android 17, API 37).
 **Import a game folder...** failed with:
 
 ```

@@ -46,7 +46,7 @@ accepted APK and the SCP Beta 8 setup stay untouched (§8).
 | Phone source `Download/System Shock 2` | 6,624 files, all hashes equal to the list taken before the previous test (`build/android/legacy-save-test/source-full-tree.sha256`) |
 | `profiles/ss2`, `profiles/ss2scp`, `touch-settings.cfg` | Unchanged against `app-data-before.sha256` (28 files). The backup tar is present (15.1 MB, 41 entries) |
 | `games/ss2scp` | Hashed (`build/android/legacy-save-test/ss2scp-tree.sha256`, 1,583 files) |
-| **PC original** `E:\Launchbox\Games\PC Games\System Shock 2` | Read only. **All 6,624 files are identical to the phone copy** (path and sha256; `pc-original-tree.sha256`), including the 161 save files |
+| **PC original** `<LaunchBox install>` | Read only. **All 6,624 files are identical to the phone copy** (path and sha256; `pc-original-tree.sha256`), including the 161 save files |
 | Test profile from the previous session | `profiles/legacy247-test` still exists. **Its `save_15` was written under SCP Beta 8 and must never be copied into a Beta 4 profile** |
 
 Nothing expected was missing. Every file this audit used was read from the phone with `adb pull`, read from `E:`, or
@@ -257,7 +257,7 @@ has trouble, switching off HDR/post-processing in the profile's `user.cfg`. Both
    Keep the main build's `--nvscript` (Beta 8) unchanged, and keep the two lifts in separate `gen` folders.
 3. **Host tests before the device:** conformance (`run_conformance.py`, default and `--cache-regs --abi-check`), and the
    upstream `harness/difftest.py`/`insnfuzz.py` on NVScript 1.2.4 as PHASE3A did for Beta 8's.
-4. **Game folder:** on the PC, make a **copy** of `E:\…\System Shock 2` (never the original). In the copy only, replace
+4. **Game folder:** on the PC, make a **copy** of `<local path>` (never the original). In the copy only, replace
    `ss2.exe` with the 2.48 `SS2.exe` (keep the name the launcher finds) and `osm\squirrel.osm` with 1.02. Hash both
    trees and record the diff (exactly 2 files). Push the copy to the legacy app's `games/` (or import it with the app's
    importer, which then reports the modules as matching). Saves go to that app's own profile, byte-for-byte, with the

@@ -39,7 +39,7 @@ were not reached. There is no touch input yet. Pause and resume with a live GL w
 
 ## 2. Game inputs
 
-`E:\Steam Games\steamapps\common\SS2` is a fresh Steam install. It was only read, never written.
+`<local path>` is a fresh Steam install. It was only read, never written.
 
 | File | Size | sha256 | CRC32 | PE header |
 | --- | --- | --- | --- | --- |

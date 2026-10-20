@@ -1,0 +1,20 @@
+# Publication denylist: never publish, never attach to a release. Regexes below are enforced in
+# tools/release/make_candidate.py; the rest are procedural.
+#
+# Game-derived / copyrighted
+*.exe *.dll *.osm *.crf *.mis *.gam *.avi *.mpg      original game files, modules, movies
+build/**  out/**  **/gen/**                           lifted C, object files, staged libraries (derived from SS2.exe)
+*.so *.a *.o                                          native binaries built from generated code (libss2game.so etc.)
+*.apk *.aab                                           any APK: contains generated game code (also GPL + LGPL code)
+NVScript.osm, SCP archives (*.7z, *.zip)              third-party mods; only their sha256 are recorded
+docs/android-audit/<subdir>/**                        device evidence: screenshots of game footage/menus (copyrighted),
+                                                      game logs and script dumps, save manifests, device-driver scripts
+                                                      with local paths and the phone's serial number (191 files withheld)
+# Personal / secret
+*.sav, save_*/, profiles/**                           personal save data
+*.jks *.keystore *.p12 *.pem *.key, keystore.properties, local.properties    signing keys / local SDK paths
+device serials, local user names, drive paths, adb captures with private screens
+# Pending review (excluded until the owner decides)
+Any screenshot containing game footage or game UI (the HUD overlays on game footage count)
+Any prebuilt "stub" APK (launcher without game code): allowed in principle, not part of this release
+Redistribution of Shockolate/Halo artwork or fonts: none is used

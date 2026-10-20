@@ -1,6 +1,6 @@
 # Legacy save compatibility: NewDark 2.47 / SCP Beta 4 saves on the 2.48 / SCP Beta 8 port
 
-2026-10-18. Galaxy S26 Ultra (serial <device-serial>), installed APK `0.8.1-import-fix-play` (`2a5ad353…`), game folder
+2026-10-18. Galaxy S26 Ultra (serial <serial>), installed APK `0.8.1-import-fix-play` (`2a5ad353…`), game folder
 `games/ss2scp` (NewDark 2.48 `SS2.exe` + SCP Beta 8). No engine, launcher or APK change was made for this test.
 
 **Verdict: loadable and playable in short tests, but not supported by SCP.** All 15 of the user's saves are listed,

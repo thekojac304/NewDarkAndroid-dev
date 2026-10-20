@@ -1,7 +1,7 @@
 # Android compatibility of the NewDarkRecompiled portable host
 
 Phase 0 audit, 2026-10-17. Source examined: `https://github.com/Owloeb/NewDarkRecompiled`, branch `main` at
-`02f77da02d0743869defbf09171790e4ab2b6059` (2026-10-15), checked out in `C:\Dev\NewDarkAndroid` on the local branch
+`02f77da02d0743869defbf09171790e4ab2b6059` (2026-10-15), checked out in `<repo>` on the local branch
 `android-port-audit`. Nothing was built or run on a device. The only compilation was a five-line probe of the NDK
 compiler (see B1).
 
@@ -114,7 +114,7 @@ lifting needs the user's `SS2.exe`.
 | Area | Status | Evidence / required work |
 | --- | --- | --- |
 | Case-insensitive Windows paths | **Untested** (portable) | `core/vfs.c` normalises `\`, `.`, `..` and trailing dots. It resolves each component case-insensitively against cached directory listings (`vfs.c:50-83`). Any drive letter maps to the game folder (`vfs.c:3`, `:52`). |
-| Absolute paths in config | **Minor risk** | Because every drive maps to the game folder, `C:\Games\SS2\DMM\x` becomes `<game>/Games/SS2/DMM/x`. Mod paths that a Windows mod manager writes as *absolute* paths would not resolve. Relative paths (`.\DMM\...`) work. Inspect each copied install's `cam_mod.ini`. A fix (strip a known Windows install prefix) would live in `vfs.c`. |
+| Absolute paths in config | **Minor risk** | Because every drive maps to the game folder, `<local path>` becomes `<game>/Games/SS2/DMM/x`. Mod paths that a Windows mod manager writes as *absolute* paths would not resolve. Relative paths (`.\DMM\...`) work. Inspect each copied install's `cam_mod.ini`. A fix (strip a known Windows install prefix) would live in `vfs.c`. |
 | Game directory selection | **Minor** | Set from the `SS2.exe` path argument (`host.c:396-398`). |
 | Android scoped storage | **Significant** | `plat_fs_*` uses POSIX `open`/`opendir` (`plat_posix.c:110-146`), so it cannot read SAF `content://` URIs. Options are compared in IMPLEMENTATION_PLAN.md §2. |
 | Read-only game files + writable saves/config/logs | **Untested** (implemented) | `SS2PORT_WRITE_DIR` overlays a write folder. Reads look there first. Writes always go there, and a file opened for update is copied there first (`vfs.c:84-106`, `:145-161`, `plat_posix.c:147`). This matches the "leave the supplied game folder unchanged" requirement. |

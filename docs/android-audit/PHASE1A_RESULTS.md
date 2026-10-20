@@ -24,10 +24,10 @@ S26 Ultra.
 
 | | |
 | --- | --- |
-| Checkout | `C:\Dev\system-shock-android` (main worktree). `C:\Dev\system-shock-baseline` is a second worktree of the same repository, detached at `main` `0d71a89`. |
+| Checkout | `<Shockolate Android checkout>` (main worktree). `<local path>` is a second worktree of the same repository, detached at `main` `0d71a89`. |
 | Branch / HEAD | `touch-controls` @ `750237049b2e9906f5e3345ff05522558b9a9f47`, "DECKLIGHT-CLOSE2: document live QA and final deck status"; 38 commits ahead of `origin/touch-controls` |
 | Uncommitted work | 32 modified tracked files, 47 untracked (non-ignored) files, no stashes |
-| Backup location | `C:\Dev\_Archive\shockolate-touch-controls-backup-2026-10-17\` (outside both repositories; see `README.txt` there) |
+| Backup location | `<local path>` (outside both repositories; see `README.txt` there) |
 
 **Contents**
 
@@ -56,14 +56,14 @@ Nothing was pushed, reset, cleaned, stashed or checked out in the Shockolate rep
 
 | Item | State |
 | --- | --- |
-| Android SDK | `C:\Users\<user>\AppData\Local\Android\Sdk` (`ANDROID_HOME` set). Platforms android-34 and android-37.0. |
+| Android SDK | `%ANDROID_HOME%` (`ANDROID_HOME` set). Platforms android-34 and android-37.0. |
 | NDK | `29.0.14206865` (r29), `Android (13989888, based on r563880c) clang version 21.0.0`. Only NDK installed; `ANDROID_NDK_ROOT` is not set. |
 | CMake / Ninja | SDK `cmake 3.22.1` and `ninja 1.10.2` (neither is on `PATH`; the runner finds them in the SDK) |
-| adb | `1.0.41` (platform-tools 37.0.1). At first `adb devices` was **empty** (checked 5 times; `adb mdns services` and Windows PnP showed nothing either). Later the owner connected the Galaxy S26 Ultra, serial `<device-serial>` (§6). |
+| adb | `1.0.41` (platform-tools 37.0.1). At first `adb devices` was **empty** (checked 5 times; `adb mdns services` and Windows PnP showed nothing either). Later the owner connected the Galaxy S26 Ultra, serial `<serial>` (§6). |
 | Python | 3.14.5 (global) with `capstone` 5.0.9 and `pytest`; **no** `pefile` or `ziglang` |
-| Installed | A venv, `C:\Dev\NewDarkAndroid\build\venv`, with `--system-site-packages` (reuses the global capstone) plus `pefile` 2024.8.26 and `ziglang` 0.16.0. These are the two packages the suite needs (`run_conformance.py:9`). The global Python is unchanged, and `build/` is git-ignored. |
+| Installed | A venv, `<repo>\build\venv`, with `--system-site-packages` (reuses the global capstone) plus `pefile` 2024.8.26 and `ziglang` 0.16.0. These are the two packages the suite needs (`run_conformance.py:9`). The global Python is unchanged, and `build/` is git-ignored. |
 | Docker | 29.7.2 (WSL2 kernel 6.18). Existing local images were used: `gcc:13` (GCC 13.5.0, amd64), with Docker Desktop's QEMU `binfmt` handler for arm64. **Nothing was pulled.** |
-| NewDark installs | Only `E:\Launchbox\Games\PC Games\System Shock 2\SS2.exe` (ProductVersion **2.47**, 5,116,416 bytes). It was read only, by its version resource. **No 2.48 install was found.** Not needed in this phase. |
+| NewDark installs | Only `<LaunchBox install>\SS2.exe` (ProductVersion **2.47**, 5,116,416 bytes). It was read only, by its version resource. **No 2.48 install was found.** Not needed in this phase. |
 
 ## 3. The setjmp fix
 
@@ -220,13 +220,13 @@ clean runs at each level.
 
 ### Commands
 
-The working directory is `C:\Dev\NewDarkAndroid` (Git Bash). `PY=build/venv/Scripts/python.exe`.
+The working directory is `<repo>` (Git Bash). `PY=build/venv/Scripts/python.exe`.
 
 ```bash
 # Android arm64 on the device (see §6 for the exact runs)
-$PY port/tests/run_conformance.py --target android --serial <device-serial> --build build/conf-android [--no-rebuild-guest]
-$PY port/tests/run_conformance.py --target android --serial <device-serial> --cache-regs --abi-check --build build/conf-android-cr [--no-rebuild-guest]
-ADB=$ANDROID_HOME/platform-tools/adb sh port/tests/setjmp/run.sh android <device-serial>
+$PY port/tests/run_conformance.py --target android --serial <serial> --build build/conf-android [--no-rebuild-guest]
+$PY port/tests/run_conformance.py --target android --serial <serial> --cache-regs --abi-check --build build/conf-android-cr [--no-rebuild-guest]
+ADB=$ANDROID_HOME/platform-tools/adb sh port/tests/setjmp/run.sh android <serial>
 
 # Windows x64, natively. See the note below the results table.
 $PY port/tests/run_conformance.py --target windows [--cache-regs --abi-check] --build build/conf-win[-cr]   # guest + lift
@@ -234,7 +234,7 @@ cmake -S port -B build/conf-win/host-null-win -G Ninja -DPORT_GENERATED=… -DPO
 CC="$PY -m ziglang cc -target x86_64-windows-gnu" LIBS= sh port/tests/setjmp/run.sh
 
 # arm64 under QEMU: the same NDK build with -DCMAKE_EXE_LINKER_FLAGS=-static, run in the local gcc:13 container
-docker run --rm -v C:/Dev/NewDarkAndroid/build:/b gcc:13 sh -c 'cd /b/conf-android/qemu-run && ./ss2port conformance.exe'
+docker run --rm -v <repo>/build:/b gcc:13 sh -c 'cd /b/conf-android/qemu-run && ./ss2port conformance.exe'
 
 # Linux x86-64 GCC 13.5 in the local gcc:13 container: a scratch script that compiles the port/CMakeLists.txt
 # source set with its flags (RelWithDebInfo, null backend; the image has no CMake), then runs it
@@ -288,7 +288,7 @@ USB with debugging authorised, and all runs were done through `adb shell` as the
 
 | Property | Value |
 | --- | --- |
-| Model | `SM-S948U1` (`ro.product.device` `m3q`), serial `<device-serial>` |
+| Model | `SM-S948U1` (`ro.product.device` `m3q`), serial `<serial>` |
 | SoC | Qualcomm `SM8850` (`ro.soc.manufacturer` QTI), 8 CPUs, `arm64-v8a` |
 | Android | 17, API 37; build `samsung/m3quew/m3q:17/CP2A.260605.016/S948U1UES4BZIG_OYM4BZIG:user/release-keys` |
 | Kernel | `6.12.69-android16-6-pb4d3caf-abogkiS948USQS4BZIG-4k`, aarch64 |
@@ -300,8 +300,8 @@ USB with debugging authorised, and all runs were done through `adb shell` as the
 
 | Run | Result |
 | --- | --- |
-| `sh port/tests/setjmp/run.sh android <device-serial>` ×5 | `-O0` and `-O2`: `setjmp (C library _setjmp / _longjmp, RT_HJ_WORDS=33): 6075 checks, all passed`, every run |
-| `run_conformance.py --target android --serial <device-serial> --build build/conf-android --no-rebuild-guest` ×5 | `conformance: 0 of 511 checks failed`, `[port] ExitProcess(0)`, `conformance (null, android): PASS`, every run |
+| `sh port/tests/setjmp/run.sh android <serial>` ×5 | `-O0` and `-O2`: `setjmp (C library _setjmp / _longjmp, RT_HJ_WORDS=33): 6075 checks, all passed`, every run |
+| `run_conformance.py --target android --serial <serial> --build build/conf-android --no-rebuild-guest` ×5 | `conformance: 0 of 511 checks failed`, `[port] ExitProcess(0)`, `conformance (null, android): PASS`, every run |
 | `run_conformance.py … --cache-regs --abi-check --build build/conf-android-cr --no-rebuild-guest` ×5 | `0 of 511 checks failed`, `ABI check: 0 call site(s) broke the calling-convention contract`, PASS, every run |
 | `./ss2port --verbose conformance.exe` (default build) | `guest address space: 4096 MB at 0x7458c00000 (4096 MB backed)`; guest thread stacks mapped; threads 1008/1012/1016 ended with 11/22/7 |
 | Scratch mutants `mutant-noregs`, `mutant-smallbuf` (`-O2`, §4) | `Segmentation fault`, `adb shell` exit status **139**. The real test returns 0. |
@@ -332,7 +332,7 @@ One issue appeared during the work: the test-only thread race (§4). It was fixe
 
 | | |
 | --- | --- |
-| Repository | `C:\Dev\NewDarkAndroid` (upstream `Owloeb/NewDarkRecompiled`; nothing pushed) |
+| Repository | `<repo>` (upstream `Owloeb/NewDarkRecompiled`; nothing pushed) |
 | Branch | `android-port`, from `android-port-audit` = `main` @ `02f77da` |
 | `5a26315` | docs: Phase 0 Android port audit (the six existing reports, committed unchanged) |
 | `8962e14` | runtime: arm64 clang host setjmp via `_setjmp`/`_longjmp`; Android conformance target |

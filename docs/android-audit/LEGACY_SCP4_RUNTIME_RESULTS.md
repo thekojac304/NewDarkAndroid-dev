@@ -86,7 +86,7 @@ Build (not in git, under `build/`):
 ```sh
 python android/build_native.py --build build/android-scp4 --game "<Steam>/SS2.exe" --game-backend all \
     --nvscript build/scp4/modules/nvscript-1.2.4/NVScript.osm          # a copy of the original, named NVScript.osm
-cd android && ./gradlew -Pside=legacytest "-Pside.label=Legacy test" -Pnative.dir=C:/Dev/NewDarkAndroid/build/android-scp4 \
+cd android && ./gradlew -Pside=legacytest "-Pside.label=Legacy test" -Pnative.dir=<repo>/build/android-scp4 \
     assemblePlayDebug assembleDevDebug
 ```
 
@@ -280,7 +280,7 @@ python docs/android-audit/legacy-scp4-runtime/save_roundtrip.py --gam <SCP_beta4
     --watch ops2.mis:1647,ops3.mis:1469 build/scp4/pc-write/save_5 build/scp4/phone/slot5-rt/save_15
 ```
 
-The two drivers contain this machine's paths (`C:\Dev\NewDarkAndroid`, the phone serial). Files in
+The two drivers contain this machine's paths (`<repo>`, the phone serial). Files in
 `legacy-scp4-runtime/`: captures `1-…` to `11-…jpg`, `roundtrip-output.txt`, `runs-summary.txt`, `hashes.txt`,
 `nvscript-1.2.4-lift.txt`, `desktop-dbmod.log-slot0.txt`, `desktop-monolog-script_dump_files.txt`,
 `{desktop,phone}-run.log-slot0.txt`, `phone-SS2.log-slot0.txt`, `phone-history.txt` (the legacy app's run history), and the scripts.

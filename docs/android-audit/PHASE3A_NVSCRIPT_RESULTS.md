@@ -24,12 +24,12 @@ engine calls into the module about 4,000–7,400 times every 20 s of play.
 
 | | |
 | --- | --- |
-| Source | `C:\Users\<user>\Downloads\SCP_beta8.7z` (the user's download), 37,710,819 bytes, sha256 `bcf547c7bd3a38ccb26e6918d72d74e567dc69b138c1ffcb975ea6d165ddb3f6`. Its `readme.txt`: "Beta 8 - December 25, 2025". Extracted with 7-Zip 26.02 into `build/scp/SCP_beta8/` (1,407 files); the archive is unchanged |
+| Source | `<downloads>\SCP_beta8.7z` (the user's download), 37,710,819 bytes, sha256 `bcf547c7bd3a38ccb26e6918d72d74e567dc69b138c1ffcb975ea6d165ddb3f6`. Its `readme.txt`: "Beta 8 - December 25, 2025". Extracted with 7-Zip 26.02 into `build/scp/SCP_beta8/` (1,407 files); the archive is unchanged |
 | File | `NVScript.osm` at the archive root, 704,512 bytes, sha256 `f15fc91b276e73ad52d5026a86a7d51b83e5644a20c3e58a53a10a4b52d4f11a` |
 | Version information | FileDescription "NVScript Shock2 OSM", InternalName "NVScript Script Module", "Copyright (C) 2024 Nameless Voice", FileVersion "." (none given). PE timestamp 1763820538 = 2025-11-22 |
 | Toolchain (PE header) | **MSVC 2017** (linker 14.16), 32-bit, image base 0x10000000, size 0xB2000, relocations, static CRT (VS2017), load-config directory (security cookie, SafeSEH table; Control Flow Guard not enabled), **static TLS** (8-byte template, no callbacks) |
 | Exports / imports | `_ScriptModuleInit@20`; KERNEL32 (76 functions), USER32 (`GetAsyncKeyState`) |
-| Not used | The 1.2.4.0 module in the PC's older install (`E:\Launchbox\…\osm\NVScript.osm` and `DMM\SCP_beta4`, sha256 `abed4ee2…9a6a`, 662,016 bytes, MSVC 2008, 2017). SCP Beta 8 ships its own newer build, which is the one its missions were made with |
+| Not used | The 1.2.4.0 module in the PC's older install (`<local path>` and `DMM\SCP_beta4`, sha256 `abed4ee2…9a6a`, 662,016 bytes, MSVC 2008, 2017). SCP Beta 8 ships its own newer build, which is the one its missions were made with |
 | Dependencies | `Squirrel.osm` (the Steam 2.48 install's `osm\squirrel.osm`, already recompiled) and `allobjs.osm`. `earth.mis` lists the modules `allobjs`, `nvscript`, `squirrel` |
 
 The Phase 0 audit expected an MSVC 2008 module like `squirrel.osm`. This build is newer, and that changed the work:
@@ -119,7 +119,7 @@ build/venv/Scripts/python.exe android/build_native.py --no-rebuild-guest --game 
   --nvscript build/scp/SCP_beta8/NVScript.osm                       # Android: relifts everything once (~10 min), then seconds
 python port/build.py "<SS2>/SS2.exe" --nvscript "<SS2>/DMM/SCP_beta8/NVScript.osm"   # desktop
 build/venv/Scripts/python.exe harness/sse_test/run.py --trials 2000                   # x86/x86-64 Windows, Zig
-python port/tests/run_conformance.py --target android --serial <device-serial> --build build/conf-android
+python port/tests/run_conformance.py --target android --serial <serial> --build build/conf-android
 adb shell am start -n local.newdarkandroid.ss2/.LauncherActivity --es autorun game --es game ss2scp \
   --es env SS2PORT_MODSTATS=1,SS2PORT_INPUT_SCRIPT=<script>,SS2PORT_SHOT_DIR=<dir>
 ```

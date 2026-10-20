@@ -1,7 +1,7 @@
 # Mod compatibility of the portable host
 
 Phase 0 audit, 2026-10-17. This is a static analysis of NewDarkRecompiled `02f77da` plus a read-only inspection of
-the local modded install at `E:\Launchbox\Games\PC Games\System Shock 2`. No mod has been run on the portable host
+the local modded install at `<LaunchBox install>`. No mod has been run on the portable host
 in this audit.
 
 ## 1. The key distinction: data, scripts and native code
@@ -40,7 +40,7 @@ Categories: **(1)** confirmed compatible from existing evidence, **(2)** likely 
 | Modified gamesys (`.gam`) | Engine | **(2)** | |
 | `.crf` resource archives | Engine (ZIP reader in `SS2.exe`) | **(2)** | |
 | Loose resource files | Engine + VFS case-insensitive resolution (`vfs.c:69-83`) | **(2)** | Windows-style mixed case is handled. |
-| Custom resource directories / `mod_path` / `uber_mod_path` | Engine reads `cam_mod.ini`; directories are probed through the VFS | **(2)**, with a **(3)** caveat | **Relative** paths (`.\DMM\...`, `osm+ubermod`) work. **Absolute** Windows paths (`C:\Games\SS2\DMM\x`) map to `<game>/Games/SS2/DMM/x`, because every drive letter is the game folder (`vfs.c:52`). Such paths would silently not resolve. Fix (3): strip a configurable Windows install prefix in `vfs.c`, or rewrite the copied `cam_mod.ini` into the write directory. The local install uses relative paths only. |
+| Custom resource directories / `mod_path` / `uber_mod_path` | Engine reads `cam_mod.ini`; directories are probed through the VFS | **(2)**, with a **(3)** caveat | **Relative** paths (`.\DMM\...`, `osm+ubermod`) work. **Absolute** Windows paths (`<local path>`) map to `<game>/Games/SS2/DMM/x`, because every drive letter is the game folder (`vfs.c:52`). Such paths would silently not resolve. Fix (3): strip a configurable Windows install prefix in `vfs.c`, or rewrite the copied `cam_mod.ini` into the write directory. The local install uses relative paths only. |
 | `cam_mod.ini`, `install.cfg`, `cam_ext.cfg`, `user.cfg` | Engine (`GetPrivateProfileString`-style and its own parser) | **(2)** | Writes go to `SS2PORT_WRITE_DIR` when set (`vfs.c:97-106`). |
 | Load priority / search order | Engine | **(2)** | Purely engine logic. Order: `uber_mod_path` → FM → `mod_path` → `resname_base` (local NewDark docs `Docs\newdark\cam_mod.ini`). |
 | DML gameplay mods | Engine | **(1)** for gamesys DML | **Evidence:** on the Vita portable host, the gamesys DML `AI_Efficiency` "loaded fine and made enemies visibly dumber" (`port/backends/vita/PERF.md`, *What did not help*). Upstream also states that DMLs work unchanged on both hosts (`docs/MODDING.md`). Mission DMLs, `dbmods\` folders and `FINGERPRINT` blocks are **(2)**. |

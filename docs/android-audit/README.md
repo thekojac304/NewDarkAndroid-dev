@@ -9,14 +9,14 @@ especially SCP.
 | Item | Value |
 | --- | --- |
 | Upstream | `https://github.com/Owloeb/NewDarkRecompiled` |
-| Checkout | `C:\Dev\NewDarkAndroid` (new; `C:\Dev\NewDark Recompiled` was empty and no other checkout existed) |
+| Checkout | `<repo>` (new; `<local path>` was empty and no other checkout existed) |
 | Upstream commit | `02f77da02d0743869defbf09171790e4ab2b6059` (`main`, 2026-10-15, "Update FLAGS.md"; 184 commits). Remote branches: `main`, `per-pixel-lighting`, `pixel-shaders` |
 | Local branch | `android-port-audit` (created from `main`). The only changes are these uncommitted audit documents. Nothing is pushed. |
 | Relevant build configurations | `port/build.py` (lift + CMake; targets `linux`/`windows`; `--cache-regs`, `--fastpaths`, `--abi-check`, `--prof`, `--low-dll-bases`); `port/CMakeLists.txt` (`PORT_BACKEND`=sdl2/null/vita, `PORT_SYSTEM`=posix/win32, `PORT_PREEMPT`, `PORT_VIDEO`, `PORT_SHADERS`, `PORT_PPL`) |
-| Shockolate Android project | `C:\Dev\system-shock-android`, branch `touch-controls` at `7502370` (38 commits not pushed, plus uncommitted, unaccepted polish work). Not modified. |
+| Shockolate Android project | `<Shockolate Android checkout>`, branch `touch-controls` at `7502370` (38 commits not pushed, plus uncommitted, unaccepted polish work). Not modified. |
 | Accepted touch baseline | Committed `7502370`, files in `AndroidProject/app/jni/touch/` (TOUCH_CONTROLS.md §1) |
 | Android toolchain on the PC | SDK with NDK `29.0.14206865` (clang 21), as used by the Shockolate build |
-| Local SS2 install | `E:\Launchbox\Games\PC Games\System Shock 2`: GOG + SS2Tool + Blue's Mod Manager, **NewDark 2.47** (not 2.48), mods inactive. Read only, unchanged. |
+| Local SS2 install | `<LaunchBox install>`: GOG + SS2Tool + Blue's Mod Manager, **NewDark 2.47** (not 2.48), mods inactive. Read only, unchanged. |
 
 ## Reports
 

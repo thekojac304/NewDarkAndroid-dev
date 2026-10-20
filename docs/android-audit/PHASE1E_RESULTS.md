@@ -70,10 +70,10 @@ the host or the platform. Same CMake options as Android: `PORT_PREEMPT=ON`, `POR
   with no warnings.
 
 ```sh
-cmake -S port -B build/desktop-win-null -G Ninja -DPORT_GENERATED=C:/Dev/NewDarkAndroid/build/android/game/gen \
+cmake -S port -B build/desktop-win-null -G Ninja -DPORT_GENERATED=<repo>/build/android/game/gen \
       -DPORT_BACKEND=null -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPORT_PREEMPT=ON -DPORT_VIDEO=ON -DPORT_SHADERS=ON \
       -DPORT_PPL=OFF -DCMAKE_TOOLCHAIN_FILE=<scratch>/windows-zig-native.cmake
-# SDL2 backend: -DPORT_BACKEND=sdl2 -DSDL2_DIR=C:/Dev/NewDarkAndroid/build/deps/sdl2-win-host/lib/cmake/SDL2
+# SDL2 backend: -DPORT_BACKEND=sdl2 -DSDL2_DIR=<repo>/build/deps/sdl2-win-host/lib/cmake/SDL2
 cmake --build build/desktop-win-null
 ```
 
