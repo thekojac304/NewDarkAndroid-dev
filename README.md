@@ -9,6 +9,15 @@
 
 <p align="center"><img src="docs/images/launcher.png" alt="The NewDark SS2 launcher" width="320"></p>
 
+<p align="center"><img src="docs/images/gameplay-touch-controls.jpg" alt="System Shock 2 running in the port on a Galaxy S26 Ultra, with the touch controls" width="720"></p>
+<p align="center"><sub>The port running a loaded save on a Galaxy S26 Ultra, with the on-screen controls (floating stick, FIRE, USE, JUMP, CROUCH, radial-menu buttons).</sub></p>
+
+> **Downloads:** there are no APK downloads, by design. An APK built by this project contains code generated from the
+> copyrighted `SS2.exe`, so each player builds their own from their own copy of the game
+> ([docs/android/BUILDING.md](docs/android/BUILDING.md)). The public source release is
+> [thekojac304/NewDarkAndroid](https://github.com/thekojac304/NewDarkAndroid); this private repository holds the full
+> development history.
+
 ## What this is, and what it is not
 
 System Shock 2's engine source has never been released. This project **recompiles the retail 32-bit x86 `SS2.exe`
