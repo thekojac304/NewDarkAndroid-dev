@@ -24,7 +24,9 @@ device test on 2026-11-10 showed Android lets the app load a library it built it
 of the translator and an ARM64 LLVM toolchain shipped inside the APK.
 
 The public source release is [thekojac304/NewDarkAndroid](https://github.com/thekojac304/NewDarkAndroid)
-(`v0.1.0-beta.1`, source only). This private repository holds the full development history. Its `v0.1.0`–`v0.4.0`
+(`v0.1.0-beta.1`, source only). This repository holds the full development history, with phone serial numbers and local user paths redacted
+(`<device-serial>`, `<user>`); commits after the upstream baseline therefore have different hashes from the
+original private history. Its `v0.1.0`–`v0.4.0`
 tags are upstream [NewDarkRecompiled](https://github.com/Owloeb/NewDarkRecompiled) releases, not builds of this port.
 
 ## What this is, and what it is not
