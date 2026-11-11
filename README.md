@@ -12,11 +12,20 @@
 <p align="center"><img src="docs/images/gameplay-touch-controls.jpg" alt="System Shock 2 running in the port on a Galaxy S26 Ultra, with the touch controls" width="720"></p>
 <p align="center"><sub>The port running a loaded save on a Galaxy S26 Ultra, with the on-screen controls (floating stick, FIRE, USE, JUMP, CROUCH, radial-menu buttons).</sub></p>
 
-> **Downloads:** there are no APK downloads, by design. An APK built by this project contains code generated from the
-> copyrighted `SS2.exe`, so each player builds their own from their own copy of the game
-> ([docs/android/BUILDING.md](docs/android/BUILDING.md)). The public source release is
-> [thekojac304/NewDarkAndroid](https://github.com/thekojac304/NewDarkAndroid); this private repository holds the full
-> development history.
+## Download status: SOURCE READY / RELEASE BLOCKED
+
+There is **no APK download**, and none is planned until the blocker below is solved. An APK built by this project
+contains `libss2game.so`: `SS2.exe` and its modules translated into C and compiled in, which is code derived from the
+copyrighted game. It can't be redistributed. Each player builds their own APK from their own copy of the game
+([docs/android/BUILDING.md](docs/android/BUILDING.md)); that currently needs Python, a JDK and the Android SDK/NDK.
+
+Removing the blocker means doing that translation and compilation on the phone, from the player's own `SS2.exe`. A
+device test on 2026-11-10 showed Android lets the app load a library it built itself. Still missing: an Android build
+of the translator and an ARM64 LLVM toolchain shipped inside the APK.
+
+The public source release is [thekojac304/NewDarkAndroid](https://github.com/thekojac304/NewDarkAndroid)
+(`v0.1.0-beta.1`, source only). This private repository holds the full development history. Its `v0.1.0`–`v0.4.0`
+tags are upstream [NewDarkRecompiled](https://github.com/Owloeb/NewDarkRecompiled) releases, not builds of this port.
 
 ## What this is, and what it is not
 
