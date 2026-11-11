@@ -23,7 +23,9 @@ Removing the blocker means doing that translation and compilation on the phone, 
 device test on 2026-11-10 showed Android lets the app load a library it built itself. Still missing: an Android build
 of the translator and an ARM64 LLVM toolchain shipped inside the APK.
 
-The public source release is [thekojac304/NewDarkAndroid](https://github.com/thekojac304/NewDarkAndroid)
+The official download is the source-only release
+[NewDarkAndroid v0.1.0-beta.1](https://github.com/thekojac304/NewDarkAndroid/releases/tag/v0.1.0-beta.1) in
+[thekojac304/NewDarkAndroid](https://github.com/thekojac304/NewDarkAndroid)
 (`v0.1.0-beta.1`, source only). This repository holds the full development history, with phone serial numbers and local user paths redacted
 (`<device-serial>`, `<user>`); commits after the upstream baseline therefore have different hashes from the
 original private history. Its `v0.1.0`–`v0.4.0`
